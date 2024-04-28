@@ -1,0 +1,54 @@
+{
+  "env": {
+    "node":true
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "eslint:recommended"
+  ],
+  "rules": {
+      "@typescript-eslint/no-explicit-any": "error",
+    "array-bracket-newline": ["error", { "multiline": true }],
+    "array-element-newline": [
+      "error", { "multiline": true, "minItems": 4 }
+  ],
+  "indent": ["error", 4,
+      {
+          "ObjectExpression": "first",
+          "CallExpression": {"arguments": "first"},
+          "MemberExpression": 2
+          // "ignoredNodes": [ "JSXAttribute" ]
+      }],
+  "function-paren-newline": ["error", "consistent"],
+  // "max-len": ["error", { "code": 120 }],
+  "max-statements-per-line": ["error", { "max": 1 }],
+  "multiline-ternary": ["error", "always"],
+  "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+  "no-var": "error",
+  "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+  "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
+  "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+  "no-trailing-spaces":"error",
+
+  "comma-dangle": "off",
+  "curly": "off",
+  "jsx-quotes": ["error", "prefer-double"],
+  "key-spacing": "off",
+  "no-console": "off",
+  "quotes": ["error", "double"],
+  "react/prop-types": "off",
+  "react/jsx-handler-names": "off",
+
+  "jsx-a11y/anchor-is-valid": "off",
+  "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
+  }
+}
