@@ -9,7 +9,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/data", async (req, res) => {
-    const data = await pool.query("SELECT * FROM test");
+    const data = await pool.query("SELECT * FROM matches");
     res.status(200).json(data.rows);
 });
 
