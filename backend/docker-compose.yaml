@@ -1,8 +1,12 @@
 services:
   backend:
     build: .
+    environment:
+      - PORT=${PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "3000:3000"
+      - "${PORT}:3000"
     depends_on:
       db:
         condition: service_healthy
@@ -11,12 +15,12 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_USER=mahmoud
-      - POSTGRES_PASSWORD=password123
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - fotleague-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mahmoud"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5

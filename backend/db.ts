@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config({path: "./.env"});
 import { Pool } from "pg";
 
 export const pool = new Pool({
