@@ -1,6 +1,6 @@
 services:
   backend:
-    build: .
+    build: ./backend
     environment:
       - PORT=${PORT}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -11,7 +11,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./:/app
+      - ./backend:/app
   db:
     image: postgres
     environment:
@@ -24,6 +24,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  python:
+    build: ./scraping
 
 volumes:
   fotleague-db:
