@@ -5,6 +5,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
+    console.log("server pinged");
     res.status(200).send("Server is running");
 });
 

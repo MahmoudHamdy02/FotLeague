@@ -1,9 +1,9 @@
-FROM python:3.10
+FROM python:3.10-alpine
 
 WORKDIR /app
 
 RUN pip install requests
 
-ADD fbref.py .
+COPY fbref.py .
 
-CMD [ "python", "fbref.py" ]
+CMD ["python", "fbref.py"]
