@@ -14,6 +14,12 @@ app.get("/data", async (req, res) => {
     res.status(200).json(data.rows);
 });
 
+app.post("/fbref", (req, res) => {
+    const body = req.body;
+    console.log(body);
+    return res.status(200).json({ok: true});
+});
+
 app.listen(3000, () => {
     console.log(`Listening on port ${process.env.PORT}`);
 });
