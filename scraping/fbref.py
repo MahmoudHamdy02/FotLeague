@@ -17,6 +17,7 @@ print(requests.get(f"http://backend:3000/").text)
 
 # Infitite loop that runs every 5 minutes
 while True:
+    break
     print(datetime.now(), "Pinging FBRef...")
     # Detect and read table from website
     tables = pd.read_html(url)
