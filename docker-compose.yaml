@@ -8,6 +8,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=fotleague
+      - SESSION_SECRET=${SESSION_SECRET}
     ports:
       - "${PORT}:3000"
     depends_on:

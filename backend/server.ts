@@ -1,8 +1,31 @@
 import express from "express";
+import session from "express-session";
+import pgSession from "connect-pg-simple";
 import { pool } from "./db";
+import passport from "passport";
+import authRouter from "./routes/auth";
 
 const app = express();
+
 app.use(express.json());
+
+app.use(session({
+    store: new (pgSession(session))({
+        pool: pool,
+        createTableIfMissing: true,
+        pruneSessionInterval: 900 // Seconds
+    }),
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 20 // Milliseconds
+    }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use("/auth/", authRouter);
 
 app.get("/", (req, res) => {
     console.log("server pinged");
