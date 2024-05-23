@@ -1,9 +1,8 @@
 import { Router } from "express";
-import bcrypt from "bcryptjs";
 import passport from "passport";
 import "../strategies/local";
-import { pool } from "../db";
 import { requireAuth } from "../middleware/requireAuth";
+import userService from "../services/userService";
 
 const router = Router();
 
@@ -16,14 +15,14 @@ router.post("/login/", passport.authenticate("local"), (req, res) => {
 });
 
 router.post("/signup/", async (req, res) => {
-    const { name, email, password } = req.body;
+    const { email, password, name } = req.body;
+    try {
+        await userService.createUser(email, password, name);
+        res.status(201).json({message: "User created"});
+    } catch (e) {
+        return res.status(400).json({error: "Error creating user"});
+    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const data = await pool.query("INSERT INTO users(email, password, name) VALUES ($1, $2, $3);", [email, hashedPassword, name]);
-    console.log(data);
-
-    res.json({message: "User created"});
 });
 
 router.post("/logout", function(req, res) {

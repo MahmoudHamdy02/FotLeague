@@ -1,9 +1,8 @@
 import { Strategy as LocalStrategy } from "passport-local";
-import bcrypt from "bcryptjs";
 import passport from "passport";
-import { pool } from "../db";
+import bcrypt from "bcryptjs";
 import { User } from "../types/User";
-import { QueryResult } from "pg";
+import userService from "../services/userService";
 
 type _User = User;
 
@@ -18,27 +17,33 @@ passport.serializeUser((user: User, done) => {
 });
 
 passport.deserializeUser(async (userId: number, done) => {
-    const data = await pool.query("SELECT * FROM users WHERE id = $1", [userId]);
-    return done(null, data.rows[0] as User);
+    try {
+        const user = await userService.getUserById(userId);
+        return done(null, user);
+    } catch (e) {
+        return done(e, null);
+    }
 });
 
-export default passport.use(new LocalStrategy({usernameField: "email"}, async function verify(username, password, cb) {
-    pool.query("SELECT * FROM users WHERE email = $1", [ username ], async function(err, row: QueryResult<User>) {
-        if (err)
-            return cb(err);
+export default passport.use(new LocalStrategy({usernameField: "email"}, async function verify(email, password, cb) {
+    try {
+        const user = await userService.getUserByEmail(email);
 
-        if (row.rowCount == 0)
+        if (!user)
             return cb(null, false, { message: "Incorrect email or password." });
-
+        console.log("before");
         const passwordsMatch = await bcrypt.compare(
             password,
-            row.rows[0].password
+            user.password
         );
+        console.log("after");
 
         if (passwordsMatch) {
-            return cb(null, row.rows[0]);
+            return cb(null, user);
         } else {
             return cb(null, false, { message: "Incorrect email or password." });
         }
-    });
+    } catch (e) {
+        return cb(e);
+    }
 }));
