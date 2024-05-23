@@ -8,7 +8,6 @@ import { QueryResult } from "pg";
 type _User = User;
 
 declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface User extends _User {}
     }
