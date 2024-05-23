@@ -3,12 +3,11 @@ import bcrypt from "bcryptjs";
 import passport from "passport";
 import "../strategies/local";
 import { pool } from "../db";
+import { requireAuth } from "../middleware/requireAuth";
 
 const router = Router();
 
-router.get("/status", (req, res) => {
-    console.log("is authenticated: ", req.isAuthenticated());
-    console.log(req.user);
+router.get("/status", requireAuth, (req, res) => {
     res.json({authenticated: req.isAuthenticated()});
 });
 
