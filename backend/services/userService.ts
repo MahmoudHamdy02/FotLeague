@@ -24,13 +24,24 @@ namespace userService {
     };
 
     export const createUser = async (email: string, password: string, name: string): Promise<void> => {
+        const client = await pool.connect();
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+
         try {
-            await pool.query("INSERT INTO users(email, password, name) VALUES ($1, $2, $3);", [email, hashedPassword, name]);
+            await client.query("BEGIN");
+            // Create user record
+            const data = await client.query("INSERT INTO users(email, password, name) VALUES ($1, $2, $3) RETURNING id;", [email, hashedPassword, name]);
+            // Automatically include user in global league
+            await client.query("INSERT INTO leagues_users(user_id, league_id) VALUES ($1, 1);", [data.rows[0].id]);
+            await client.query("COMMIT");
         } catch (error) {
+            await client.query("ROLLBACK");
             console.log(error);
             throw error;
+        } finally {
+            client.release();
         }
     };
 }

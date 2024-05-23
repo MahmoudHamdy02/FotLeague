@@ -50,3 +50,5 @@ CREATE TABLE IF NOT EXISTS scores(
 
 -- Insert data
 INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played');
+
+INSERT INTO leagues(name) VALUES('global');
