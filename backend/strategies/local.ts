@@ -5,7 +5,6 @@ import { User } from "../types/User";
 import userService from "../services/userService";
 
 type _User = User;
-
 declare global {
     namespace Express {
         interface User extends _User {}
@@ -31,12 +30,11 @@ export default passport.use(new LocalStrategy({usernameField: "email"}, async fu
 
         if (!user)
             return cb(null, false, { message: "Incorrect email or password." });
-        console.log("before");
+
         const passwordsMatch = await bcrypt.compare(
             password,
             user.password
         );
-        console.log("after");
 
         if (passwordsMatch) {
             return cb(null, user);

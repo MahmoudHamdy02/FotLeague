@@ -22,7 +22,6 @@ router.post("/signup/", async (req, res) => {
     } catch (e) {
         return res.status(400).json({error: "Error creating user"});
     }
-
 });
 
 router.post("/logout", function(req, res) {
