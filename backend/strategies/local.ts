@@ -8,6 +8,9 @@ type _User = User;
 declare global {
     namespace Express {
         interface User extends _User {}
+        interface Request {
+            authUser: User
+        }
     }
 }
 

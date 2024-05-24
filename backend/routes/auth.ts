@@ -15,9 +15,9 @@ router.post("/login/", passport.authenticate("local"), (req, res) => {
 });
 
 router.post("/signup/", async (req, res) => {
-    const { email, password, name } = req.body;
+    const { email, password, name, role } = req.body;
     try {
-        await userService.createUser(email, password, name);
+        await userService.createUser(email, password, name, role);
         res.status(201).json({message: "User created"});
     } catch (e) {
         return res.status(400).json({error: "Error creating user"});

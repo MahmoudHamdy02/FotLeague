@@ -4,6 +4,7 @@ import pgSession from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
 import authRouter from "./routes/auth";
+import leaguesRouter from "./routes/leagues";
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/auth/", authRouter);
+
+app.use("/leagues/", leaguesRouter);
 
 app.get("/", (req, res) => {
     console.log("server pinged");
