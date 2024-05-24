@@ -3,8 +3,8 @@ import session from "express-session";
 import pgSession from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
-import authRouter from "./routes/auth";
-import leaguesRouter from "./routes/leagues";
+import authRouter from "./routes/authRouter";
+import leaguesRouter from "./routes/leagueRouter";
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 20 // Milliseconds
+        maxAge: 1000 * 60 * 5 // Milliseconds
     }
 }));
 app.use(passport.initialize());
