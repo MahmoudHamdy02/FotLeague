@@ -2,6 +2,16 @@ import { pool } from "../db";
 import { Match } from "../types/Match";
 
 
+export const getMatchesBySeason = async (season: string): Promise<Match[]> => {
+    try {
+        const data = await pool.query<Match>("SELECT * FROM matches WHERE season = $1;", [season]);
+        return data.rows;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
 export const insertMatches = async (matches: Omit<Match, "id">[]): Promise<Match[]> => {
     try {
         const data = await pool.query<Match>(

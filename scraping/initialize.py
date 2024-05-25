@@ -38,7 +38,7 @@ matchesJSON = []
 # 2 - In Progress
 # 3 - Played
 # 4 - Aborted
-for match in matches:
+for i, match in enumerate(matches):
     status = 1
     if match["status"]["started"] and not match["status"]["finished"]:
         status = 2
@@ -46,16 +46,28 @@ for match in matches:
         status = 3
     elif match["status"]["cancelled"]:
         status = 4
-    matchesJSON.append({
-        "gameweek": match["round"],
-        "season": season,
-        "home": match["home"]["name"],
-        "away": match["away"]["name"],
-        "home_score": match["status"]["scoreStr"].split("-")[0].strip(),
-        "away_score": match["status"]["scoreStr"].split("-")[1].strip(),
-        "datetime": match["status"]["utcTime"],
-        "match_status": status
-    })
+    if i > (len(matches) - 10):
+        matchesJSON.append({
+            "gameweek": match["round"],
+            "season": season,
+            "home": match["home"]["name"],
+            "away": match["away"]["name"],
+            "home_score": None,
+            "away_score": None,
+            "datetime": match["status"]["utcTime"],
+            "match_status": 1
+        })
+    else:
+        matchesJSON.append({
+            "gameweek": match["round"],
+            "season": season,
+            "home": match["home"]["name"],
+            "away": match["away"]["name"],
+            "home_score": match["status"]["scoreStr"].split("-")[0].strip(),
+            "away_score": match["status"]["scoreStr"].split("-")[1].strip(),
+            "datetime": match["status"]["utcTime"],
+            "match_status": status
+        })
 
 print(len(matchesJSON))
 
