@@ -10,6 +10,7 @@ const app = express();
 
 app.use(express.json());
 
+// Postgres auth sessions
 app.use(session({
     store: new (pgSession(session))({
         pool: pool,
@@ -26,26 +27,17 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/auth/", authRouter);
 
-app.use("/leagues/", leaguesRouter);
-
+// Routes
 app.get("/", (req, res) => {
-    console.log("server pinged");
     res.status(200).send("Server is running");
 });
 
-app.get("/data", async (req, res) => {
-    const data = await pool.query("SELECT * FROM match_status");
-    res.status(200).json(data.rows);
-});
+app.use("/auth/", authRouter);
+app.use("/leagues/", leaguesRouter);
 
-app.post("/fbref", (req, res) => {
-    const body = req.body;
-    console.log(body);
-    return res.status(200).json({ok: true});
-});
 
+// Start server
 app.listen(3000, () => {
     console.log(`Listening on port ${process.env.PORT}`);
 });
