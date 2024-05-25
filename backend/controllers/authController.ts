@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import userService from "../services/userService";
+import passport from "passport";
 
 namespace authController {
     export const authStatus = (req: Request, res: Response) => {
@@ -13,8 +14,12 @@ namespace authController {
     export const signup = async (req: Request, res: Response) => {
         const { email, password, name, role } = req.body;
         try {
-            await userService.createUser(email, password, name, role);
-            res.status(201).json({message: "User created"});
+            const user = await userService.createUser(email, password, name, role);
+
+            passport.authenticate("local")(req, res, () => {
+                res.status(201).json(user);
+            });
+
         } catch (e) {
             return res.status(400).json({error: "Error creating user"});
         }

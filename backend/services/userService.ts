@@ -23,7 +23,7 @@ namespace userService {
         }
     };
 
-    export const createUser = async (email: string, password: string, name: string, role: number): Promise<void> => {
+    export const createUser = async (email: string, password: string, name: string, role: number): Promise<User> => {
         const client = await pool.connect();
 
         const salt = await bcrypt.genSalt(10);
@@ -32,7 +32,7 @@ namespace userService {
         try {
             await client.query("BEGIN");
             // Create user record
-            const data = await client.query("INSERT INTO users(email, password, name, role) VALUES ($1, $2, $3, $4) RETURNING id;", [
+            const data = await client.query<User>("INSERT INTO users(email, password, name, role) VALUES ($1, $2, $3, $4) RETURNING *;", [
                 email,
                 hashedPassword,
                 name,
@@ -41,6 +41,7 @@ namespace userService {
             // Automatically include user in global league
             await client.query("INSERT INTO leagues_users(user_id, league_id) VALUES ($1, 1);", [data.rows[0].id]);
             await client.query("COMMIT");
+            return data.rows[0];
         } catch (error) {
             await client.query("ROLLBACK");
             console.log(error);
