@@ -2,8 +2,8 @@ FROM python:3.10-alpine
 
 WORKDIR /app
 
-RUN pip install requests beautifulsoup4 pandas lxml
+RUN pip install requests
 
-COPY fbref.py .
+COPY scrape.py .
 
-CMD ["python", "fbref.py"]
+CMD ["python", "scrape.py"]

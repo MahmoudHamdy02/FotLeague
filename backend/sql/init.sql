@@ -35,7 +35,9 @@ CREATE TABLE IF NOT EXISTS matches(
     match_status INT NOT NULL REFERENCES match_status(id),
     home_score INT NULL,
     away_score INT NULL,
-    season INT NOT NULL
+    season TEXT NOT NULL,
+    datetime TIMESTAMP NOT NULL,
+    gameweek INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS predictions(
@@ -60,7 +62,7 @@ CREATE TABLE IF NOT EXISTS scores(
 );
 
 -- Insert data
-INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played');
+INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played'), ('aborted');
 
 INSERT INTO roles(role) VALUES ('admin'), ('user');
 

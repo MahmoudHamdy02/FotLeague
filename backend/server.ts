@@ -5,6 +5,7 @@ import { pool } from "./db";
 import passport from "passport";
 import authRouter from "./routes/authRouter";
 import leaguesRouter from "./routes/leagueRouter";
+import matchRouter from "./routes/matchRouter";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth/", authRouter);
 app.use("/leagues/", leaguesRouter);
+app.use("/matches/", matchRouter);
 
 
 // Start server
