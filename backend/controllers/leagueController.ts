@@ -37,10 +37,33 @@ namespace leagueController {
 
         try {
             const league = await leagueService.createLeague(name, userId, code);
-            res.status(201).json(league);
+            return res.status(201).json(league);
         } catch (e) {
             console.log(e);
-            res.status(400).json({error: "Error creating league"});
+            return res.status(400).json({error: "Error creating league"});
+        }
+    };
+
+    export const joinLeague = async (req: Request, res: Response) => {
+        const userId = req.authUser.id;
+        const { code } : { code: string } = req.body;
+
+        try {
+            const league = await leagueService.getLeagueByCode(code);
+
+            // Check if league was found
+            if (!league) return res.status(400).json({error: "No league found"});
+
+            // Check if user is already in league
+            const existingUsers = await leagueService.getLeagueUsers(league.id);
+            if (existingUsers.includes(userId)) return res.status(400).json({error: "User already in league"});
+
+            const leagueUser = await leagueService.addLeagueUser(userId, league.id);
+
+            return res.status(201).json(leagueUser);
+        } catch(e) {
+            console.log(e);
+            return res.status(400).json({error: "Error joining league"});
         }
     };
 }

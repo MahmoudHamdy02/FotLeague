@@ -7,7 +7,7 @@ import userService from "../services/userService";
 const router = Router();
 
 router.get("/status", requireAuth, (req, res) => {
-    res.json({authenticated: req.isAuthenticated()});
+    res.json(req.authUser);
 });
 
 router.post("/login/", passport.authenticate("local"), (req, res) => {

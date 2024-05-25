@@ -6,4 +6,6 @@ const router = Router();
 
 router.post("/", requireAuth, leagueController.createLeague);
 
+router.post("/join/", requireAuth, leagueController.joinLeague);
+
 export default router;
