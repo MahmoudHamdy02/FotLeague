@@ -2,7 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import "../strategies/local";
 import { requireAuth } from "../middleware/requireAuth";
-import authController from "../controllers/authController";
+import * as authController from "../controllers/authController";
 
 const router = Router();
 
