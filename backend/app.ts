@@ -6,6 +6,7 @@ import passport from "passport";
 import authRouter from "./routes/authRouter";
 import leaguesRouter from "./routes/leagueRouter";
 import matchRouter from "./routes/matchRouter";
+import predictionRouter from "./routes/predictionRouter";
 import dotenv from "dotenv";
 dotenv.config({path: "../.env"});
 
@@ -39,5 +40,6 @@ app.get("/", (req, res) => {
 app.use("/auth/", authRouter);
 app.use("/leagues/", leaguesRouter);
 app.use("/matches/", matchRouter);
+app.use("/matches/", predictionRouter);
 
 export default app;

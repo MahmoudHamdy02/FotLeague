@@ -19,7 +19,8 @@ export const signup = async (req: Request, res: Response) => {
             res.status(201).json(user);
         });
 
-    } catch (e) {
+    } catch (error) {
+        console.log(error);
         return res.status(400).json({error: "Error creating user"});
     }
 };
