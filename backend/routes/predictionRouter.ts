@@ -5,8 +5,8 @@ const router = Router();
 
 router.get("/:season", predictionController.getUserPredictionsBySeason);
 
-router.post("/");
+router.post("/", predictionController.addPrediction);
 
-router.patch("/:id");
+router.patch("/", predictionController.updatePrediction);
 
 export default router;
