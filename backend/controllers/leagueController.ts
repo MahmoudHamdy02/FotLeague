@@ -25,9 +25,8 @@ export const createLeague = async (req: Request, res: Response) => {
 
     // Generate random code
     let code = generateLeagueCode(6);
-    console.log(code);
     let isValid = await checkValidCode(code);
-    console.log(isValid);
+
     // Keep generating codes until we find a valid one
     while (!isValid) {
         code = generateLeagueCode(6);
@@ -38,7 +37,6 @@ export const createLeague = async (req: Request, res: Response) => {
         const league = await leagueService.createLeague(name, userId, code);
         return res.status(201).json(league);
     } catch (e) {
-        console.log(e);
         return res.status(400).json({error: "Error creating league"});
     }
 };
@@ -61,7 +59,6 @@ export const joinLeague = async (req: Request, res: Response) => {
 
         return res.status(201).json(leagueUser);
     } catch(e) {
-        console.log(e);
         return res.status(400).json({error: "Error joining league"});
     }
 };

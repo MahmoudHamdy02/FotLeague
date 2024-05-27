@@ -3,23 +3,13 @@ import { User } from "../types/User";
 import bcrypt from "bcryptjs";
 
 export const getUserById = async (id: number): Promise<User> => {
-    try {
-        const data = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-        return data.rows[0] as User;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
+    const data = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    return data.rows[0] as User;
 };
 
 export const getUserByEmail = async (email: string): Promise<User> => {
-    try {
-        const data = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-        return data.rows[0] as User;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
+    const data = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    return data.rows[0] as User;
 };
 
 export const createUser = async (email: string, password: string, name: string, role: number): Promise<User> => {
@@ -43,7 +33,6 @@ export const createUser = async (email: string, password: string, name: string, 
         return data.rows[0];
     } catch (error) {
         await client.query("ROLLBACK");
-        console.log(error);
         throw error;
     } finally {
         client.release();

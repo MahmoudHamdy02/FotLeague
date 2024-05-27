@@ -9,7 +9,6 @@ export const initializeMatches = async (req: Request, res: Response) => {
 
         res.status(200).json(_matches);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error initializing matches"});
     }
 };
@@ -20,7 +19,6 @@ export const getMatchesBySeason = async (req: Request, res: Response) => {
         const matches = await matchService.getMatchesBySeason(season);
         res.status(200).json(matches);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error getting matches"});
     }
 };

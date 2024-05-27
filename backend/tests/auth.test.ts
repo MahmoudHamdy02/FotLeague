@@ -90,4 +90,15 @@ describe("Auth System", () => {
         expect(res.body.message).toEqual("Signed in");
         cookie = res.headers["set-cookie"][0];
     });
+
+    it("allows access to protected routes after login", async () => {
+        const res = await request(app).get("/auth/status")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.email).toEqual(newUser.email);
+        expect(res.body.name).toEqual(newUser.name);
+        expect(res.body.role).toEqual(newUser.role);
+        expect(typeof res.body.id).toEqual("number");
+        expect(res.body.password).not.toEqual(newUser.password);
+    });
 });

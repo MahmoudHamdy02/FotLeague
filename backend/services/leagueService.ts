@@ -15,7 +15,6 @@ export const createLeague = async (name: string, ownerId: number, code: string):
         return league.rows[0];
     } catch (error) {
         await pool.query("ROLLBACK");
-        console.log(error);
         throw error;
     } finally {
         client.release();
@@ -30,21 +29,11 @@ export const getLeagueByCode = async (code: string): Promise<League | null> => {
 };
 
 export const addLeagueUser = async (userId: number, leagueId: number): Promise<LeagueUser> => {
-    try {
-        const data = await pool.query<LeagueUser>("INSERT INTO leagues_users(user_id, league_id) VALUES ($1, $2) RETURNING *;", [userId, leagueId]);
-        return data.rows[0];
-    } catch(error) {
-        console.log(error);
-        throw error;
-    }
+    const data = await pool.query<LeagueUser>("INSERT INTO leagues_users(user_id, league_id) VALUES ($1, $2) RETURNING *;", [userId, leagueId]);
+    return data.rows[0];
 };
 
 export const getLeagueUsers = async (leagueId: number): Promise<number[]> => {
-    try {
-        const users = await pool.query<LeagueUser>("SELECT user_id FROM leagues_users WHERE league_id = $1", [leagueId]);
-        return users.rows.map(user => user.user_id);
-    } catch(error) {
-        console.log(error);
-        throw error;
-    }
+    const users = await pool.query<LeagueUser>("SELECT user_id FROM leagues_users WHERE league_id = $1", [leagueId]);
+    return users.rows.map(user => user.user_id);
 };

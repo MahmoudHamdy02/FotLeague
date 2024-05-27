@@ -9,7 +9,6 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
         const predictions = await predictionService.getUserPredictionsBySeason(userId, season);
         res.status(200).json(predictions);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error getting predictions"});
     }
 };
@@ -20,7 +19,6 @@ export const addPrediction = async (req: Request, res: Response) => {
         const prediction = await predictionService.addPrediction({user_id, match_id, home, away});
         res.status(201).json(prediction);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error adding prediction"});
     }
 };
@@ -31,7 +29,6 @@ export const updatePrediction = async (req: Request, res: Response) => {
         const prediction = await predictionService.editPredictionScores(id, home, away);
         res.status(201).json(prediction);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error updating prediction"});
     }
 };
