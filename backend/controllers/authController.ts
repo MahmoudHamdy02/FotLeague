@@ -12,6 +12,7 @@ export const login = (req: Request, res: Response) => {
 
 export const signup = async (req: Request, res: Response) => {
     const { email, password, name, role } = req.body;
+    // TODO: Send back specific errors
     try {
         const user = await userService.createUser(email, password, name, role);
 
@@ -27,6 +28,6 @@ export const signup = async (req: Request, res: Response) => {
 
 export const logout = (req: Request, res: Response) => {
     req.logout(err => {
-        res.json({message: "Logged out", error: err});
+        res.status(200).json({message: "Logged out", error: err});
     });
 };
