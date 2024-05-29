@@ -40,6 +40,6 @@ app.get("/", (req, res) => {
 app.use("/auth/", authRouter);
 app.use("/leagues/", leaguesRouter);
 app.use("/matches/", matchRouter);
-app.use("/matches/", predictionRouter);
+app.use("/predictions/", predictionRouter);
 
 export default app;

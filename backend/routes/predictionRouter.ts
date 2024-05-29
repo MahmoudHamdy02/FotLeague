@@ -1,12 +1,13 @@
 import { Router } from "express";
 import * as predictionController from "../controllers/predictionController";
+import { requireAuth } from "../middleware/requireAuth";
 
 const router = Router();
 
-router.get("/:season", predictionController.getUserPredictionsBySeason);
+router.get("/:season", requireAuth, predictionController.getUserPredictionsBySeason);
 
-router.post("/", predictionController.addPrediction);
+router.post("/", requireAuth, predictionController.addPrediction);
 
-router.patch("/", predictionController.updatePrediction);
+router.patch("/", requireAuth, predictionController.updatePrediction);
 
 export default router;

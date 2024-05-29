@@ -24,6 +24,7 @@ services:
       - POSTGRES_DB=fotleague
     volumes:
       - fotleague-db:/var/lib/postgresql/data
+      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d fotleague"]
       interval: 5s

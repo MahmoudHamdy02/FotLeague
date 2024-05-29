@@ -9,6 +9,7 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
         const predictions = await predictionService.getUserPredictionsBySeason(userId, season);
         res.status(200).json(predictions);
     } catch (error) {
+        console.log(error);
         res.status(400).json({error: "Error getting predictions"});
     }
 };
@@ -24,9 +25,10 @@ export const addPrediction = async (req: Request, res: Response) => {
 };
 
 export const updatePrediction = async (req: Request, res: Response) => {
-    const { id, home, away } = req.body;
+    const { match_id, home, away } = req.body;
+    const userId = req.authUser.id;
     try {
-        const prediction = await predictionService.editPredictionScores(id, home, away);
+        const prediction = await predictionService.editPredictionScores(userId, match_id, home, away);
         res.status(201).json(prediction);
     } catch (error) {
         res.status(400).json({error: "Error updating prediction"});
