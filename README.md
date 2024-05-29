@@ -21,15 +21,6 @@ Alternatively, you could run this command to be able to Ctrl-C without suspendin
 
 ```docker compose up -d && docker compose logs --follow```
 
-Afterwards, initalize the database by copying the `init.sql` file into the container and running it:
-
-```
-docker cp ./sql/init.sql fotleague-db-1:/
-docker exec -it fotleague-db-1 bash -c "psql -U <username>"
-\i /init.sql
-```
-
-where `<username>` is the same as specified in the `.env` file
 
 ## Backend 
 
