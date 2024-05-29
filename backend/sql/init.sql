@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS matches(
     match_status INT NOT NULL REFERENCES match_status(id),
     home_score INT NULL,
     away_score INT NULL,
-    season TEXT NOT NULL,
+    season INT NOT NULL,
     datetime TIMESTAMP NOT NULL,
     gameweek INT NOT NULL
 );

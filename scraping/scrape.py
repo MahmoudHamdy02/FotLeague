@@ -7,7 +7,7 @@ import requests
 url = "https://www.fotmob.com/api/leagues?id=47"
 
 # Wait until backend starts up
-sleep(20)
+sleep(30)
 
 # Health check
 print("Pinging backend")

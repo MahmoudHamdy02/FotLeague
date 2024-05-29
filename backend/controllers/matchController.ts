@@ -1,6 +1,16 @@
 import { Request, Response } from "express";
 import * as matchService from "../services/matchService";
 
+export const getCurrentSeason = async (req: Request, res: Response) => {
+    try {
+        const season = await matchService.getCurrentSeason();
+
+        res.status(200).json({currentSeason: season});
+    } catch (error) {
+        res.status(400).json({error: "Error getting current season"});
+    }
+};
+
 export const initializeMatches = async (req: Request, res: Response) => {
     const { matches } = req.body;
 
