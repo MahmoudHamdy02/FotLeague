@@ -84,4 +84,17 @@ export const calculateScoresForMatch = async (req: Request, res: Response) => {
     }
 };
 
+export const getTopGlobalUsersBySeason = async (req: Request, res: Response) => {
+    const {season} = req.params;
+    const num = parseInt((req.query.num ?? "10").toString());
+
+    try {
+        const results = await scoreService.getTopGlobalUsersBySeason(num, parseInt(season));
+
+        return res.status(200).json(results);
+    } catch (error) {
+        return res.status(400).json({error: "Error getting top global users"});
+    }
+};
+
 export * as scoreController from "./scoreController";

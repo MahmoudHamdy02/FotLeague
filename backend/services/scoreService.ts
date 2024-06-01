@@ -11,6 +11,22 @@ export const getUserScoresBySeason = async (userId: number, season: number): Pro
     return data.rows;
 };
 
+export const getTopGlobalUsersBySeason = async (num: number, season: number): Promise<{name: string, score: number}[]> => {
+    const data = await pool.query<{name: string, score: number}>(
+        `
+        SELECT U.name, SUM(S.score) AS total_score
+        FROM users AS U 
+        JOIN scores AS S ON U.id = S.user_id 
+        JOIN matches AS M ON S.match_id = M.id
+        WHERE M.season = $1
+        GROUP BY U.name
+        ORDER BY total_score DESC
+        LIMIT $2;
+    `, [season, num]
+    );
+    return data.rows;
+};
+
 export const addScores = async (scores: Score[]): Promise<void> => {
     await pool.query(
         `INSERT INTO scores (user_id, match_id, score)

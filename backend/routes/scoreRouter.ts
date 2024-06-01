@@ -10,4 +10,7 @@ router.get("/user/:season", requireAuth, scoreController.getUserScoresBySeason);
 
 router.get("/user/total/:season", requireAuth, scoreController.getTotalUserScoreBySeason);
 
+// TODO: Needs tests
+router.get("/top-10-global", scoreController.getTopGlobalUsersBySeason);
+
 export default router;
