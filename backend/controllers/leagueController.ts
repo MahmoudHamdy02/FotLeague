@@ -2,6 +2,12 @@ import { Request, Response } from "express";
 import { leagueService } from "../services/leagueService";
 
 // Utils
+
+/**
+ * Generate a random league code
+ * @param length - Length of the generated code
+ * @returns a random code from digits and capital and small letters
+ */
 const generateLeagueCode = (length: number): string => {
     let result = "";
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -12,8 +18,12 @@ const generateLeagueCode = (length: number): string => {
     return result;
 };
 
+/**
+ * Checks if the league code is unique i.e. no league with the same code exists
+ * @param code - The code to be checked
+ * @returns true if the code is valid
+ */
 const checkValidCode = async (code: string): Promise<boolean> => {
-    // Check if a league already exists with this code
     const league = await leagueService.getLeagueByCode(code);
     return league === null;
 };

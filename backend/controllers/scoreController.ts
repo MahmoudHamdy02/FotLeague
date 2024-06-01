@@ -5,6 +5,16 @@ import { MatchStatus } from "../enums/MatchStatus";
 import { predictionService } from "../services/predictionService";
 import { matchService } from "../services/matchService";
 
+/**
+ * Calculates the score based on a prediction and the actual match result
+ * @param trueHomeScore Actual home score
+ * @param trueAwayScore Actual away score
+ * @param predictedHomeScore Predicted home score
+ * @param predictedAwayScore Predicted away score
+ * @returns 3 for an exact prediction
+ * @returns 1 for a correct result and wrong goal amount
+ * @returns 0 for a wrong prediction
+ */
 const calculateScore = (trueHomeScore: number, trueAwayScore: number, predictedHomeScore: number, predictedAwayScore: number): 0 | 1 | 3 => {
     // Exact prediction
     if (trueHomeScore === predictedHomeScore && trueAwayScore === predictedAwayScore)

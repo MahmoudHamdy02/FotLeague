@@ -6,6 +6,8 @@ import { authController } from "../controllers/authController";
 
 const router = Router();
 
+// TODO: Admin routes/functionality?
+
 router.get("/status", requireAuth, authController.authStatus);
 
 // TODO: Setup error handling for passport login
