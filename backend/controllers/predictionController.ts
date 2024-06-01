@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as predictionService from "../services/predictionService";
+import { predictionService } from "../services/predictionService";
 
 export const getUserPredictionsBySeason = async (req: Request, res: Response) => {
     const { season } = req.params;
@@ -35,3 +35,5 @@ export const updatePrediction = async (req: Request, res: Response) => {
         res.status(400).json({error: "Error updating prediction"});
     }
 };
+
+export * as predictionController from "./predictionController";

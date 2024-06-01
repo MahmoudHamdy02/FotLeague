@@ -38,3 +38,5 @@ export const createUser = async (email: string, password: string, name: string, 
         client.release();
     }
 };
+
+export * as userService from "./userService";

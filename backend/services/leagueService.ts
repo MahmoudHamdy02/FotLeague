@@ -43,3 +43,5 @@ export const getUserLeagues = async (userId: number): Promise<League[]> => {
     const leagues = await pool.query<League>("SELECT L.* FROM leagues_users AS LU JOIN leagues AS L ON LU.league_id = L.id WHERE LU.user_id = $1", [userId]);
     return leagues.rows;
 };
+
+export * as leagueService from "./leagueService";

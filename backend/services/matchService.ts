@@ -35,3 +35,5 @@ export const insertMatches = async (matches: Omit<Match, "id">[]): Promise<Match
     );
     return data.rows;
 };
+
+export * as matchService from "./matchService";

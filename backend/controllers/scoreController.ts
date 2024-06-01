@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import * as matchService from "../services/matchService";
-import * as predictionService from "../services/predictionService";
 import { Score } from "../types/Score";
 import { scoreService } from "../services/scoreService";
 import { MatchStatus } from "../enums/MatchStatus";
+import { predictionService } from "../services/predictionService";
+import { matchService } from "../services/matchService";
 
 const calculateScore = (trueHomeScore: number, trueAwayScore: number, predictedHomeScore: number, predictedAwayScore: number): 0 | 1 | 3 => {
     // Exact prediction
@@ -70,3 +70,5 @@ export const calculateScoresForMatch = async (req: Request, res: Response) => {
         return res.status(400).json({error: "Error calculating scores"});
     }
 };
+
+export * as scoreController from "./scoreController";

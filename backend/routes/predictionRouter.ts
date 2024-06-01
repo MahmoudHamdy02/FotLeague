@@ -1,6 +1,6 @@
 import { Router } from "express";
-import * as predictionController from "../controllers/predictionController";
 import { requireAuth } from "../middleware/requireAuth";
+import { predictionController } from "../controllers/predictionController";
 
 const router = Router();
 

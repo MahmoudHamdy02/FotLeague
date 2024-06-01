@@ -32,3 +32,5 @@ export const getMatchPredictions = async (match_id: number): Promise<Prediction[
     const data = await pool.query<Prediction>("SELECT * FROM predictions WHERE match_id = $1", [match_id]);
     return data.rows;
 };
+
+export * as predictionService from "./predictionService";

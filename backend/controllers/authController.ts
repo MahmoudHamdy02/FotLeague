@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import * as userService from "../services/userService";
 import passport from "passport";
+import { userService } from "../services/userService";
 
 export const authStatus = (req: Request, res: Response) => {
     res.json(req.authUser);
@@ -30,3 +30,5 @@ export const logout = (req: Request, res: Response) => {
         res.status(200).json({message: "Logged out", error: err});
     });
 };
+
+export * as authController from "./authController";

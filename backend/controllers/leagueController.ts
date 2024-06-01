@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as leagueService from "../services/leagueService";
+import { leagueService } from "../services/leagueService";
 
 // Utils
 const generateLeagueCode = (length: number): string => {
@@ -74,3 +74,5 @@ export const getUserLeagues = async (req: Request, res: Response) => {
         return res.status(400).json({error: "Error getting user leagues"});
     }
 };
+
+export * as leagueController from "./leagueController";

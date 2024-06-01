@@ -1,6 +1,6 @@
 import { Router } from "express";
-import * as scoreController from "../controllers/scoreController";
 import { requireAuth } from "../middleware/requireAuth";
+import { scoreController } from "../controllers/scoreController";
 
 const router = Router();
 

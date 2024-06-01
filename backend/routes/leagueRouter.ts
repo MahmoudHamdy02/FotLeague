@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../middleware/requireAuth";
-import * as leagueController from "../controllers/leagueController";
+import { leagueController } from "../controllers/leagueController";
 
 const router = Router();
 
