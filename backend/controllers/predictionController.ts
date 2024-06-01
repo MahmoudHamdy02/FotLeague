@@ -15,6 +15,7 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
 };
 
 export const addPrediction = async (req: Request, res: Response) => {
+    // TODO: Get user id from authUser not body
     const { user_id, match_id, home, away } = req.body;
     try {
         const prediction = await predictionService.addPrediction({user_id, match_id, home, away});

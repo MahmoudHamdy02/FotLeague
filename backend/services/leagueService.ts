@@ -2,14 +2,14 @@ import { pool } from "../db";
 import { League } from "../types/League";
 import { LeagueUser } from "../types/LeagueUser";
 
-export const createLeague = async (name: string, ownerId: number, code: string): Promise<League> => {
+export const createLeague = async (name: string, owner_id: number, code: string): Promise<League> => {
     const client = await pool.connect();
     try {
         await client.query("BEGIN");
         // Create new league
-        const league = await pool.query<League>("INSERT INTO leagues(name, ownerId, code) VALUES ($1, $2, $3) RETURNING *;", [name, ownerId, code]);
+        const league = await pool.query<League>("INSERT INTO leagues(name, owner_id, code) VALUES ($1, $2, $3) RETURNING *;", [name, owner_id, code]);
         // Automatically insert user into their league
-        await pool.query("INSERT INTO leagues_users(league_id, user_id) VALUES ($1, $2);", [league.rows[0].id, ownerId]);
+        await pool.query("INSERT INTO leagues_users(league_id, user_id) VALUES ($1, $2);", [league.rows[0].id, owner_id]);
 
         await pool.query("COMMIT");
         return league.rows[0];

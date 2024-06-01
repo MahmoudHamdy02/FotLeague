@@ -1,6 +1,7 @@
 import { pool } from "../db";
 import { Prediction } from "../types/Prediction";
 
+// TODO: Unify case between backend and db for user_id/userId etc
 export const getUserPredictionsBySeason = async (user_id: number, season: string): Promise<Prediction[]> => {
     const data = await pool.query<Prediction>("SELECT p.user_id, p.match_id, p.home, p.away FROM predictions AS p JOIN matches AS m ON p.match_id = m.id WHERE m.season=$1 AND p.user_id=$2;", [season, user_id]);
     return data.rows;
@@ -25,4 +26,9 @@ export const editPredictionScores = async (user_id: number, match_id: number, ho
         match_id
     ]);
     return data.rows[0];
+};
+
+export const getMatchPredictions = async (match_id: number): Promise<Prediction[]> => {
+    const data = await pool.query<Prediction>("SELECT * FROM predictions WHERE match_id = $1", [match_id]);
+    return data.rows;
 };

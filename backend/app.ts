@@ -7,6 +7,7 @@ import authRouter from "./routes/authRouter";
 import leaguesRouter from "./routes/leagueRouter";
 import matchRouter from "./routes/matchRouter";
 import predictionRouter from "./routes/predictionRouter";
+import scoreRouter from "./routes/scoreRouter";
 import dotenv from "dotenv";
 dotenv.config({path: "../.env"});
 
@@ -41,5 +42,6 @@ app.use("/auth/", authRouter);
 app.use("/leagues/", leaguesRouter);
 app.use("/matches/", matchRouter);
 app.use("/predictions/", predictionRouter);
+app.use("/scores/", scoreRouter);
 
 export default app;

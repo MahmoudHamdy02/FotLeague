@@ -1,6 +1,6 @@
 export type League = {
     id: number,
     name: string,
-    ownerId: number,
+    owner_id: number,
     code: string
 }

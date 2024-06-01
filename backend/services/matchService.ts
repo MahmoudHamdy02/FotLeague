@@ -1,6 +1,17 @@
 import { pool } from "../db";
+import { MatchStatus } from "../enums/MatchStatus";
 import { Match } from "../types/Match";
 
+
+export const getMatchDetails = async (matchId: number): Promise<Match> => {
+    const data = await pool.query<Match>("SELECT * FROM matches WHERE id = $1", [matchId]);
+    return data.rows[0];
+};
+
+export const updateMatchStatus = async (matchId: number, status: MatchStatus): Promise<Match> => {
+    const data = await pool.query<Match>("UPDATE matches SET match_status = $1 WHERE id = $2 RETURNING *;", [status, matchId]);
+    return data.rows[0];
+};
 
 export const getCurrentSeason = async (): Promise<number> => {
     const data = await pool.query("SELECT MAX(season) FROM matches;");
