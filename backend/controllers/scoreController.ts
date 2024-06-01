@@ -27,6 +27,19 @@ const calculateScore = (trueHomeScore: number, trueAwayScore: number, predictedH
     return 0;
 };
 
+export const getTotalUserScoreBySeason = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const {season} = req.params;
+
+    try {
+        const score = await scoreService.getTotalUserScoreBySeason(userId, parseInt(season));
+
+        return res.status(200).json({score});
+    } catch (error) {
+        return res.status(400).json({error: "Error getting user season score"});
+    }
+};
+
 export const getUserScoresBySeason = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const {season} = req.params;

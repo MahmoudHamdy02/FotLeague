@@ -1,6 +1,11 @@
 import { pool } from "../db";
 import { Score } from "../types/Score";
 
+export const getTotalUserScoreBySeason = async (userId: number, season: number): Promise<number> => {
+    const data = await pool.query("SELECT SUM(S.score) FROM scores AS S JOIN matches AS M ON S.match_id = M.id WHERE S.user_id = $1 AND M.season = $2", [userId, season]);
+    return parseInt(data.rows[0].sum);
+};
+
 export const getUserScoresBySeason = async (userId: number, season: number): Promise<Score[]> => {
     const data = await pool.query<Score>("SELECT S.* FROM scores S JOIN matches M ON S.match_id = M.id WHERE S.user_id = $1 AND M.season = $2", [userId, season]);
     return data.rows;

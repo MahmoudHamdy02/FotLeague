@@ -104,6 +104,14 @@ describe("Score System", () => {
         });
     });
 
+    it("updates user's season score to 3", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(3);
+    });
+
     it("awards score of 1 for correct result: draw", async () => {
         await request(app).post("/scores/calculate-match-scores")
                 .send({
@@ -120,6 +128,14 @@ describe("Score System", () => {
             match_id: 2,
             score: 1
         });
+    });
+
+    it("updates user's season score to 4", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(4);
     });
 
     it("awards score of 1 for correct result: home win", async () => {
@@ -140,6 +156,14 @@ describe("Score System", () => {
         });
     });
 
+    it("updates user's season score to 5", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(5);
+    });
+
     it("awards score of 1 for correct result: away win", async () => {
         await request(app).post("/scores/calculate-match-scores")
                 .send({
@@ -158,6 +182,14 @@ describe("Score System", () => {
         });
     });
 
+    it("updates user's season score to 6", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(6);
+    });
+
     it("awards score of 0 for wrong prediction", async () => {
         await request(app).post("/scores/calculate-match-scores")
                 .send({
@@ -174,5 +206,13 @@ describe("Score System", () => {
             match_id: 5,
             score: 0
         });
+    });
+
+    it("keeps user's season score at 6", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(6);
     });
 });
