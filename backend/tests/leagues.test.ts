@@ -42,6 +42,19 @@ describe("League System", () => {
         cookie = res.headers["set-cookie"][0];
     });
 
+    it("joins new user into the global league", async () => {
+        const res = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(1);
+        expect(res.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
+    });
+
     it("creates a new league", async () => {
         const res = await request(app).post("/leagues/")
                 .send(newLeague)
@@ -66,6 +79,25 @@ describe("League System", () => {
         expect(res2.statusCode).toEqual(201);
         expect(res2.body.league_id).toEqual(newLeagueId);
         expect(res2.body.user_id).toEqual(res.body.id);
+    });
+
+    it("returns the two user leagues", async () => {
+        const res = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(2);
+        expect(res.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
+        expect(res.body[1]).toEqual({
+            id: newLeagueId,
+            name: "Test League",
+            owner_id: 2,
+            code: newLeagueCode
+        });
     });
 
     it("throws an error when joining same league twice", async () => {

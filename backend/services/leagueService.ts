@@ -33,7 +33,13 @@ export const addLeagueUser = async (userId: number, leagueId: number): Promise<L
     return data.rows[0];
 };
 
+// TODO: Make these two consistent
 export const getLeagueUsers = async (leagueId: number): Promise<number[]> => {
     const users = await pool.query<LeagueUser>("SELECT user_id FROM leagues_users WHERE league_id = $1", [leagueId]);
     return users.rows.map(user => user.user_id);
+};
+
+export const getUserLeagues = async (userId: number): Promise<League[]> => {
+    const leagues = await pool.query<League>("SELECT L.* FROM leagues_users AS LU JOIN leagues AS L ON LU.league_id = L.id WHERE LU.user_id = $1", [userId]);
+    return leagues.rows;
 };

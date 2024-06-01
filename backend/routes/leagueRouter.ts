@@ -8,4 +8,6 @@ router.post("/", requireAuth, leagueController.createLeague);
 
 router.post("/join/", requireAuth, leagueController.joinLeague);
 
+router.get("/user/leagues", requireAuth, leagueController.getUserLeagues);
+
 export default router;

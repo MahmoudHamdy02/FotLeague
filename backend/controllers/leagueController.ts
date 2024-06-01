@@ -62,3 +62,15 @@ export const joinLeague = async (req: Request, res: Response) => {
         return res.status(400).json({error: "Error joining league"});
     }
 };
+
+export const getUserLeagues = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+
+    try {
+        const leagues = await leagueService.getUserLeagues(userId);
+
+        return res.status(200).json(leagues);
+    } catch (error) {
+        return res.status(400).json({error: "Error getting user leagues"});
+    }
+};

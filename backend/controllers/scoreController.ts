@@ -40,6 +40,7 @@ export const getUserScoresBySeason = async (req: Request, res: Response) => {
     }
 };
 
+// TODO: Validate request parameters and body
 export const calculateScoresForMatch = async (req: Request, res: Response) => {
     const { matchId } = req.body;
 
