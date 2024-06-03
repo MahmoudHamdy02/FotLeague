@@ -7,6 +7,11 @@ export const authStatus = (req: Request, res: Response) => {
 };
 
 export const login = (req: Request, res: Response) => {
+    const { rememberMe } = req.body;
+    if (rememberMe !== undefined && rememberMe) {
+        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; // 1 Month
+        req.session.save();
+    }
     res.json({message: "Signed in"});
 };
 
