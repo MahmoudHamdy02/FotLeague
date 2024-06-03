@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import passport from "passport";
 import { userService } from "../services/userService";
+import bcrypt from "bcryptjs";
 
 export const authStatus = (req: Request, res: Response) => {
     res.json(req.authUser);
@@ -19,6 +20,7 @@ export const signup = async (req: Request, res: Response) => {
     const { email, password, name, role } = req.body;
     // TODO: Send back specific errors
     try {
+        // TODO: Auto assign normal user role
         const user = await userService.createUser(email, password, name, role);
 
         passport.authenticate("local")(req, res, () => {
@@ -27,6 +29,29 @@ export const signup = async (req: Request, res: Response) => {
 
     } catch (error) {
         return res.status(400).json({error: "Error creating user"});
+    }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        const userDetails = await userService.getUserById(userId);
+
+        const passwordsMatch = await bcrypt.compare(oldPassword, userDetails.password);
+
+        if (!passwordsMatch)
+            return res.status(403).json({error: "Old user password is incorrect"});
+
+        const newUser = await userService.changeUserPassword(userId, newPassword);
+
+        req.logout(err => {
+            return res.status(200).json({user: newUser, error: err});
+        });
+
+    } catch (error) {
+        return res.status(400).json({error: "Error updating password"});
     }
 };
 

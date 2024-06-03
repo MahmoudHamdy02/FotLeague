@@ -1,22 +1,21 @@
 import { pool } from "../db";
 import { User } from "../types/User";
-import bcrypt from "bcryptjs";
+import { hashPassword } from "../utils";
 
 export const getUserById = async (id: number): Promise<User> => {
-    const data = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-    return data.rows[0] as User;
+    const data = await pool.query<User>("SELECT * FROM users WHERE id = $1;", [id]);
+    return data.rows[0];
 };
 
 export const getUserByEmail = async (email: string): Promise<User> => {
-    const data = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    return data.rows[0] as User;
+    const data = await pool.query<User>("SELECT * FROM users WHERE email = $1;", [email]);
+    return data.rows[0];
 };
 
 export const createUser = async (email: string, password: string, name: string, role: number): Promise<User> => {
     const client = await pool.connect();
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await hashPassword(password);
 
     try {
         await client.query("BEGIN");
@@ -37,6 +36,13 @@ export const createUser = async (email: string, password: string, name: string, 
     } finally {
         client.release();
     }
+};
+
+export const changeUserPassword = async (userId: number, password: string): Promise<User> => {
+    const hashedPassword = await hashPassword(password);
+
+    const data = await pool.query<User>("UPDATE users SET password = $1 WHERE id = $2 RETURNING *;", [hashedPassword, userId]);
+    return data.rows[0];
 };
 
 export * as userService from "./userService";

@@ -9,7 +9,6 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
         const predictions = await predictionService.getUserPredictionsBySeason(userId, season);
         res.status(200).json(predictions);
     } catch (error) {
-        console.log(error);
         res.status(400).json({error: "Error getting predictions"});
     }
 };

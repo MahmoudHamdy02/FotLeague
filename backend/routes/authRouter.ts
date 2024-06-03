@@ -17,4 +17,6 @@ router.post("/signup/", authController.signup);
 
 router.post("/logout", authController.logout);
 
+router.post("/reset", requireAuth, authController.resetPassword);
+
 export default router;
