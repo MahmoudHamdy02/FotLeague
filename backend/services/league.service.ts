@@ -44,4 +44,4 @@ export const getUserLeagues = async (userId: number): Promise<League[]> => {
     return leagues.rows;
 };
 
-export * as leagueService from "./leagueService";
+export * as leagueService from "./league.service";

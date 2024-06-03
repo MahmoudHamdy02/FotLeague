@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import passport from "passport";
-import { userService } from "../services/userService";
+import { userService } from "../services/user.service";
 import bcrypt from "bcryptjs";
 
 export const authStatus = (req: Request, res: Response) => {
@@ -61,4 +61,4 @@ export const logout = (req: Request, res: Response) => {
     });
 };
 
-export * as authController from "./authController";
+export * as authController from "./auth.controller";

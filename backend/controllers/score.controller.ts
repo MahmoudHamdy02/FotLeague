@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { Score } from "../types/Score";
-import { scoreService } from "../services/scoreService";
+import { scoreService } from "../services/score.service";
 import { MatchStatus } from "../enums/MatchStatus";
-import { predictionService } from "../services/predictionService";
-import { matchService } from "../services/matchService";
+import { predictionService } from "../services/prediction.service";
+import { matchService } from "../services/match.service";
 
 /**
  * Calculates the score based on a prediction and the actual match result
@@ -107,4 +107,4 @@ export const getTopGlobalUsersBySeason = async (req: Request, res: Response) => 
     }
 };
 
-export * as scoreController from "./scoreController";
+export * as scoreController from "./score.controller";

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { matchService } from "../services/matchService";
+import { matchService } from "../services/match.service";
 
 export const getCurrentSeason = async (req: Request, res: Response) => {
     try {
@@ -33,4 +33,4 @@ export const getMatchesBySeason = async (req: Request, res: Response) => {
     }
 };
 
-export * as matchController from "./matchController";
+export * as matchController from "./match.controller";

@@ -2,7 +2,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
 import bcrypt from "bcryptjs";
 import { User } from "../types/User";
-import { userService } from "../services/userService";
+import { userService } from "../services/user.service";
 
 type _User = User;
 declare global {

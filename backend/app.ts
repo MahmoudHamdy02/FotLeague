@@ -3,12 +3,12 @@ import session from "express-session";
 import pgSession from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
-import authRouter from "./routes/authRouter";
-import leaguesRouter from "./routes/leagueRouter";
-import matchRouter from "./routes/matchRouter";
-import predictionRouter from "./routes/predictionRouter";
-import scoreRouter from "./routes/scoreRouter";
 import dotenv from "dotenv";
+import { authRouter } from "./routes/auth.router";
+import { leagueRouter } from "./routes/league.router";
+import { matchRouter } from "./routes/match.router";
+import { predictionRouter } from "./routes/prediction.router";
+import { scoreRouter } from "./routes/score.router";
 dotenv.config({path: "../.env"});
 
 const app = express();
@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth/", authRouter);
-app.use("/leagues/", leaguesRouter);
+app.use("/leagues/", leagueRouter);
 app.use("/matches/", matchRouter);
 app.use("/predictions/", predictionRouter);
 app.use("/scores/", scoreRouter);

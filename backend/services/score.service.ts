@@ -38,4 +38,4 @@ export const addScores = async (scores: Score[]): Promise<void> => {
     );
 };
 
-export * as scoreService from "./scoreService";
+export * as scoreService from "./score.service";

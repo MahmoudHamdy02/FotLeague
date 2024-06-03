@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { leagueService } from "../services/leagueService";
+import { leagueService } from "../services/league.service";
 
 // Utils
 
@@ -85,4 +85,4 @@ export const getUserLeagues = async (req: Request, res: Response) => {
     }
 };
 
-export * as leagueController from "./leagueController";
+export * as leagueController from "./league.controller";

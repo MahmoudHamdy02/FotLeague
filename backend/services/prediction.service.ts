@@ -33,4 +33,4 @@ export const getMatchPredictions = async (match_id: number): Promise<Prediction[
     return data.rows;
 };
 
-export * as predictionService from "./predictionService";
+export * as predictionService from "./prediction.service";

@@ -45,4 +45,4 @@ export const changeUserPassword = async (userId: number, password: string): Prom
     return data.rows[0];
 };
 
-export * as userService from "./userService";
+export * as userService from "./user.service";
