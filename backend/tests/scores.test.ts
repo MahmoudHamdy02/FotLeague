@@ -31,11 +31,11 @@ describe("Score System", () => {
         cookie = res.headers["set-cookie"][0];
 
         // Test setup: 5 matches, 1 exact prediction, 3 correct results, one wrong prediction
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Everton', 3, 1, 3, '2024-12-14 18:00:00', 2024, 1);");
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man City', 3, 3, 3, '2024-12-14 18:00:00', 2024, 1);");
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man United', 2, 0, 3, '2024-12-14 18:00:00', 2024, 1);");
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Chelsea', 0, 2, 3, '2024-12-14 18:00:00', 2024, 1);");
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Arsenal', 1, 0, 3, '2024-12-14 18:00:00', 2024, 1);");
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Everton', 3, 1, 2, '2024-12-14 18:00:00', 2024, 1);");
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man City', 3, 3, 2, '2024-12-14 18:00:00', 2024, 1);");
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man United', 2, 0, 2, '2024-12-14 18:00:00', 2024, 1);");
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Chelsea', 0, 2, 2, '2024-12-14 18:00:00', 2024, 1);");
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Arsenal', 1, 0, 2, '2024-12-14 18:00:00', 2024, 1);");
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
@@ -87,9 +87,10 @@ describe("Score System", () => {
     });
 
     it("awards score of 3 for exact prediction", async () => {
-        await request(app).post("/scores/calculate-match-scores")
+        await request(app).post("/matches/update-status")
                 .send({
                     matchId: 1,
+                    status: 3
                 })
                 .set("Cookie", cookie);
 
@@ -113,9 +114,10 @@ describe("Score System", () => {
     });
 
     it("awards score of 1 for correct result: draw", async () => {
-        await request(app).post("/scores/calculate-match-scores")
+        await request(app).post("/matches/update-status")
                 .send({
                     matchId: 2,
+                    status: 3
                 })
                 .set("Cookie", cookie);
 
@@ -139,9 +141,10 @@ describe("Score System", () => {
     });
 
     it("awards score of 1 for correct result: home win", async () => {
-        await request(app).post("/scores/calculate-match-scores")
+        await request(app).post("/matches/update-status")
                 .send({
                     matchId: 3,
+                    status: 3
                 })
                 .set("Cookie", cookie);
 
@@ -165,9 +168,10 @@ describe("Score System", () => {
     });
 
     it("awards score of 1 for correct result: away win", async () => {
-        await request(app).post("/scores/calculate-match-scores")
+        await request(app).post("/matches/update-status")
                 .send({
                     matchId: 4,
+                    status: 3
                 })
                 .set("Cookie", cookie);
 
@@ -191,9 +195,10 @@ describe("Score System", () => {
     });
 
     it("awards score of 0 for wrong prediction", async () => {
-        await request(app).post("/scores/calculate-match-scores")
+        await request(app).post("/matches/update-status")
                 .send({
                     matchId: 5,
+                    status: 3
                 })
                 .set("Cookie", cookie);
 

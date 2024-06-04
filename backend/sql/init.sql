@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS scores(
 );
 
 -- Insert data
-INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played'), ('calculated'), ('aborted');
+INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played'), ('aborted');
 
 INSERT INTO roles(role) VALUES ('admin'), ('user');
 
