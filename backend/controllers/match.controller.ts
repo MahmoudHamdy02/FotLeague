@@ -67,6 +67,7 @@ export const getMatchesBySeason = async (req: Request, res: Response) => {
     }
 };
 
+// TODO: Could probably use some better error handling
 export const updateMatch = async (req: Request, res: Response) => {
     const { matchId, status, homeScore, awayScore, datetime } = req.body;
 

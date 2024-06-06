@@ -7,6 +7,8 @@ import { authController } from "../controllers/auth.controller";
 export const authRouter = Router();
 
 // TODO: Admin routes/functionality?
+// TODO: Google OAuth (& twitter/facebook?)
+// TODO: Forgot password
 
 authRouter.get("/status", requireAuth, authController.authStatus);
 
