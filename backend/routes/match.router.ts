@@ -9,4 +9,4 @@ matchRouter.get("/:season", matchController.getMatchesBySeason);
 
 matchRouter.post("/init", matchController.initializeMatches);
 
-matchRouter.post("/update-status", matchController.updateMatchStatus);
+matchRouter.post("/update", matchController.updateMatch);

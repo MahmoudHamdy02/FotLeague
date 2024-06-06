@@ -13,6 +13,17 @@ export const updateMatchStatus = async (matchId: number, status: MatchStatus): P
     return data.rows[0];
 };
 
+export const updateMatch = async (matchId: number, status: MatchStatus, homeScore: number, awayScore: number, datetime: string): Promise<Match> => {
+    const data = await pool.query<Match>("UPDATE matches SET home_score = $1, away_score = $2, match_status = $3, datetime = $4 WHERE id = $5 RETURNING *;", [
+        homeScore,
+        awayScore,
+        status,
+        datetime,
+        matchId
+    ]);
+    return data.rows[0];
+};
+
 export const getCurrentSeason = async (): Promise<number> => {
     const data = await pool.query("SELECT MAX(season) FROM matches;");
     return data.rows[0].max;
