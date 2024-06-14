@@ -80,7 +80,7 @@ describe("Auth System", () => {
 
     it("logs in user", async () => {
         const res = await request(app).post("/auth/login")
-                .send({email: newUser.email, password: newUser.password});
+                .send({email: newUser.email, password: newUser.password, rememberMe: false});
         expect(res.statusCode).toEqual(200);
         expect(res.body.message).toEqual("Signed in");
         cookie = res.headers["set-cookie"][0];
@@ -148,7 +148,7 @@ describe("Reset password", () => {
 
     it("logs in user with new password", async () => {
         const res = await request(app).post("/auth/login")
-                .send({email: newUser.email, password: newUser.password + "4"});
+                .send({email: newUser.email, password: newUser.password + "4", rememberMe: false});
         expect(res.statusCode).toEqual(200);
         expect(res.body.message).toEqual("Signed in");
         cookie = res.headers["set-cookie"][0];

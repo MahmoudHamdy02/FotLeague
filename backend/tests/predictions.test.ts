@@ -42,8 +42,7 @@ describe("Prediction System", () => {
     it("submits a user prediction for a match", async () => {
         const res = await request(app).post("/predictions/")
                 .send({
-                    user_id: user_id,
-                    match_id: 1,
+                    matchId: 1,
                     home: 3,
                     away: 1
                 })
@@ -73,8 +72,7 @@ describe("Prediction System", () => {
     it("throws an error when submitting the same prediction", async () => {
         const res = await request(app).post("/predictions/")
                 .send({
-                    user_id: user_id,
-                    match_id: 1,
+                    matchId: 1,
                     home: 2,
                     away: 2
                 })
@@ -86,8 +84,7 @@ describe("Prediction System", () => {
     it("updates an existing prediction", async () => {
         const res = await request(app).patch("/predictions/")
                 .send({
-                    user_id: user_id,
-                    match_id: 1,
+                    matchId: 1,
                     home: 2,
                     away: 2
                 })

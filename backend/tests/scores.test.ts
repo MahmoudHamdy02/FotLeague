@@ -99,7 +99,7 @@ describe("Score System", () => {
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
-                    match_id: 1,
+                    matchId: 1,
                     home: match1.homeScore,
                     away: match1.awayScore
                 })
@@ -108,7 +108,7 @@ describe("Score System", () => {
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
-                    match_id: 2,
+                    matchId: 2,
                     home: match2.homeScore+1,
                     away: match2.awayScore+1
                 })
@@ -117,7 +117,7 @@ describe("Score System", () => {
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
-                    match_id: 3,
+                    matchId: 3,
                     home: match3.homeScore+1,
                     away: match3.awayScore
                 })
@@ -126,7 +126,7 @@ describe("Score System", () => {
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
-                    match_id: 4,
+                    matchId: 4,
                     home: match4.homeScore,
                     away: match4.awayScore+1
                 })
@@ -135,7 +135,7 @@ describe("Score System", () => {
         await request(app).post("/predictions/")
                 .send({
                     user_id: user_id,
-                    match_id: 5,
+                    matchId: 5,
                     home: 0,
                     away: 0
                 })

@@ -29,7 +29,7 @@ export const getCurrentSeason = async (): Promise<number> => {
     return data.rows[0].max;
 };
 
-export const getMatchesBySeason = async (season: string): Promise<Match[]> => {
+export const getMatchesBySeason = async (season: number): Promise<Match[]> => {
     const data = await pool.query<Match>("SELECT * FROM matches WHERE season = $1;", [season]);
     return data.rows;
 };

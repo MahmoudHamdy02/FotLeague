@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { leagueService } from "../services/league.service";
+import { validate } from "./utils";
 
 // Utils
 
@@ -32,6 +33,7 @@ const checkValidCode = async (code: string): Promise<boolean> => {
 export const createLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { name } = req.body;
+    if (!validate([name], ["string"], res)) return;
 
     // Generate random code
     let code = generateLeagueCode(6);
@@ -47,13 +49,15 @@ export const createLeague = async (req: Request, res: Response) => {
         const league = await leagueService.createLeague(name, userId, code);
         return res.status(201).json(league);
     } catch (e) {
+        console.log(e);
         return res.status(400).json({error: "Error creating league"});
     }
 };
 
 export const joinLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
-    const { code } : { code: string } = req.body;
+    const { code } = req.body;
+    if (!validate([code], ["string"], res)) return;
 
     try {
         const league = await leagueService.getLeagueByCode(code);

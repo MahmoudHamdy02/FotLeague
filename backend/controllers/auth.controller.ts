@@ -3,6 +3,7 @@ import passport from "passport";
 import { userService } from "../services/user.service";
 import bcrypt from "bcryptjs";
 import { UserRole } from "../enums/UserRole";
+import { validate } from "./utils";
 
 export const authStatus = (req: Request, res: Response) => {
     res.json(req.authUser);
@@ -10,7 +11,9 @@ export const authStatus = (req: Request, res: Response) => {
 
 export const login = (req: Request, res: Response) => {
     const { rememberMe } = req.body;
-    if (rememberMe !== undefined && rememberMe) {
+    if (!validate([rememberMe], ["boolean"], res)) return;
+
+    if (rememberMe) {
         req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; // 1 Month
         req.session.save();
     }
@@ -19,6 +22,8 @@ export const login = (req: Request, res: Response) => {
 
 export const signup = async (req: Request, res: Response) => {
     const { email, password, name } = req.body;
+    if (!validate([email, password, name], ["string", "string", "string"], res)) return;
+
     // TODO: Send back specific errors
     try {
         const user = await userService.createUser(email, password, name, UserRole.User);
@@ -35,6 +40,8 @@ export const signup = async (req: Request, res: Response) => {
 export const resetPassword = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { oldPassword, newPassword } = req.body;
+    if (!validate([oldPassword, newPassword], ["string", "string"], res)) return;
+
 
     try {
         const userDetails = await userService.getUserById(userId);

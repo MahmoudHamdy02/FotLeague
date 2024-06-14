@@ -1,7 +1,7 @@
 import { pool } from "../db";
 import { Prediction } from "../types/Prediction";
 
-export const getUserPredictionsBySeason = async (userId: number, season: string): Promise<Prediction[]> => {
+export const getUserPredictionsBySeason = async (userId: number, season: number): Promise<Prediction[]> => {
     const data = await pool.query<Prediction>("SELECT p.user_id, p.match_id, p.home, p.away FROM predictions AS p JOIN matches AS m ON p.match_id = m.id WHERE m.season=$1 AND p.user_id=$2;", [season, userId]);
     return data.rows;
 
