@@ -1,4 +1,5 @@
 import { pool } from "../db";
+import { UserRole } from "../enums/UserRole";
 import { User } from "../types/User";
 import { hashPassword } from "../utils";
 
@@ -12,7 +13,7 @@ export const getUserByEmail = async (email: string): Promise<User> => {
     return data.rows[0];
 };
 
-export const createUser = async (email: string, password: string, name: string, role: number): Promise<User> => {
+export const createUser = async (email: string, password: string, name: string, role: UserRole): Promise<User> => {
     const client = await pool.connect();
 
     const hashedPassword = await hashPassword(password);

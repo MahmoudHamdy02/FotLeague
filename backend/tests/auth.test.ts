@@ -3,6 +3,7 @@ import app from "../app";
 import request from "supertest";
 import { pool } from "../db";
 import { resetDB } from "./utils";
+import { UserRole } from "../enums/UserRole";
 
 
 beforeAll(async () => {
@@ -17,8 +18,7 @@ describe("Auth System", () => {
     const newUser = {
         email: "test@gmail.com",
         password: "test123",
-        name: "testuser",
-        role: 2
+        name: "testuser"
     };
 
     let cookie: string;
@@ -35,7 +35,7 @@ describe("Auth System", () => {
         expect(res.statusCode).toEqual(201);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password);
         cookie = res.headers["set-cookie"][0];
@@ -47,7 +47,7 @@ describe("Auth System", () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password);
     });
@@ -92,7 +92,7 @@ describe("Auth System", () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password);
     });
@@ -102,8 +102,7 @@ describe("Reset password", () => {
     const newUser = {
         email: "testreset@gmail.com",
         password: "test123",
-        name: "testuserreset",
-        role: 2
+        name: "testuserreset"
     };
 
     let cookie: string;
@@ -114,7 +113,7 @@ describe("Reset password", () => {
         expect(res.statusCode).toEqual(201);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password);
         cookie = res.headers["set-cookie"][0];
@@ -126,7 +125,7 @@ describe("Reset password", () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password);
     });
@@ -161,7 +160,7 @@ describe("Reset password", () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
-        expect(res.body.role).toEqual(newUser.role);
+        expect(res.body.role).toEqual(UserRole.User);
         expect(typeof res.body.id).toEqual("number");
         expect(res.body.password).not.toEqual(newUser.password + "4");
     });

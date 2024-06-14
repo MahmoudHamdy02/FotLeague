@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import passport from "passport";
 import { userService } from "../services/user.service";
 import bcrypt from "bcryptjs";
+import { UserRole } from "../enums/UserRole";
 
 export const authStatus = (req: Request, res: Response) => {
     res.json(req.authUser);
@@ -17,11 +18,10 @@ export const login = (req: Request, res: Response) => {
 };
 
 export const signup = async (req: Request, res: Response) => {
-    const { email, password, name, role } = req.body;
+    const { email, password, name } = req.body;
     // TODO: Send back specific errors
     try {
-        // TODO: Auto assign normal user role
-        const user = await userService.createUser(email, password, name, role);
+        const user = await userService.createUser(email, password, name, UserRole.User);
 
         passport.authenticate("local")(req, res, () => {
             res.status(201).json(user);
