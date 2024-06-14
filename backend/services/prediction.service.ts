@@ -8,12 +8,12 @@ export const getUserPredictionsBySeason = async (user_id: number, season: string
 
 };
 
-export const addPrediction = async (prediction: Prediction): Promise<Prediction> => {
+export const addPrediction = async (userId: number, matchId: number, home: number, away: number): Promise<Prediction> => {
     const data = await pool.query<Prediction>("INSERT INTO predictions(user_id, match_id, home, away) VALUES ($1, $2, $3, $4) RETURNING *", [
-        prediction.user_id,
-        prediction.match_id,
-        prediction.home,
-        prediction.away
+        userId,
+        matchId,
+        home,
+        away
     ]);
     return data.rows[0];
 };

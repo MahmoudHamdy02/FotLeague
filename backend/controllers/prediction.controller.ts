@@ -14,10 +14,10 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
 };
 
 export const addPrediction = async (req: Request, res: Response) => {
-    // TODO: Get user id from authUser not body
-    const { user_id, match_id, home, away } = req.body;
+    const { match_id, home, away } = req.body;
+    const userId = req.authUser.id;
     try {
-        const prediction = await predictionService.addPrediction({user_id, match_id, home, away});
+        const prediction = await predictionService.addPrediction(userId, match_id, home, away);
         res.status(201).json(prediction);
     } catch (error) {
         res.status(400).json({error: "Error adding prediction"});
