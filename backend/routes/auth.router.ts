@@ -6,7 +6,7 @@ import { authController } from "../controllers/auth.controller";
 
 export const authRouter = Router();
 
-// TODO: Admin routes/functionality?
+// TODO: Admin routes/functionality: no. of registered/logged in users, no. of created leagues?
 // TODO: Google OAuth (& twitter/facebook?)
 // TODO: Forgot password
 

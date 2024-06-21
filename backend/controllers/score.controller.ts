@@ -27,7 +27,6 @@ export const getUserScoresBySeason = async (req: Request, res: Response) => {
     }
 };
 
-// TODO: Validate request parameters and body
 export const getTopGlobalUsersBySeason = async (req: Request, res: Response) => {
     const {season} = req.params;
     const num = parseInt((req.query.num ?? "10").toString());
