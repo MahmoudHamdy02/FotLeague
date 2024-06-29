@@ -11,11 +11,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
-import com.example.fotleague.data.RetrofitInstance
+import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.ui.theme.FotLeagueTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var api: FotLeagueApi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +40,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            val status = RetrofitInstance.api.getStatus()
+            val status = api.getStatus()
             println(status)
         }
     }

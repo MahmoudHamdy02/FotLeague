@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -76,5 +78,12 @@ dependencies {
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+}
 
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }
