@@ -81,6 +81,10 @@ dependencies {
     // Dagger Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
 }
 
 // Allow references to generated code
