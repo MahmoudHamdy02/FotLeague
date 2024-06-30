@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.screens.leaderboard.LeaderboardScreen
 import com.example.fotleague.screens.leagues.LeaguesScreen
 import com.example.fotleague.screens.matches.MatchesScreen
