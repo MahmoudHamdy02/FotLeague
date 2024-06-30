@@ -14,14 +14,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.Screen
+import com.example.fotleague.ui.theme.FotLeagueTheme
 
 data class BottomNavigationItem(
     val title: String,
-    val route: String,
+    val screen: Screen,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 )
@@ -32,31 +35,31 @@ fun BottomNavigation(navController: NavHostController) {
     val items = listOf(
         BottomNavigationItem(
             title = "Matches",
-            route = Screen.MatchesScreen.route,
+            screen = Screen.MatchesScreen,
             selectedIcon = Icons.Default.Add,
             unselectedIcon = Icons.Default.Add
         ),
         BottomNavigationItem(
             title = "Leagues",
-            route = Screen.LeaguesScreen.route,
+            screen = Screen.LeaguesScreen,
             selectedIcon = Icons.Default.Add,
             unselectedIcon = Icons.Default.Add
         ),
         BottomNavigationItem(
             title = "Leaderboard",
-            route = Screen.LeaderboardScreen.route,
+            screen = Screen.LeaderboardScreen,
             selectedIcon = Icons.Default.Add,
             unselectedIcon = Icons.Default.Add
         ),
         BottomNavigationItem(
             title = "Stats",
-            route = Screen.StatsScreen.route,
+            screen = Screen.StatsScreen,
             selectedIcon = Icons.Default.Add,
             unselectedIcon = Icons.Default.Add
         ),
         BottomNavigationItem(
             title = "More",
-            route = Screen.MoreScreen.route,
+            screen = Screen.MoreScreen,
             selectedIcon = Icons.Default.Add,
             unselectedIcon = Icons.Default.Add
         )
@@ -75,7 +78,7 @@ fun BottomNavigation(navController: NavHostController) {
                 label = { Text(text = item.title, fontSize = 10.sp) },
                 onClick = {
                     selectedItemIndex = index
-                    navController.navigate(item.route)
+                    navController.navigate(item.screen.route)
                 },
                 icon = {
                     Icon(imageVector = item.selectedIcon, contentDescription = item.title)
