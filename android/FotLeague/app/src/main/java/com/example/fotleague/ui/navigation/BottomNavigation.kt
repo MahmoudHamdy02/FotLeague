@@ -1,9 +1,11 @@
 package com.example.fotleague.ui.navigation
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,11 +15,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
+import com.example.fotleague.ui.theme.DarkGray
+import com.example.fotleague.ui.theme.LightGray
+import com.example.fotleague.ui.theme.Primary
 
 data class BottomNavigationItem(
     val title: String,
@@ -67,20 +73,24 @@ fun BottomNavigation(navController: NavHostController) {
     }
 
     NavigationBar(
-        modifier = Modifier.height(120.dp)
+        modifier = Modifier.height(120.dp),
+        containerColor = DarkGray,
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = index == selectedItemIndex,
-                label = { Text(text = item.title, fontSize = 10.sp) },
+                label = { Text(text = item.title, fontSize = 10.sp, color = if (index == selectedItemIndex) Primary else LightGray, fontWeight = if (index == selectedItemIndex) FontWeight.Bold else FontWeight.Normal) },
                 onClick = {
                     selectedItemIndex = index
                     navController.navigate(item.screen.route)
                 },
+                colors = NavigationBarItemDefaults.colors(indicatorColor = DarkGray),
                 icon = {
                     Icon(
                         imageVector = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.title
+                        contentDescription = item.title,
+                        tint = if (index == selectedItemIndex) Primary else LightGray,
+                        modifier = Modifier.size(if (index == selectedItemIndex) 32.dp else 24.dp)
                     )
                 })
         }
