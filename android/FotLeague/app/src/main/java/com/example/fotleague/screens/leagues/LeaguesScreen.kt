@@ -39,18 +39,20 @@ import com.example.fotleague.ui.theme.LightGray
 
 @Composable
 fun LeaguesScreen(navController: NavHostController) {
-    Scaffold(contentWindowInsets = WindowInsets(0.dp), topBar = {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(horizontal = 8.dp)
-                .height(60.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Leagues", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-        }
-    }) { paddingValues ->
+    Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.DarkGray)
+                    .padding(horizontal = 8.dp)
+                    .height(60.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Leagues", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
