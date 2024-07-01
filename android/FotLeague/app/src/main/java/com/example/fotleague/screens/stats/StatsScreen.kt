@@ -16,21 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fotleague.ui.navigation.TopBar
 
 @Composable
 fun StatsScreen() {
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.DarkGray)
-                    .padding(horizontal = 8.dp)
-                    .height(60.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Stats", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            }
+            TopBar(text = "Stats")
         }
     ) { paddingValues ->
         Column(

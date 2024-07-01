@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fotleague.R
+import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -42,21 +43,7 @@ fun LeagueDetails() {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.DarkGray)
-                    .padding(horizontal = 8.dp)
-                    .height(60.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Leagues",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = LightGray
-                )
-            }
+            TopBar(text = "Leagues")
         }
     ) { paddingValues ->
         Box(
