@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -24,10 +26,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             FotLeagueTheme {
                 val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        BottomNavigation(navController)
+                        if (currentRoute in bottomBarRoutes) {
+                            BottomNavigation(navController)
+                        }
                     }
                 ) { innerPadding ->
                     Box(

@@ -1,6 +1,7 @@
 package com.example.fotleague.screens.leagues
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,29 +28,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.R
+import com.example.fotleague.Screen
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun LeaguesScreen() {
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.DarkGray)
-                    .padding(horizontal = 8.dp)
-                    .height(60.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Leagues", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            }
+fun LeaguesScreen(navController: NavHostController) {
+    Scaffold(contentWindowInsets = WindowInsets(0.dp), topBar = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.DarkGray)
+                .padding(horizontal = 8.dp)
+                .height(60.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Leagues", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
         }
-    ) { paddingValues ->
+    }) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -65,9 +66,9 @@ fun LeaguesScreen() {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    League(name = "League 1 name", pos = 1)
-                    League(name = "League 2 name", pos = 3)
-                    League(name = "League 3 name", pos = 2)
+                    League(navController = navController, name = "League 1 name", pos = 1)
+                    League(navController = navController, name = "League 2 name", pos = 3)
+                    League(navController = navController, name = "League 3 name", pos = 2)
                 }
             }
         }
@@ -77,18 +78,16 @@ fun LeaguesScreen() {
 // Components
 
 @Composable
-fun League(name: String, pos: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .clip(
-                RoundedCornerShape(8.dp)
-            )
-            .background(DarkGray)
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+fun League(navController: NavHostController, name: String, pos: Int) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(50.dp)
+        .clip(
+            RoundedCornerShape(8.dp)
+        )
+        .background(DarkGray)
+        .clickable { navController.navigate(Screen.LeagueDetails.route) }
+        .padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(text = name, fontSize = 16.sp, color = LightGray)
         Spacer(modifier = Modifier.weight(1f))
         Text(text = pos.toString(), color = LightGray)
@@ -105,7 +104,7 @@ fun League(name: String, pos: Int) {
 @Composable
 fun LeaguePreview(modifier: Modifier = Modifier) {
     FotLeagueTheme {
-        League(name = "League 1 name", pos = 1)
+        League(navController = rememberNavController(), name = "League 1 name", pos = 1)
     }
 }
 
