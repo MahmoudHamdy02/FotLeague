@@ -91,19 +91,19 @@ fun Match(homeTeam: String, awayTeam: String, time: String) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
-            Text(text = homeTeam, color = LightGray)
+            Text(text = homeTeam)
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.shield),
                 contentDescription = "Team Icon",
                 tint = LightGray
             )
-            Text(text = time, color = LightGray)
+            Text(text = time)
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.shield),
                 contentDescription = "Team Icon",
                 tint = LightGray
             )
-            Text(text = awayTeam, color = LightGray)
+            Text(text = awayTeam)
         }
 
     }

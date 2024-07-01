@@ -29,7 +29,6 @@ fun TopBar(text: String, weight: FontWeight = FontWeight.SemiBold, fontSize: Int
             text = text,
             fontSize = fontSize.sp,
             fontWeight = weight,
-            color = LightGray
         )
     }
 }

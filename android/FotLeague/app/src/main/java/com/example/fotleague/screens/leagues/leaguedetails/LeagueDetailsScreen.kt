@@ -66,7 +66,6 @@ fun LeagueDetails() {
                         Text(
                             text = "League name",
                             fontSize = 22.sp,
-                            color = LightGray,
                             fontWeight = FontWeight.SemiBold
                         )
                         Spacer(modifier = Modifier.weight(1f))
@@ -83,7 +82,6 @@ fun LeagueDetails() {
                             )
                             Text(
                                 text = "jf8r1G",
-                                color = LightGray,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -91,14 +89,14 @@ fun LeagueDetails() {
                     }
                     // League owner
                     Row {
-                        Text(text = "Owner: Mahmoud", fontSize = 18.sp, color = LightGray)
+                        Text(text = "Owner: Mahmoud", fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(color = DarkGray)
                 }
 
                 // Members table
-                Text(text = "Members", color = LightGray, fontSize = 20.sp)
+                Text(text = "Members", fontSize = 20.sp)
                 TableScreen()
             }
         }
@@ -140,9 +138,9 @@ fun TableScreen() {
         items(tableData) {
             val (id, text) = it
             Row(Modifier.fillMaxWidth()) {
-                TableCell(text = id.toString(), weight = column1Weight, color = LightGray)
-                TableCell(text = text, weight = column2Weight, color = LightGray)
-                TableCell(text = id.toString(), weight = column3Weight, color = LightGray)
+                TableCell(text = id.toString(), weight = column1Weight)
+                TableCell(text = text, weight = column2Weight)
+                TableCell(text = id.toString(), weight = column3Weight)
             }
             HorizontalDivider(color = DarkGray)
         }
@@ -153,7 +151,7 @@ fun TableScreen() {
 fun RowScope.TableCell(
     text: String,
     weight: Float,
-    color: Color
+    color: Color = Color.Unspecified
 ) {
     Text(
         text = text,

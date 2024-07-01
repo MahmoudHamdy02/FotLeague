@@ -82,9 +82,9 @@ fun League(navController: NavHostController, name: String, pos: Int) {
         .background(DarkGray)
         .clickable { navController.navigate(Screen.LeagueDetails.route) }
         .padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(text = name, fontSize = 16.sp, color = LightGray)
+        Text(text = name, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = pos.toString(), color = LightGray)
+        Text(text = pos.toString())
         Spacer(modifier = Modifier.width(10.dp))
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.double_arrow_right_24),
