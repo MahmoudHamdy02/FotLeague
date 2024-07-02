@@ -46,34 +46,23 @@ for i, match in enumerate(matches):
         status = 3
     elif match["status"]["cancelled"]:
         status = 4
-    if i > (len(matches) - 10):
-        matchesJSON.append({
-            "gameweek": match["round"],
-            "season": int(season.split("/")[1]),
-            "home": match["home"]["name"],
-            "away": match["away"]["name"],
-            "home_score": None,
-            "away_score": None,
-            "datetime": match["status"]["utcTime"],
-            "match_status": 1
-        })
-    else:
-        matchesJSON.append({
-            "gameweek": match["round"],
-            "season": int(season.split("/")[1]),
-            "home": match["home"]["name"],
-            "away": match["away"]["name"],
-            "home_score": match["status"]["scoreStr"].split("-")[0].strip(),
-            "away_score": match["status"]["scoreStr"].split("-")[1].strip(),
-            "datetime": match["status"]["utcTime"],
-            "match_status": status
-        })
+    
+    matchesJSON.append({
+        "gameweek": match["round"],
+        "season": int(season.split("/")[1]),
+        "home": match["home"]["name"],
+        "away": match["away"]["name"],
+        "home_score": None if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[0].strip(),
+        "away_score": None if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[1].strip(),
+        "datetime": match["status"]["utcTime"],
+        "match_status": status
+    })
 
 print(len(matchesJSON))
 
-matchesJSON.pop(161)
+# matchesJSON.pop(161)
 
-print(len(matchesJSON))
+# print(len(matchesJSON))
 
 # Send to backend
 print(requests.post(f"http://localhost:3001/matches/init", json={"matches": matchesJSON}))
