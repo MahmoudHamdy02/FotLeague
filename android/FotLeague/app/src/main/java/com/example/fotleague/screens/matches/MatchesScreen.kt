@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.matches
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,11 +11,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,8 +42,26 @@ import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MatchesScreen() {
+
+    val gameweeks = (1..38).toList()
+    var selectedTabIndex by remember {
+        mutableIntStateOf(0)
+    }
+    val pagerState = rememberPagerState {
+        38
+    }
+
+    LaunchedEffect(selectedTabIndex) {
+        pagerState.animateScrollToPage(selectedTabIndex)
+    }
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress)
+            selectedTabIndex = pagerState.currentPage
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
@@ -43,19 +71,45 @@ fun MatchesScreen() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Background)
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Background)
-                    .padding(horizontal = 16.dp, vertical = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                Match("Liverpool", "Everton", "9:00 PM")
-                Match("Liverpool", "Everton", "9:00 PM")
-                Match("Liverpool", "Everton", "9:00 PM")
-                Match("Liverpool", "Everton", "9:00 PM")
+            Column(modifier = Modifier.fillMaxSize()) {
+                ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
+                    gameweeks.forEachIndexed { index, i ->
+                        Tab(
+                            selected = index == selectedTabIndex,
+                            onClick = {
+                                selectedTabIndex = index
+                            },
+                            text = { Text(text = "Game Week $i") },
+                            modifier = Modifier.background(Background)
+                        )
+                    }
+                }
+                HorizontalPager(
+                    state = pagerState, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        // Matches
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp, vertical = 32.dp),
+                            verticalArrangement = Arrangement.spacedBy(32.dp)
+                        ) {
+                            Match("Liverpool", "Everton", "9:00 PM")
+                            Match("Liverpool", "Everton", "9:00 PM")
+                            Match("Liverpool", "Everton", "9:00 PM")
+                            Match("Liverpool", "Everton", "9:00 PM")
+                        }
+                    }
+                }
             }
         }
     }
@@ -111,9 +165,8 @@ fun Match(homeTeam: String, awayTeam: String, time: String) {
 
 @Preview
 @Composable
-fun MatchPreview() {
+fun MatchesScreenPreview() {
     FotLeagueTheme {
-//        Match("Liverpool", "Everton", "9:00 PM")
         MatchesScreen()
     }
 }
