@@ -19,7 +19,7 @@ object AppModule {
     @Singleton
     fun provideFotLeagueApi(): FotLeagueApi {
         return Retrofit.Builder()
-            .baseUrl("http://mahmoud-PC.local:3001")
+            .baseUrl("http://192.168.1.100:3001")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)

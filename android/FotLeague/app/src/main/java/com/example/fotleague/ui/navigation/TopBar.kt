@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fotleague.ui.theme.LightGray
 
 @Composable
 fun TopBar(text: String, weight: FontWeight = FontWeight.SemiBold, fontSize: Int = 22) {
