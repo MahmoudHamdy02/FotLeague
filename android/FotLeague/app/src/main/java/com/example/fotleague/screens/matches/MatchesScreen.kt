@@ -182,15 +182,13 @@ fun Match(homeTeam: String, awayTeam: String, time: String) {
             )
             Text(text = awayTeam, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         }
-
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun MatchesScreenPreview() {
     FotLeagueTheme {
-        MatchesScreen()
+        Match("Liverpool", "Everton", "9:00 PM")
     }
 }
