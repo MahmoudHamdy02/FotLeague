@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.R
 import com.example.fotleague.ui.navigation.TopBar
@@ -109,7 +110,7 @@ fun MatchesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                ) {index ->
+                ) { index ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.TopCenter
@@ -168,19 +169,44 @@ fun Match(homeTeam: String, awayTeam: String, time: String) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
-            Text(text = homeTeam, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.shield),
-                contentDescription = "Team Icon",
-                tint = LightGray
-            )
-            Text(text = time, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.shield),
-                contentDescription = "Team Icon",
-                tint = LightGray
-            )
-            Text(text = awayTeam, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                val (homeRef, awayRef, timeRef, homeIconRef, awayIconRef) = createRefs()
+                Text(
+                    text = homeTeam,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.constrainAs(homeRef) {
+                        end.linkTo(homeIconRef.start, margin = 8.dp)
+                    })
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.shield),
+                    contentDescription = "Team Icon",
+                    tint = LightGray,
+                    modifier = Modifier.constrainAs(homeIconRef) {
+                        end.linkTo(timeRef.start, margin = 8.dp)
+                    }
+                )
+                Text(
+                    text = time,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.constrainAs(timeRef) { centerTo(parent) })
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.shield),
+                    contentDescription = "Team Icon",
+                    tint = LightGray,
+                    modifier = Modifier.constrainAs(awayIconRef) {
+                        start.linkTo(timeRef.end, margin = 8.dp)
+                    }
+                )
+                Text(
+                    text = awayTeam,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.constrainAs(awayRef) {
+                        start.linkTo(awayIconRef.end, margin = 8.dp)
+                    })
+            }
         }
     }
 }

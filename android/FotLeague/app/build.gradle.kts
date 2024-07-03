@@ -85,8 +85,11 @@ dependencies {
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
-
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // Constraint layout
+    implementation(libs.androidx.constraintlayout.compose)
+
 }
 
 // Allow references to generated code
