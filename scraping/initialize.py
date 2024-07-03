@@ -50,10 +50,10 @@ for i, match in enumerate(matches):
     matchesJSON.append({
         "gameweek": match["round"],
         "season": int(season.split("/")[1]),
-        "home": match["home"]["name"],
-        "away": match["away"]["name"],
-        "home_score": None if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[0].strip(),
-        "away_score": None if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[1].strip(),
+        "home": match["home"]["shortName"],
+        "away": match["away"]["shortName"],
+        "home_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[0].strip(),
+        "away_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[1].strip(),
         "datetime": match["status"]["utcTime"],
         "match_status": status
     })

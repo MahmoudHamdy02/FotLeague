@@ -6,6 +6,6 @@ export type Match = {
     away_score: number,
     match_status: number,
     datetime: string,
-    season: string,
+    season: number,
     gameweek: number
 }
