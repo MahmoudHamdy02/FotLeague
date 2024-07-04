@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.matches
 
+import android.content.res.Resources
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.R
+import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.components.picker.Picker
 import com.example.fotleague.ui.components.picker.rememberPickerState
 import com.example.fotleague.ui.navigation.TopBar
@@ -193,12 +197,14 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                         end.linkTo(homeIconRef.start, margin = 8.dp)
                     })
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.shield),
+                    painter = painterResource(id = Logos.getResourceId(homeTeam.lowercase().replace(" ", ""))),
                     contentDescription = "Team Icon",
-                    tint = LightGray,
-                    modifier = Modifier.constrainAs(homeIconRef) {
-                        end.linkTo(timeRef.start, margin = 8.dp)
-                    }
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .constrainAs(homeIconRef) {
+                            end.linkTo(timeRef.start, margin = 8.dp)
+                        }
+                        .size(24.dp)
                 )
                 Text(
                     text = time,
@@ -209,12 +215,12 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                         .widthIn(min = 60.dp)
                         .constrainAs(timeRef) { centerTo(parent) })
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.shield),
+                    painter = painterResource(id = Logos.getResourceId(awayTeam.lowercase().replace(" ", ""))),
                     contentDescription = "Team Icon",
-                    tint = LightGray,
+                    tint = Color.Unspecified,
                     modifier = Modifier.constrainAs(awayIconRef) {
                         start.linkTo(timeRef.end, margin = 8.dp)
-                    }
+                    }.size(24.dp)
                 )
                 Text(
                     text = awayTeam,
@@ -343,6 +349,10 @@ private fun SubmitPredictionModal(homeTeam: String, awayTeam: String, onDismiss:
             }
         }
     }
+
+}
+
+private fun getResourceId(res: String) {
 
 }
 
