@@ -1,6 +1,5 @@
 package com.example.fotleague.screens.matches
 
-import android.content.res.Resources
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -197,7 +196,11 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                         end.linkTo(homeIconRef.start, margin = 8.dp)
                     })
                 Icon(
-                    painter = painterResource(id = Logos.getResourceId(homeTeam.lowercase().replace(" ", ""))),
+                    painter = painterResource(
+                        id = Logos.getResourceId(
+                            homeTeam.lowercase().replace(" ", "")
+                        )
+                    ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
                     modifier = Modifier
@@ -215,12 +218,18 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                         .widthIn(min = 60.dp)
                         .constrainAs(timeRef) { centerTo(parent) })
                 Icon(
-                    painter = painterResource(id = Logos.getResourceId(awayTeam.lowercase().replace(" ", ""))),
+                    painter = painterResource(
+                        id = Logos.getResourceId(
+                            awayTeam.lowercase().replace(" ", "")
+                        )
+                    ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
-                    modifier = Modifier.constrainAs(awayIconRef) {
-                        start.linkTo(timeRef.end, margin = 8.dp)
-                    }.size(24.dp)
+                    modifier = Modifier
+                        .constrainAs(awayIconRef) {
+                            start.linkTo(timeRef.end, margin = 8.dp)
+                        }
+                        .size(24.dp)
                 )
                 Text(
                     text = awayTeam,
@@ -349,10 +358,6 @@ private fun SubmitPredictionModal(homeTeam: String, awayTeam: String, onDismiss:
             }
         }
     }
-
-}
-
-private fun getResourceId(res: String) {
 
 }
 
