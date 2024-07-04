@@ -20,7 +20,6 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
     private val _state = MutableStateFlow(MatchesState())
     val state: StateFlow<MatchesState> = _state.asStateFlow()
 
-
     init {
         viewModelScope.launch {
             val matches = api.getMatches(2025)
@@ -29,8 +28,21 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
             _state.update { state -> state.copy(matches = matches) }
         }
     }
+
+    fun onEvent(event: MatchesEvent) {
+        when(event) {
+            MatchesEvent.CloseDialog -> _state.update { state -> state.copy(predictionDialogOpen = false) }
+            MatchesEvent.OpenDialog -> _state.update { state -> state.copy(predictionDialogOpen = true) }
+        }
+    }
 }
 
 data class MatchesState(
-    val matches: List<Match> = emptyList()
+    val matches: List<Match> = emptyList(),
+    val predictionDialogOpen: Boolean = false
 )
+
+sealed interface MatchesEvent {
+    data object OpenDialog: MatchesEvent
+    data object CloseDialog: MatchesEvent
+}

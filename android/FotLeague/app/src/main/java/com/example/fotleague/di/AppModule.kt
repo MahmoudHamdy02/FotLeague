@@ -23,26 +23,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFotLeagueApi(): FotLeagueApi {
-        var address: String
-        runBlocking {
-            address = getAddress()
-        }
-        Log.d("NET", address)
-        if (address.isEmpty()) {
-            throw Error("No address found")
-        }
         return Retrofit.Builder()
-            .baseUrl("http://$address:3001")
+            .baseUrl("http://192.168.1.104:3001")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)
     }
-}
-
-// Temporary until backend is hosted
-private suspend fun getAddress(): String {
-    val address = withContext(Dispatchers.IO) {
-        InetAddress.getByName("mahmoud-PC.local")
-    }
-    return address.hostAddress ?: ""
 }
