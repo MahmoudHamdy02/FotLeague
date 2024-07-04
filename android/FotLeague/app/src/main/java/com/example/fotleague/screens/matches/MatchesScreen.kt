@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -130,17 +132,24 @@ fun MatchesScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 32.dp),
+                                .padding(horizontal = 16.dp),
                             verticalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
+                            item {
+                                Spacer(modifier = Modifier.height(12.dp))
+                            }
                             items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
                                 val date = ZonedDateTime.parse(match.datetime)
                                     .withZoneSameInstant(ZoneId.systemDefault())
                                 Match(
                                     match.home,
                                     match.away,
+                                    date.format(DateTimeFormatter.ofPattern("d MMM")),
                                     date.format(DateTimeFormatter.ofPattern("h:mm a"))
                                 ) { viewModel.onEvent(MatchesEvent.OpenDialog) }
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(12.dp))
                             }
                         }
                     }
@@ -156,7 +165,7 @@ fun MatchesScreen(
 }
 
 @Composable
-fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit) {
+fun Match(homeTeam: String, awayTeam: String, date: String, time: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,7 +183,7 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
         ) {
-            Text(text = "No prediction submitted", color = DarkGray, fontSize = 13.sp)
+            Text(text = "Tap to submit prediction", color = DarkGray, fontSize = 13.sp)
         }
         Row(
             modifier = Modifier
@@ -187,13 +196,14 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                val (homeRef, awayRef, timeRef, homeIconRef, awayIconRef) = createRefs()
+                val (homeRef, awayRef, datetimeRef, homeIconRef, awayIconRef) = createRefs()
                 Text(
                     text = homeTeam,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(homeRef) {
                         end.linkTo(homeIconRef.start, margin = 8.dp)
+                        centerVerticallyTo(parent)
                     })
                 Icon(
                     painter = painterResource(
@@ -205,18 +215,37 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .constrainAs(homeIconRef) {
-                            end.linkTo(timeRef.start, margin = 8.dp)
+                            end.linkTo(datetimeRef.start, margin = 8.dp)
+                            centerVerticallyTo(parent)
                         }
                         .size(24.dp)
                 )
-                Text(
-                    text = time,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    textAlign = TextAlign.Center,
+                Column(
                     modifier = Modifier
                         .widthIn(min = 60.dp)
-                        .constrainAs(timeRef) { centerTo(parent) })
+                        .fillMaxHeight()
+                        .constrainAs(datetimeRef) {
+                            centerTo(parent)
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = date,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 12.sp
+                    )
+                    Text(
+                        text = time,
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+
+                    )
+                }
                 Icon(
                     painter = painterResource(
                         id = Logos.getResourceId(
@@ -227,16 +256,18 @@ fun Match(homeTeam: String, awayTeam: String, time: String, onClick: () -> Unit)
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .constrainAs(awayIconRef) {
-                            start.linkTo(timeRef.end, margin = 8.dp)
+                            start.linkTo(datetimeRef.end, margin = 8.dp)
+                            centerVerticallyTo(parent)
                         }
                         .size(24.dp)
                 )
                 Text(
                     text = awayTeam,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(awayRef) {
                         start.linkTo(awayIconRef.end, margin = 8.dp)
+                        centerVerticallyTo(parent)
                     })
             }
         }
@@ -365,7 +396,7 @@ private fun SubmitPredictionModal(homeTeam: String, awayTeam: String, onDismiss:
 @Composable
 private fun MatchPreview() {
     FotLeagueTheme {
-        Match("Liverpool", "Everton", "9:00 PM") {}
+        Match("Liverpool", "Everton", "27 Aug", "9:00 PM") {}
     }
 }
 
