@@ -33,16 +33,19 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
         when(event) {
             MatchesEvent.CloseDialog -> _state.update { state -> state.copy(predictionDialogOpen = false) }
             MatchesEvent.OpenDialog -> _state.update { state -> state.copy(predictionDialogOpen = true) }
+            is MatchesEvent.SelectMatch -> _state.update { state -> state.copy(selectedMatch = event.match) }
         }
     }
 }
 
 data class MatchesState(
     val matches: List<Match> = emptyList(),
-    val predictionDialogOpen: Boolean = false
+    val predictionDialogOpen: Boolean = false,
+    val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0)
 )
 
 sealed interface MatchesEvent {
     data object OpenDialog: MatchesEvent
     data object CloseDialog: MatchesEvent
+    data class SelectMatch(val match: Match): MatchesEvent
 }

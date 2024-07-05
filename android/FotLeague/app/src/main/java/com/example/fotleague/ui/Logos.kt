@@ -27,6 +27,6 @@ object Logos {
     )
 
     fun getResourceId(teamName: String): Int {
-        return logos[teamName] ?: R.drawable.shield
+        return logos[teamName.lowercase().replace(" ", "")] ?: R.drawable.shield
     }
 }
