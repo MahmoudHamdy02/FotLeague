@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -91,57 +92,61 @@ fun MatchesScreen(
                 .background(Background)
                 .padding(paddingValues)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
-                    gameweeks.forEachIndexed { index, i ->
-                        Tab(
-                            selected = index == selectedTabIndex,
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(index)
-                                }
-                                selectedTabIndex = index
-                            },
-                            text = { Text(text = "Game Week $i") },
-                            modifier = Modifier.background(Background)
-                        )
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center).size(48.dp))
+            } else {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
+                        gameweeks.forEachIndexed { index, i ->
+                            Tab(
+                                selected = index == selectedTabIndex,
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                    selectedTabIndex = index
+                                },
+                                text = { Text(text = "Game Week $i") },
+                                modifier = Modifier.background(Background)
+                            )
+                        }
                     }
-                }
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) { index ->
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        // Matches
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(20.dp)
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) { index ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.TopCenter
                         ) {
-                            item {
-                                Spacer(modifier = Modifier.height(12.dp))
-                            }
-                            items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
-                                val date = ZonedDateTime.parse(match.datetime)
-                                    .withZoneSameInstant(ZoneId.systemDefault())
-                                Match(
-                                    match.home,
-                                    match.away,
-                                    date.format(DateTimeFormatter.ofPattern("d MMM")),
-                                    date.format(DateTimeFormatter.ofPattern("h:mm a"))
-                                ) {
-                                    viewModel.onEvent(MatchesEvent.OpenDialog)
-                                    viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                            // Matches
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(20.dp)
+                            ) {
+                                item {
+                                    Spacer(modifier = Modifier.height(12.dp))
                                 }
-                            }
-                            item {
-                                Spacer(modifier = Modifier.height(12.dp))
+                                items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
+                                    val date = ZonedDateTime.parse(match.datetime)
+                                        .withZoneSameInstant(ZoneId.systemDefault())
+                                    Match(
+                                        match.home,
+                                        match.away,
+                                        date.format(DateTimeFormatter.ofPattern("d MMM")),
+                                        date.format(DateTimeFormatter.ofPattern("h:mm a"))
+                                    ) {
+                                        viewModel.onEvent(MatchesEvent.OpenDialog)
+                                        viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                                    }
+                                }
+                                item {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
                             }
                         }
                     }

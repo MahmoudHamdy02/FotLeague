@@ -22,10 +22,9 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
 
     init {
         viewModelScope.launch {
+            _state.update { state -> state.copy(isLoading = true) }
             val matches = api.getMatches(2025)
-            Log.d("MATCHES", matches[0].home)
-            Log.d("MATCHES", (matches[0].matchStatus == MatchStatus.Played.num).toString())
-            _state.update { state -> state.copy(matches = matches) }
+            _state.update { state -> state.copy(matches = matches, isLoading = false) }
         }
     }
 
@@ -39,6 +38,7 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
 }
 
 data class MatchesState(
+    val isLoading: Boolean = false,
     val matches: List<Match> = emptyList(),
     val predictionDialogOpen: Boolean = false,
     val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0)
