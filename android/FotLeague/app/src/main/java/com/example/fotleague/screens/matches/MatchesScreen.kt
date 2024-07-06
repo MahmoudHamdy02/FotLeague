@@ -93,7 +93,11 @@ fun MatchesScreen(
                 .padding(paddingValues)
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center).size(48.dp))
+                CircularProgressIndicator(modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(48.dp))
+            } else if (state.error != null){
+                Text(text = state.error!!, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
                     ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
