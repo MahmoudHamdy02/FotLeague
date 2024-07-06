@@ -48,7 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.screens.matches.components.SubmitPredictionModal
+import androidx.navigation.NavHostController
+import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.Background
@@ -63,7 +64,8 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MatchesScreen(
-    viewModel: MatchesViewModel = hiltViewModel()
+    viewModel: MatchesViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -115,16 +117,16 @@ fun MatchesScreen(
                             .fillMaxWidth()
                             .weight(1f)
                     ) { index ->
-                        MatchesBody(state = state, index = index, viewModel = viewModel)
+                        MatchesList(state = state, index = index, viewModel = viewModel)
                     }
                 }
             }
         }
         if (state.predictionDialogOpen)
-            SubmitPredictionModal(
+            SubmitPredictionDialog(
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
-                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) })
+                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) }, navController = navController)
     }
 }
 
@@ -149,7 +151,7 @@ fun GameweeksRow(selectedTabIndex: Int, setSelectedTabIndex: (Int) -> Unit, game
 }
 
 @Composable
-fun MatchesBody(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
+fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
