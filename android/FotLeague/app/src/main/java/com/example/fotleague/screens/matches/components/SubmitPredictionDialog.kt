@@ -33,6 +33,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.components.picker.Picker
@@ -44,11 +45,13 @@ import com.example.fotleague.ui.theme.Gray
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, navController: NavHostController, onDismiss: () -> Unit) {
+fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, onDismiss: () -> Unit) {
     val homeGoals = remember { (0..15).map { it.toString() } }
     val homePickerState = rememberPickerState()
     val awayGoals = remember { (0..15).map { it.toString() } }
     val awayPickerState = rememberPickerState()
+
+    val navController = LocalNavController.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -161,6 +164,6 @@ fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, navController: Na
 @Composable
 private fun SubmitPredictionModalPreview() {
     FotLeagueTheme {
-        SubmitPredictionDialog("Liverpool", "Everton", rememberNavController()) {}
+        SubmitPredictionDialog("Liverpool", "Everton") {}
     }
 }

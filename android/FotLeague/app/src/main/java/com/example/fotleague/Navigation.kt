@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,19 +39,24 @@ sealed class Route(val route: String) {
 
 val bottomBarRoutes = setOf(Screen.MatchesScreen.route, Screen.LeaguesScreen.route, Screen.LeaderboardScreen.route, Screen.StatsScreen.route, Screen.MoreScreen.route)
 
+val LocalNavController = compositionLocalOf<NavHostController> {
+    error("No LocalNavController provided")
+}
+
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation() {
+
     NavHost(
-        navController = navController,
+        navController = LocalNavController.current,
         startDestination = Screen.MatchesScreen.route,
         modifier = Modifier.fillMaxSize()
     ) {
         // Bottom navigation
         composable(Screen.MatchesScreen.route) {
-            MatchesScreen(navController = navController)
+            MatchesScreen()
         }
         composable(Screen.LeaguesScreen.route) {
-            LeaguesScreen(navController)
+            LeaguesScreen()
         }
         composable(Screen.LeaderboardScreen.route) {
             LeaderboardScreen()
@@ -73,31 +79,13 @@ fun Navigation(navController: NavHostController) {
             route = Route.Auth.route
         ) {
             composable(Screen.Auth.LoginScreen.route) {
-                Text(text = "Login screen")
-                Column {
-                    Button(onClick = { navController.navigate(Screen.Auth.SignupScreen.route) }) {
-                        Text(text = "Create account")
-                    }
-                    Button(onClick = { navController.navigate(Screen.Auth.ForgotPasswordScreen.route) }) {
-                        Text(text = "Forgot password")
-                    }
-                    Button(onClick = { navController.navigate(Screen.MatchesScreen.route) {
-                        popUpTo(Route.Auth.route) {
-                            inclusive = true
-                        }
-                    } }) {
-                        Text(text = "matches")
-                    }
-                }
+
             }
             composable(Screen.Auth.SignupScreen.route) {
-                Text(text = "Signup screen")
-                Button(onClick = { navController.navigate(Screen.Auth.LoginScreen.route) }) {
-                    Text(text = "Login instead")
-                }
+
             }
             composable(Screen.Auth.ForgotPasswordScreen.route) {
-                Text(text = "Forgot password screen")
+
             }
         }
     }

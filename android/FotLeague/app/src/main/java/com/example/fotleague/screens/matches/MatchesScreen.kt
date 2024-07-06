@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.navigation.TopBar
@@ -64,8 +63,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MatchesScreen(
-    viewModel: MatchesViewModel = hiltViewModel(),
-    navController: NavHostController
+    viewModel: MatchesViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -97,16 +95,18 @@ fun MatchesScreen(
                 .padding(paddingValues)
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(48.dp))
-            } else if (state.error != null){
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(48.dp)
+                )
+            } else if (state.error != null) {
                 Text(text = state.error!!, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
                     GameweeksRow(
                         selectedTabIndex = selectedTabIndex,
-                        setSelectedTabIndex = {i -> selectedTabIndex = i},
+                        setSelectedTabIndex = { i -> selectedTabIndex = i },
                         gameweeks = gameweeks,
                         scope = scope,
                         pagerState = pagerState
@@ -126,13 +126,19 @@ fun MatchesScreen(
             SubmitPredictionDialog(
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
-                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) }, navController = navController)
+                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) })
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GameweeksRow(selectedTabIndex: Int, setSelectedTabIndex: (Int) -> Unit, gameweeks: List<Int>, scope: CoroutineScope, pagerState: PagerState) {
+fun GameweeksRow(
+    selectedTabIndex: Int,
+    setSelectedTabIndex: (Int) -> Unit,
+    gameweeks: List<Int>,
+    scope: CoroutineScope,
+    pagerState: PagerState
+) {
     ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
         gameweeks.forEachIndexed { index, i ->
             Tab(

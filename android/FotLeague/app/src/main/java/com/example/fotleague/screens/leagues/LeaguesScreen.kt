@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.ui.navigation.TopBar
@@ -37,7 +38,7 @@ import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun LeaguesScreen(navController: NavHostController) {
+fun LeaguesScreen() {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
@@ -58,9 +59,9 @@ fun LeaguesScreen(navController: NavHostController) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    League(navController = navController, name = "League 1 name", pos = 1)
-                    League(navController = navController, name = "League 2 name", pos = 3)
-                    League(navController = navController, name = "League 3 name", pos = 2)
+                    League(name = "League 1 name", pos = 1)
+                    League(name = "League 2 name", pos = 3)
+                    League(name = "League 3 name", pos = 2)
                 }
             }
         }
@@ -70,7 +71,8 @@ fun LeaguesScreen(navController: NavHostController) {
 // Components
 
 @Composable
-fun League(navController: NavHostController, name: String, pos: Int) {
+fun League(name: String, pos: Int) {
+    val navController = LocalNavController.current
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(50.dp)
@@ -96,7 +98,7 @@ fun League(navController: NavHostController, name: String, pos: Int) {
 @Composable
 fun LeaguePreview(modifier: Modifier = Modifier) {
     FotLeagueTheme {
-        League(navController = rememberNavController(), name = "League 1 name", pos = 1)
+        League(name = "League 1 name", pos = 1)
     }
 }
 
