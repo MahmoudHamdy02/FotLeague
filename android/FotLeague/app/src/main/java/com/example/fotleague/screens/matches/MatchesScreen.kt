@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +54,7 @@ import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -100,59 +102,20 @@ fun MatchesScreen(
                 Text(text = state.error!!, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
-                        gameweeks.forEachIndexed { index, i ->
-                            Tab(
-                                selected = index == selectedTabIndex,
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.animateScrollToPage(index)
-                                    }
-                                    selectedTabIndex = index
-                                },
-                                text = { Text(text = "Game Week $i") },
-                                modifier = Modifier.background(Background)
-                            )
-                        }
-                    }
+                    GameweeksRow(
+                        selectedTabIndex = selectedTabIndex,
+                        setSelectedTabIndex = {i -> selectedTabIndex = i},
+                        gameweeks = gameweeks,
+                        scope = scope,
+                        pagerState = pagerState
+                    )
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
                     ) { index ->
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.TopCenter
-                        ) {
-                            // Matches
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 16.dp),
-                                verticalArrangement = Arrangement.spacedBy(20.dp)
-                            ) {
-                                item {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                }
-                                items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
-                                    val date = ZonedDateTime.parse(match.datetime)
-                                        .withZoneSameInstant(ZoneId.systemDefault())
-                                    Match(
-                                        match.home,
-                                        match.away,
-                                        date.format(DateTimeFormatter.ofPattern("d MMM")),
-                                        date.format(DateTimeFormatter.ofPattern("h:mm a"))
-                                    ) {
-                                        viewModel.onEvent(MatchesEvent.OpenDialog)
-                                        viewModel.onEvent(MatchesEvent.SelectMatch(match))
-                                    }
-                                }
-                                item {
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                }
-                            }
-                        }
+                        MatchesBody(state = state, index = index, viewModel = viewModel)
                     }
                 }
             }
@@ -162,6 +125,62 @@ fun MatchesScreen(
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
                 onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) })
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun GameweeksRow(selectedTabIndex: Int, setSelectedTabIndex: (Int) -> Unit, gameweeks: List<Int>, scope: CoroutineScope, pagerState: PagerState) {
+    ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
+        gameweeks.forEachIndexed { index, i ->
+            Tab(
+                selected = index == selectedTabIndex,
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
+                    setSelectedTabIndex(index)
+                },
+                text = { Text(text = "Game Week $i") },
+                modifier = Modifier.background(Background)
+            )
+        }
+    }
+}
+
+@Composable
+fun MatchesBody(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        // Matches
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
+                val date = ZonedDateTime.parse(match.datetime)
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                Match(
+                    match.home,
+                    match.away,
+                    date.format(DateTimeFormatter.ofPattern("d MMM")),
+                    date.format(DateTimeFormatter.ofPattern("h:mm a"))
+                ) {
+                    viewModel.onEvent(MatchesEvent.OpenDialog)
+                    viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
     }
 }
 
