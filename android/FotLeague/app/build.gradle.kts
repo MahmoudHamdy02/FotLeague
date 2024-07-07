@@ -90,6 +90,8 @@ dependencies {
     // Constraint layout
     implementation(libs.androidx.constraintlayout.compose)
 
+    // Datastore
+    implementation(libs.androidx.datastore.preferences)
 }
 
 // Allow references to generated code
