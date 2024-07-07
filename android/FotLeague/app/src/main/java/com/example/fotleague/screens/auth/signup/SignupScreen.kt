@@ -5,14 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,8 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalNavController
-import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -61,39 +56,39 @@ import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
-fun LoginScreen() {
+fun SignupScreen() {
     val navController = LocalNavController.current
 
+    var username by remember {
+        mutableStateOf("")
+    }
     var email by remember {
         mutableStateOf("")
     }
     var password by remember {
         mutableStateOf("")
     }
-    var isRememberMeChecked by remember {
-        mutableStateOf(false)
-    }
 
-    LoginScreenContent(
+    SignupScreenContent(
+        username = username,
+        setUsername = { username = it },
         email = email,
         setEmail = { email = it },
         password = password,
         setPassword = { password = it },
-        isRememberMeChecked = isRememberMeChecked,
-        setIsRememberMeChecked = { isRememberMeChecked = it },
         navController = navController
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoginScreenContent(
+private fun SignupScreenContent(
+    username: String,
     email: String,
     setEmail: (String) -> Unit,
     password: String,
     setPassword: (String) -> Unit,
-    isRememberMeChecked: Boolean,
-    setIsRememberMeChecked: (Boolean) -> Unit,
+    setUsername: (String) -> Unit,
     navController: NavHostController
 ) {
     Scaffold(
@@ -101,7 +96,7 @@ private fun LoginScreenContent(
         topBar = {
             TopAppBar(
                 windowInsets = WindowInsets(0.dp),
-                title = { Text(text = "Log in") },
+                title = { Text(text = "Sign up") },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
                 navigationIcon = {
                     IconButton(onClick = {
@@ -126,11 +121,16 @@ private fun LoginScreenContent(
                     .background(color = Background)
                     .padding(horizontal = 16.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                Text(text = "Log in to FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Create an account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextField(
+                        value = username,
+                        onValueChange = { setUsername(it) },
+                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                        label = { Text(text = "Username") })
                     TextField(
                         value = email,
                         onValueChange = { setEmail(it) },
@@ -141,12 +141,7 @@ private fun LoginScreenContent(
                         onValueChange = { setPassword(it) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
                         label = { Text(text = "Password") })
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = isRememberMeChecked,
-                            onCheckedChange = { setIsRememberMeChecked(it) })
-                        Text(text = "Stay signed in?")
-                    }
+
                 }
 
                 Button(
@@ -160,75 +155,24 @@ private fun LoginScreenContent(
                             Brush.linearGradient(listOf(Primary, PrimaryLight))
                         )
                 ) {
-                    Text(text = "Log in", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(Modifier.width(280.dp), verticalAlignment = Alignment.CenterVertically) {
-                        HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
-                        Text(
-                            text = "or continue with",
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
-                        HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        SocialLoginButton(iconResourceId = R.drawable.google)
-                        SocialLoginButton(iconResourceId = R.drawable.facebook)
-                        SocialLoginButton(iconResourceId = R.drawable.twitter)
-                    }
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Don't have an account?")
-                    Text(
-                        text = "Register now",
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable {
-                            navController.navigate(Screen.Auth.SignupScreen.route)
-                        })
+                    Text(text = "Create account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
     }
 }
 
-@Composable
-private fun SocialLoginButton(iconResourceId: Int) {
-    Button(
-        onClick = { /*TODO*/ }, modifier = Modifier
-            .size(48.dp),
-        shape = RoundedCornerShape(8.dp),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = LightGray)
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = iconResourceId),
-            contentDescription = "Google",
-            tint = Color.Unspecified
-        )
-    }
-}
-
 @Preview
 @Composable
-private fun LoginScreenPreview() {
+private fun SignupScreenPreview() {
     FotLeagueTheme {
-        LoginScreenContent(
+        SignupScreenContent(
+            username = "",
+            setUsername = {},
             email = "",
             setEmail = {},
             password = "",
             setPassword = {},
-            isRememberMeChecked = false,
-            setIsRememberMeChecked = {},
             navController = rememberNavController()
         )
     }

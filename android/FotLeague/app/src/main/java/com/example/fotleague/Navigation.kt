@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.fotleague.screens.auth.login.LoginScreen
+import com.example.fotleague.screens.auth.login.SignupScreen
 import com.example.fotleague.screens.leaderboard.LeaderboardScreen
 import com.example.fotleague.screens.leagues.LeaguesScreen
 import com.example.fotleague.screens.leagues.leaguedetails.LeagueDetails
@@ -83,7 +84,7 @@ fun Navigation() {
                 LoginScreen()
             }
             composable(Screen.Auth.SignupScreen.route) {
-                Text(text = "Signup screen")
+                SignupScreen()
             }
             composable(Screen.Auth.ForgotPasswordScreen.route) {
 
