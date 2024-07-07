@@ -27,6 +27,7 @@ object AppModule {
         runBlocking {
             address = getAddress()
         }
+        Log.d("NET", address ?: "No address found")
         if (address == null) {
             return null
         }
@@ -43,6 +44,7 @@ object AppModule {
             val address = withContext(Dispatchers.IO) {
                 InetAddress.getByName("mahmoud-PC.local")
             }
+            Log.d("NET", address.hostAddress ?: "No address")
             return address.hostAddress
         } catch (e: Exception) {
             return null

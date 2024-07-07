@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalNavController
@@ -48,7 +49,9 @@ import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
-fun SignupScreen() {
+fun SignupScreen(
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
 
     var username by remember {
@@ -68,7 +71,8 @@ fun SignupScreen() {
         setEmail = { email = it },
         password = password,
         setPassword = { password = it },
-        navController = navController
+        navController = navController,
+        onSignUpClick = {viewModel.onEvent(SignUpEvent.SignUp)}
     )
 }
 
@@ -81,7 +85,8 @@ private fun SignupScreenContent(
     password: String,
     setPassword: (String) -> Unit,
     setUsername: (String) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    onSignUpClick: () -> Unit
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
@@ -137,7 +142,7 @@ private fun SignupScreenContent(
                 }
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { onSignUpClick() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .width(280.dp)
@@ -165,7 +170,8 @@ private fun SignupScreenPreview() {
             setEmail = {},
             password = "",
             setPassword = {},
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            onSignUpClick = {}
         )
     }
 }
