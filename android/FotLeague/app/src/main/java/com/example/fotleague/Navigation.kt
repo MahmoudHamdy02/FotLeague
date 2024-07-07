@@ -83,7 +83,7 @@ fun Navigation() {
                 LoginScreen()
             }
             composable(Screen.Auth.SignupScreen.route) {
-
+                Text(text = "Signup screen")
             }
             composable(Screen.Auth.ForgotPasswordScreen.route) {
 
