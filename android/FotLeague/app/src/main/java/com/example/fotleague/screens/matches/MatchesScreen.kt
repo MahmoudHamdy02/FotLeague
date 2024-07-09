@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.navigation.TopBar
@@ -94,13 +95,7 @@ fun MatchesScreen(
                 .background(Background)
                 .padding(paddingValues)
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(48.dp)
-                )
-            } else if (state.error != null) {
+            if (state.error != null) {
                 Text(text = state.error!!, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -111,13 +106,22 @@ fun MatchesScreen(
                         scope = scope,
                         pagerState = pagerState
                     )
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) { index ->
-                        MatchesList(state = state, index = index, viewModel = viewModel)
+                    if (state.isLoading || LocalAuthUser.current.isLoading) {
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(48.dp)
+                            )
+                        }
+                    } else {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) { index ->
+                            MatchesList(state = state, index = index, viewModel = viewModel)
+                        }
                     }
                 }
             }
@@ -171,6 +175,7 @@ fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
         ) {
             item {
                 Spacer(modifier = Modifier.height(12.dp))
+                Text(text = LocalAuthUser.current.isLoggedIn.toString())
             }
             items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
                 val date = ZonedDateTime.parse(match.datetime)

@@ -1,4 +1,4 @@
-package com.example.fotleague.models
+package com.example.fotleague.models.network.request
 
 import kotlinx.serialization.Serializable
 

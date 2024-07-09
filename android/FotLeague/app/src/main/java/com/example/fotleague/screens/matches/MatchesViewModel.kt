@@ -14,7 +14,7 @@ import java.net.ConnectException
 import javax.inject.Inject
 
 @HiltViewModel
-class MatchesViewModel @Inject constructor(private val api: FotLeagueApi?) : ViewModel() {
+class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : ViewModel() {
 
     private val _state = MutableStateFlow(MatchesState())
     val state: StateFlow<MatchesState> = _state.asStateFlow()
@@ -23,19 +23,21 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi?) : Vie
         viewModelScope.launch {
             _state.update { state -> state.copy(isLoading = true) }
 
-            if (api == null) {
-                _state.update { state -> state.copy(isLoading = false, error = "Failed to connect to server") }
-            } else {
-                try {
-                    val matches = api.getMatches(2025)
-                    val body = matches.body()
-                    if (matches.isSuccessful && body != null) {
-                        _state.update { state -> state.copy(matches = body, isLoading = false) }
-                    }
-                } catch (e: Exception) {
-                    _state.update { state -> state.copy(error = if (e is ConnectException) "Failed to connect to server" else "An error occurred", isLoading = false) }
+            try {
+                val matches = api.getMatches(2025)
+                val body = matches.body()
+                if (matches.isSuccessful && body != null) {
+                    _state.update { state -> state.copy(matches = body, isLoading = false) }
+                }
+            } catch (e: Exception) {
+                _state.update { state ->
+                    state.copy(
+                        error = if (e is ConnectException) "Failed to connect to server" else "An error occurred",
+                        isLoading = false
+                    )
                 }
             }
+
 
         }
     }
