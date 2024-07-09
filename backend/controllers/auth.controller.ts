@@ -6,7 +6,8 @@ import { UserRole } from "../enums/UserRole";
 import { validate } from "./utils";
 
 export const authStatus = (req: Request, res: Response) => {
-    res.json(req.authUser);
+    const {password: _, ...details} = req.authUser;
+    res.status(200).json(details);
 };
 
 export const login = (req: Request, res: Response) => {
@@ -38,20 +39,18 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-    const userId = req.authUser.id;
+    const user = req.authUser;
     const { oldPassword, newPassword } = req.body;
     if (!validate([oldPassword, newPassword], ["string", "string"], res)) return;
 
 
     try {
-        const userDetails = await userService.getUserById(userId);
-
-        const passwordsMatch = await bcrypt.compare(oldPassword, userDetails.password);
+        const passwordsMatch = await bcrypt.compare(oldPassword, user.password);
 
         if (!passwordsMatch)
             return res.status(403).json({error: "Old user password is incorrect"});
 
-        const newUser = await userService.changeUserPassword(userId, newPassword);
+        const newUser = await userService.changeUserPassword(user.id, newPassword);
 
         req.logout(err => {
             return res.status(200).json({user: newUser, error: err});
