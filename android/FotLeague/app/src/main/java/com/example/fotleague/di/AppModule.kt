@@ -1,19 +1,17 @@
 package com.example.fotleague.di
 
-import android.util.Log
+import android.content.Context
+import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import java.net.InetAddress
 import javax.inject.Singleton
 
 @Module
@@ -36,6 +34,12 @@ object AppModule {
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStoreUtil(@ApplicationContext context: Context): DataStoreUtil {
+        return DataStoreUtil(context)
     }
 
     // Temporary until backend is hosted
