@@ -34,7 +34,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
-import com.example.fotleague.models.network.request.AddPredictionRequest
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.components.picker.Picker
 import com.example.fotleague.ui.components.picker.PickerState
@@ -46,7 +45,7 @@ import com.example.fotleague.ui.theme.Gray
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun SubmitPredictionDialog(matchId: Int, homeTeam: String, awayTeam: String, homePickerState: PickerState, awayPickerState: PickerState, onDismiss: () -> Unit, onSubmit: (prediction: AddPredictionRequest) -> Unit) {
+fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, homePickerState: PickerState, awayPickerState: PickerState, onDismiss: () -> Unit, onSubmit: () -> Unit, edit: Boolean) {
     val homeGoals = remember { (0..15).map { it.toString() } }
     val awayGoals = remember { (0..15).map { it.toString() } }
 
@@ -69,7 +68,7 @@ fun SubmitPredictionDialog(matchId: Int, homeTeam: String, awayTeam: String, hom
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Submit prediction",
+                    text = if (edit) "Edit prediction" else "Submit prediction",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = LightGray
@@ -152,7 +151,7 @@ fun SubmitPredictionDialog(matchId: Int, homeTeam: String, awayTeam: String, hom
                         if (!authUser.isLoggedIn) {
                             navController.navigate(Route.Auth.route)
                         } else {
-                            onSubmit(AddPredictionRequest(matchId, homePickerState.selectedItem.toInt(), awayPickerState.selectedItem.toInt()))
+                            onSubmit()
                             onDismiss()
                         }
                     },
@@ -172,11 +171,13 @@ fun SubmitPredictionDialog(matchId: Int, homeTeam: String, awayTeam: String, hom
 private fun SubmitPredictionModalPreview() {
     FotLeagueTheme {
         SubmitPredictionDialog(
-            matchId = 0,
             homeTeam = "Liverpool",
             awayTeam = "Everton",
             homePickerState = rememberPickerState(),
             awayPickerState = rememberPickerState(),
-            onDismiss = {}) {}
+            onDismiss = {},
+            onSubmit = {},
+            edit = false
+        )
     }
 }

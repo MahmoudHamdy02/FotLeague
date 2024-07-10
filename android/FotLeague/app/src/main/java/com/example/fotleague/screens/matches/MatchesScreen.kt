@@ -135,13 +135,19 @@ fun MatchesScreen(
         }
         if (state.predictionDialogOpen)
             SubmitPredictionDialog(
-                matchId = state.selectedMatch.id,
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
                 homePickerState = state.homePickerState,
                 awayPickerState = state.awayPickerState,
-                onSubmit = { viewModel.onEvent(MatchesEvent.SubmitPrediction) },
-                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) }
+                onSubmit = {
+                    if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
+                        viewModel.onEvent(MatchesEvent.UpdatePrediction)
+                    } else {
+                        viewModel.onEvent(MatchesEvent.SubmitPrediction)
+                    }
+                },
+                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) },
+                edit = state.predictions.any { it.matchId == state.selectedMatch.id }
             )
     }
 }
@@ -246,7 +252,11 @@ fun Match(
             if (prediction == null) {
                 Text(text = "Tap to submit prediction", color = DarkGray, fontSize = 13.sp)
             } else {
-                Text(text = "Prediction: ${prediction.home} - ${prediction.away}", color = DarkGray, fontSize = 13.sp)
+                Text(
+                    text = "Prediction: ${prediction.home} - ${prediction.away}",
+                    color = DarkGray,
+                    fontSize = 13.sp
+                )
             }
         }
         Row(

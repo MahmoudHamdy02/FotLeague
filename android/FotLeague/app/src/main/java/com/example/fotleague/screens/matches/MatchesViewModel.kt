@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
-import com.example.fotleague.models.network.request.AddPredictionRequest
+import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
 import com.example.fotleague.ui.components.picker.PickerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +50,7 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
             MatchesEvent.OpenDialog -> _state.update { state -> state.copy(predictionDialogOpen = true) }
             is MatchesEvent.SelectMatch -> _state.update { state -> state.copy(selectedMatch = event.match) }
             is MatchesEvent.SubmitPrediction -> submitPrediction()
+            MatchesEvent.UpdatePrediction -> updatePrediction()
         }
     }
 
@@ -82,7 +83,20 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
     private fun submitPrediction() {
         viewModelScope.launch {
             api.addPrediction(
-                AddPredictionRequest(
+                AddOrEditPredictionRequest(
+                    _state.value.selectedMatch.id,
+                    _state.value.homePickerState.selectedItem.toInt(),
+                    _state.value.awayPickerState.selectedItem.toInt()
+                )
+            )
+            getPredictions()
+        }
+    }
+
+    private fun updatePrediction() {
+        viewModelScope.launch {
+            api.updatePrediction(
+                AddOrEditPredictionRequest(
                     _state.value.selectedMatch.id,
                     _state.value.homePickerState.selectedItem.toInt(),
                     _state.value.awayPickerState.selectedItem.toInt()
@@ -109,4 +123,5 @@ sealed interface MatchesEvent {
     data object CloseDialog : MatchesEvent
     data class SelectMatch(val match: Match) : MatchesEvent
     data object SubmitPrediction : MatchesEvent
+    data object UpdatePrediction : MatchesEvent
 }
