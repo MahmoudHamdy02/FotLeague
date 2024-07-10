@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -24,16 +25,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,25 +55,17 @@ fun SignupScreen(
 ) {
     val navController = LocalNavController.current
 
-    var username by remember {
-        mutableStateOf("")
-    }
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
+    val state by viewModel.state.collectAsState()
 
     SignupScreenContent(
-        username = username,
-        setUsername = { username = it },
-        email = email,
-        setEmail = { email = it },
-        password = password,
-        setPassword = { password = it },
+        username = state.username,
+        setUsername = { viewModel.onEvent(SignUpEvent.SetUsername(it)) },
+        email = state.email,
+        setEmail = { viewModel.onEvent(SignUpEvent.SetEmail(it)) },
+        password = state.password,
+        setPassword = { viewModel.onEvent(SignUpEvent.SetPassword(it)) },
         navController = navController,
-        onSignUpClick = {viewModel.onEvent(SignUpEvent.SignUp)}
+        onSignUpClick = { viewModel.onEvent(SignUpEvent.SignUp) }
     )
 }
 
@@ -127,18 +120,24 @@ private fun SignupScreenContent(
                         value = username,
                         onValueChange = { setUsername(it) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Username") })
+                        label = { Text(text = "Username") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        )
                     TextField(
                         value = email,
                         onValueChange = { setEmail(it) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Email") })
+                        label = { Text(text = "Email") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
                     TextField(
                         value = password,
                         onValueChange = { setPassword(it) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Password") })
-
+                        label = { Text(text = "Password") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
                 }
 
                 Button(
