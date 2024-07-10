@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalNavController
@@ -61,7 +62,9 @@ import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val navController = LocalNavController.current
 
     var email by remember {
@@ -81,6 +84,7 @@ fun LoginScreen() {
         setPassword = { password = it },
         isRememberMeChecked = isRememberMeChecked,
         setIsRememberMeChecked = { isRememberMeChecked = it },
+        onLogin = { viewModel.onEvent(LoginEvent.Login)},
         navController = navController
     )
 }
@@ -94,6 +98,7 @@ private fun LoginScreenContent(
     setPassword: (String) -> Unit,
     isRememberMeChecked: Boolean,
     setIsRememberMeChecked: (Boolean) -> Unit,
+    onLogin: () -> Unit,
     navController: NavHostController
 ) {
     Scaffold(
@@ -150,7 +155,7 @@ private fun LoginScreenContent(
                 }
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { onLogin() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .width(280.dp)
@@ -229,6 +234,7 @@ private fun LoginScreenPreview() {
             setPassword = {},
             isRememberMeChecked = false,
             setIsRememberMeChecked = {},
+            onLogin = {},
             navController = rememberNavController()
         )
     }

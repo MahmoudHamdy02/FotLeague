@@ -1,4 +1,4 @@
-package com.example.fotleague.screens.auth.signup
+package com.example.fotleague.screens.auth.login
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,33 +6,33 @@ import androidx.lifecycle.viewModelScope
 import com.example.fotleague.LifecycleUtil
 import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
+import com.example.fotleague.models.network.request.LoginRequest
 import com.example.fotleague.models.network.request.SignUpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val api: FotLeagueApi,
     private val dataStoreUtil: DataStoreUtil
 ) : ViewModel() {
 
-    fun onEvent(event: SignUpEvent) {
+    fun onEvent(event: LoginEvent) {
         when (event) {
-            SignUpEvent.SignUp -> signUp()
+            LoginEvent.Login -> login()
         }
     }
 
-    private fun signUp() {
+    private fun login() {
         viewModelScope.launch {
-            val response = api.signUp(SignUpRequest("fotleague@fotleague.com", "fotleague", "fotleague"))
-            Log.d("SIGNUP", response.body().toString())
-            Log.d("SIGNUP", response.headers()["Set-Cookie"] ?: "No cookie found")
+            val response = api.login(LoginRequest("fotleague@fotleague.com", "fotleague", false))
+            Log.d("LOGIN", response.body().toString())
             LifecycleUtil.onSetRestartTrue()
         }
     }
 }
 
-sealed interface SignUpEvent {
-    data object SignUp : SignUpEvent
+sealed interface LoginEvent {
+    data object Login : LoginEvent
 }
