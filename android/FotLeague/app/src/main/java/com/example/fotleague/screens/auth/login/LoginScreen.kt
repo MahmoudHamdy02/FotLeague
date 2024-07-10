@@ -31,10 +31,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,24 +66,16 @@ fun LoginScreen(
 ) {
     val navController = LocalNavController.current
 
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
-    var isRememberMeChecked by remember {
-        mutableStateOf(false)
-    }
+    val state by viewModel.state.collectAsState()
 
     LoginScreenContent(
-        email = email,
-        setEmail = { email = it },
-        password = password,
-        setPassword = { password = it },
-        isRememberMeChecked = isRememberMeChecked,
-        setIsRememberMeChecked = { isRememberMeChecked = it },
-        onLogin = { viewModel.onEvent(LoginEvent.Login)},
+        email = state.email,
+        setEmail = { viewModel.onEvent(LoginEvent.SetEmail(it)) },
+        password = state.password,
+        setPassword = { viewModel.onEvent(LoginEvent.SetPassword(it)) },
+        isRememberMeChecked = state.rememberMe,
+        setIsRememberMeChecked = { viewModel.onEvent(LoginEvent.SetRememberMe(it)) },
+        onLogin = { viewModel.onEvent(LoginEvent.Login) },
         navController = navController
     )
 }
@@ -145,7 +136,9 @@ private fun LoginScreenContent(
                         value = password,
                         onValueChange = { setPassword(it) },
                         colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Password") })
+                        label = { Text(text = "Password") },
+                        visualTransformation = PasswordVisualTransformation()
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = isRememberMeChecked,

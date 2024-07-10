@@ -7,14 +7,14 @@ import com.example.fotleague.LifecycleUtil
 import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.SignUpRequest
+import com.example.fotleague.screens.auth.login.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val api: FotLeagueApi,
-    private val dataStoreUtil: DataStoreUtil
+    private val api: FotLeagueApi
 ) : ViewModel() {
 
     fun onEvent(event: SignUpEvent) {

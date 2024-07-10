@@ -109,7 +109,11 @@ fun MatchesScreen(
                         pagerState = pagerState
                     )
                     if (state.isLoading || LocalAuthUser.current.isLoading) {
-                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             CircularProgressIndicator(
                                 modifier = Modifier
                                     .size(48.dp)
