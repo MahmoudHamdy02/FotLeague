@@ -4,10 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fotleague.LifecycleUtil
-import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.SignUpRequest
-import com.example.fotleague.screens.auth.login.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
