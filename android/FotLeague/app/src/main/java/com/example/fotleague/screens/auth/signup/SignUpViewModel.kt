@@ -25,11 +25,11 @@ class SignUpViewModel @Inject constructor(
 
     private fun signUp() {
         viewModelScope.launch {
-            val response = api.signUp(SignUpRequest("test29@test.com", "fnoeuwf23", "mahmoud29"))
+            val response = api.signUp(SignUpRequest("test30@test.com", "fnoeuwf23", "mahmoud30"))
             Log.d("SIGNUP", response.body().toString())
             Log.d("SIGNUP", response.headers()["Set-Cookie"] ?: "No cookie found")
             dataStoreUtil.setAuthCookie(response.headers()["Set-Cookie"] ?: "")
-            LifecycleUtil.onRestart()
+            LifecycleUtil.onSetRestartTrue()
         }
     }
 }

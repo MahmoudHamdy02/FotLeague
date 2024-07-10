@@ -8,13 +8,11 @@ object LifecycleUtil {
     private val _restartAppEvent = MutableLiveData<Boolean>()
     val restartAppEvent: LiveData<Boolean> = _restartAppEvent
 
-    fun onRestart() {
-        // Trigger the event when login is successful
+    fun onSetRestartTrue() {
         _restartAppEvent.value = true
     }
 
-    fun onSetFalse() {
-        // Trigger the event when login is successful
+    fun onSetRestartFalse() {
         _restartAppEvent.value = false
     }
 }
