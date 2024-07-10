@@ -18,9 +18,6 @@ class AddCookiesInterceptor(private val dataStoreUtil: DataStoreUtil) : Intercep
         val cookie = dataStoreUtil.getAuthCookie.value
         Log.d("INTERCEPTOR COOKIE", cookie)
 
-        val original: Request = chain.request()
-//        if (original.url.toString().contains("distributor")) {
-//        }
         builder.addHeader("Cookie", cookie)
 
         return chain.proceed(builder.build())

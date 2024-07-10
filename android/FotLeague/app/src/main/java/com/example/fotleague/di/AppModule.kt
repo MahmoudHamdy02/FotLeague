@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.fotleague.data.AddCookiesInterceptor
 import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
+import com.example.fotleague.data.ReceivedCookiesInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -11,7 +12,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -33,7 +33,13 @@ object AppModule {
 //            return null
 //        }
         return Retrofit.Builder()
-            .client(OkHttpClient.Builder().addInterceptor(AddCookiesInterceptor(dataStoreUtil)).build())
+            .client(
+                OkHttpClient
+                    .Builder()
+                    .addInterceptor(AddCookiesInterceptor(dataStoreUtil))
+                    .addInterceptor(ReceivedCookiesInterceptor(dataStoreUtil))
+                    .build()
+            )
             .baseUrl("http://192.168.1.103:3001")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
