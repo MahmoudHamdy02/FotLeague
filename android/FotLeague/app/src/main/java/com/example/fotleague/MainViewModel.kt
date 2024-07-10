@@ -16,29 +16,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(@ApplicationContext context: Context, api: FotLeagueApi) :
+class MainViewModel @Inject constructor(api: FotLeagueApi) :
     ViewModel() {
-    private val dataStoreUtil = DataStoreUtil(context)
 
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            dataStoreUtil.getAuthCookie.collect {
-                Log.d("COOKIE", it)
-                if (it.isEmpty()) {
-                    _state.update { state -> state.copy(isLoggedIn = false, isLoading = false) }
-                } else {
-                    val userResponse = api.getAuthUser(it)
-                    Log.d("RESPONSE", userResponse.toString())
-                    Log.d("RESPONSE", userResponse.body().toString())
-                    if (userResponse.code() == 200) {
-                        _state.update { state -> state.copy(isLoggedIn = true, isLoading = false) }
-                    } else {
-                        _state.update { state -> state.copy(isLoggedIn = false, isLoading = false) }
-                    }
-                }
+            val userResponse = api.getAuthUser()
+            Log.d("RESPONSE", userResponse.toString())
+            Log.d("RESPONSE", userResponse.body().toString())
+            if (userResponse.code() == 200) {
+                _state.update { state -> state.copy(isLoggedIn = true, isLoading = false) }
+            } else {
+                _state.update { state -> state.copy(isLoggedIn = false, isLoading = false) }
             }
         }
     }

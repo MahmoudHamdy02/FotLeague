@@ -28,7 +28,7 @@ app.use(session({
     cookie: {
         // Default: 15 Minutes
         // Remember me: 1 Month
-        maxAge: 1000 * 60 * 15 // Milliseconds
+        maxAge: 1000 * 30 // Milliseconds
     }
 }));
 app.use(passport.initialize());

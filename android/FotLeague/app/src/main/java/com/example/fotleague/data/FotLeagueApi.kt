@@ -19,7 +19,7 @@ interface FotLeagueApi {
     suspend fun getStatus(): Status
 
     @GET("/auth/status")
-    suspend fun getAuthUser(@Header("Cookie") cookie: String): Response<User>
+    suspend fun getAuthUser(): Response<User>
 
     @GET("/matches/{season}")
     suspend fun getMatches(@Path("season") season: Int): Response<List<Match>>

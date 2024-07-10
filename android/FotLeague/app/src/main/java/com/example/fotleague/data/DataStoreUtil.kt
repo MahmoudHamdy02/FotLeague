@@ -7,9 +7,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 
 class DataStoreUtil(@ApplicationContext private val context: Context) {
 
@@ -18,13 +21,13 @@ class DataStoreUtil(@ApplicationContext private val context: Context) {
         val AUTH_COOKIE = stringPreferencesKey("auth_cookie")
     }
 
-    val getAuthCookie: Flow<String> = context.dataStore.data
-        .map { preferences ->
-            preferences[AUTH_COOKIE] ?: ""
-        }
+    private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun getAuthCookie(): String {
-        return getAuthCookie.last()
+    val getAuthCookie: StateFlow<String> = runBlocking {
+        context.dataStore.data
+            .map { preferences ->
+                preferences[AUTH_COOKIE] ?: ""
+            }.stateIn(scope)
     }
 
     suspend fun setAuthCookie(value: String) {
