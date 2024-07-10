@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalAuthUser
+import com.example.fotleague.LocalNavController
+import com.example.fotleague.Route
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.navigation.TopBar
@@ -162,6 +164,9 @@ fun GameweeksRow(
 
 @Composable
 fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
+    val navController = LocalNavController.current
+    val authUser = LocalAuthUser.current
+
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter
@@ -186,8 +191,12 @@ fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
                     date.format(DateTimeFormatter.ofPattern("d MMM")),
                     date.format(DateTimeFormatter.ofPattern("h:mm a"))
                 ) {
-                    viewModel.onEvent(MatchesEvent.OpenDialog)
-                    viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                    if (!authUser.isLoggedIn) {
+                        navController.navigate(Route.Auth.route)
+                    } else {
+                        viewModel.onEvent(MatchesEvent.OpenDialog)
+                        viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                    }
                 }
             }
             item {

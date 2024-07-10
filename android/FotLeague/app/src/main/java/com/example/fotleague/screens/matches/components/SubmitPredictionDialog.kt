@@ -31,8 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.ui.Logos
@@ -52,6 +51,7 @@ fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, onDismiss: () -> 
     val awayPickerState = rememberPickerState()
 
     val navController = LocalNavController.current
+    val authUser = LocalAuthUser.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -148,7 +148,13 @@ fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, onDismiss: () -> 
                     }
                 }
                 Button(
-                    onClick = { navController.navigate(Route.Auth.route) },
+                    onClick = {
+                        if (!authUser.isLoggedIn) {
+                            navController.navigate(Route.Auth.route)
+                        } else {
+                            onDismiss()
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Gray),
                     shape = RoundedCornerShape(8.dp)
                 ) {

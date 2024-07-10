@@ -21,6 +21,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // Todo: add another api and builder to automatically restart the app if token is expired and 401 error is received
+
     @Provides
     @Singleton
     fun provideFotLeagueApi(dataStoreUtil: DataStoreUtil): FotLeagueApi {
