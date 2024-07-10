@@ -1,6 +1,19 @@
 import { Request, Response } from "express";
 import { predictionService } from "../services/prediction.service";
 import { validate } from "./utils";
+import { matchService } from "../services/match.service";
+
+export const getUserPredictionsForCurrentSeason = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+
+    try {
+        const currenstSeason = await matchService.getCurrentSeason();
+        const predictions = await predictionService.getUserPredictionsBySeason(userId, currenstSeason);
+        res.status(200).json(predictions);
+    } catch (error) {
+        res.status(400).json({error: "Error getting predictions"});
+    }
+};
 
 export const getUserPredictionsBySeason = async (req: Request, res: Response) => {
     const userId = req.authUser.id;

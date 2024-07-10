@@ -4,6 +4,8 @@ import { predictionController } from "../controllers/prediction.controller";
 
 export const predictionRouter = Router();
 
+predictionRouter.get("/", requireAuth, predictionController.getUserPredictionsForCurrentSeason);
+
 predictionRouter.get("/:season", requireAuth, predictionController.getUserPredictionsBySeason);
 
 predictionRouter.post("/", requireAuth, predictionController.addPrediction);

@@ -1,18 +1,18 @@
 package com.example.fotleague.data
 
 import com.example.fotleague.models.Match
-import com.example.fotleague.models.network.request.SignUpRequest
-import com.example.fotleague.models.network.response.SignUpResponse
+import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Status
 import com.example.fotleague.models.User
+import com.example.fotleague.models.network.request.AddPredictionRequest
 import com.example.fotleague.models.network.request.LoginRequest
+import com.example.fotleague.models.network.request.SignUpRequest
 import com.example.fotleague.models.network.response.LoginResponse
 import com.example.fotleague.models.network.response.LogoutResponse
+import com.example.fotleague.models.network.response.SignUpResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -26,6 +26,12 @@ interface FotLeagueApi {
 
     @GET("/matches/{season}")
     suspend fun getMatches(@Path("season") season: Int): Response<List<Match>>
+
+    @GET("/predictions/")
+    suspend fun getPredictions(): Response<List<Prediction>>
+
+    @POST("/predictions")
+    suspend fun addPrediction(@Body body: AddPredictionRequest): Response<Prediction>
 
     @POST("/auth/signup")
     suspend fun signUp(@Body body: SignUpRequest): Response<SignUpResponse>

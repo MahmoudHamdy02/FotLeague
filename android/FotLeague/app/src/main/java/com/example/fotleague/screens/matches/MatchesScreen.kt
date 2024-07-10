@@ -51,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
+import com.example.fotleague.models.Prediction
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.navigation.TopBar
@@ -134,9 +135,14 @@ fun MatchesScreen(
         }
         if (state.predictionDialogOpen)
             SubmitPredictionDialog(
+                matchId = state.selectedMatch.id,
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
-                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) })
+                homePickerState = state.homePickerState,
+                awayPickerState = state.awayPickerState,
+                onSubmit = { viewModel.onEvent(MatchesEvent.SubmitPrediction) },
+                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) }
+            )
     }
 }
 
@@ -193,7 +199,8 @@ fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
                     match.home,
                     match.away,
                     date.format(DateTimeFormatter.ofPattern("d MMM")),
-                    date.format(DateTimeFormatter.ofPattern("h:mm a"))
+                    date.format(DateTimeFormatter.ofPattern("h:mm a")),
+                    prediction = state.predictions.find { it.matchId == match.id }
                 ) {
                     if (!authUser.isLoggedIn) {
                         navController.navigate(Route.Auth.route)
@@ -211,7 +218,14 @@ fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
 }
 
 @Composable
-fun Match(homeTeam: String, awayTeam: String, date: String, time: String, onClick: () -> Unit) {
+fun Match(
+    homeTeam: String,
+    awayTeam: String,
+    date: String,
+    time: String,
+    prediction: Prediction?,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -229,7 +243,11 @@ fun Match(homeTeam: String, awayTeam: String, date: String, time: String, onClic
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
         ) {
-            Text(text = "Tap to submit prediction", color = DarkGray, fontSize = 13.sp)
+            if (prediction == null) {
+                Text(text = "Tap to submit prediction", color = DarkGray, fontSize = 13.sp)
+            } else {
+                Text(text = "Prediction: ${prediction.home} - ${prediction.away}", color = DarkGray, fontSize = 13.sp)
+            }
         }
         Row(
             modifier = Modifier
@@ -320,6 +338,6 @@ fun Match(homeTeam: String, awayTeam: String, date: String, time: String, onClic
 @Composable
 private fun MatchPreview() {
     FotLeagueTheme {
-        Match("Liverpool", "Everton", "27 Aug", "9:00 PM") {}
+        Match("Liverpool", "Everton", "27 Aug", "9:00 PM", Prediction(0, 0, 0, 0)) {}
     }
 }
