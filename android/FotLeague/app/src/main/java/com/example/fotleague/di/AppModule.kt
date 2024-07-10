@@ -1,6 +1,7 @@
 package com.example.fotleague.di
 
 import android.content.Context
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.AddCookiesInterceptor
 import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
@@ -42,7 +43,7 @@ object AppModule {
                     .addInterceptor(ReceivedCookiesInterceptor(dataStoreUtil))
                     .build()
             )
-            .baseUrl("http://192.168.1.103:3001")
+            .baseUrl("http://192.168.1.101:3001")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)
@@ -66,4 +67,10 @@ object AppModule {
 //            return null
 //        }
 //    }
+
+    @Provides
+    @Singleton
+    fun provideAuthStatus(api: FotLeagueApi): AuthStatus {
+        return AuthStatus(api)
+    }
 }

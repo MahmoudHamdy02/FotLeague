@@ -13,11 +13,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,23 +36,59 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
-import com.example.fotleague.ui.navigation.TopBar
+import com.example.fotleague.models.League
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun LeaguesScreen() {
+fun LeaguesScreen(
+    viewModel: LeaguesViewModel = hiltViewModel()
+) {
+    val navController = LocalNavController.current
+
+    val state by viewModel.state.collectAsState()
+
+    LeaguesContent(
+        leagues = state.leagues,
+        onLeagueClick = { navController.navigate(Screen.LeagueDetails.route) },
+        onBackIconClick = { navController.popBackStack() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LeaguesContent(leagues: List<League>, onLeagueClick: () -> Unit, onBackIconClick: () -> Unit) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            TopBar(text = "Leagues")
+            TopAppBar(
+                title = { Text(text = "Leagues") },
+                windowInsets = WindowInsets(0.dp),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+                actions = {
+                    IconButton(onClick = onBackIconClick) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            tint = LightGray
+                        )
+                    }
+                    IconButton(onClick = onBackIconClick) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
+                            contentDescription = null,
+                            tint = LightGray
+                        )
+                    }
+                }
+            )
         }) { paddingValues ->
         Box(
             modifier = Modifier
@@ -55,33 +101,47 @@ fun LeaguesScreen() {
                     .background(color = Background)
                     .padding(horizontal = 16.dp, vertical = 24.dp),
             ) {
-                Header()
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
-                ) {
-                    League(name = "League 1 name", pos = 1)
-                    League(name = "League 2 name", pos = 3)
-                    League(name = "League 3 name", pos = 2)
+                if (!LocalAuthUser.current.isLoggedIn) {
+                    Text(text = "Log in to see your leagues")
+                } else {
+                    Header()
+                    LeaguesList(leagues = leagues, onLeagueClick = onLeagueClick)
                 }
             }
         }
     }
 }
 
-// Components
+@Composable
+fun LeaguesList(leagues: List<League>, onLeagueClick: () -> Unit) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        item {
+            League(name = "Global", pos = 1)
+        }
+        items(leagues.drop(1)) { league ->
+            League(name = league.name, pos = 1, modifier = Modifier.clickable { onLeagueClick() })
+        }
+    }
+}
+
 
 @Composable
-fun League(name: String, pos: Int) {
-    val navController = LocalNavController.current
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .height(50.dp)
-        .clip(
-            RoundedCornerShape(8.dp)
-        )
-        .background(DarkGray)
-        .clickable { navController.navigate(Screen.LeagueDetails.route) }
-        .padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+fun League(name: String, pos: Int, modifier: Modifier = Modifier) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .clip(
+                RoundedCornerShape(8.dp)
+            )
+            .background(DarkGray)
+            .then(modifier)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
         Text(text = name, fontSize = 16.sp)
         Spacer(modifier = Modifier.weight(1f))
         Text(text = pos.toString())

@@ -1,5 +1,6 @@
 package com.example.fotleague.data
 
+import com.example.fotleague.models.League
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Status
@@ -28,6 +29,7 @@ interface FotLeagueApi {
     @GET("/matches/{season}")
     suspend fun getMatches(@Path("season") season: Int): Response<List<Match>>
 
+
     @GET("/predictions/")
     suspend fun getPredictions(): Response<List<Prediction>>
 
@@ -36,6 +38,10 @@ interface FotLeagueApi {
 
     @PATCH("/predictions")
     suspend fun updatePrediction(@Body body: AddOrEditPredictionRequest): Response<Prediction>
+
+
+    @GET("/leagues/user/leagues")
+    suspend fun getLeagues(): Response<List<League>>
 
     @POST("/auth/signup")
     suspend fun signUp(@Body body: SignUpRequest): Response<SignUpResponse>
