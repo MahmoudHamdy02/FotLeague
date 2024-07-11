@@ -42,6 +42,7 @@ import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.League
+import com.example.fotleague.screens.leagues.components.JoinLeagueDialog
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -58,38 +59,30 @@ fun LeaguesScreen(
     LeaguesContent(
         leagues = state.leagues,
         onLeagueClick = { navController.navigate(Screen.LeagueDetails.route) },
-        onBackIconClick = { navController.popBackStack() }
+        isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
+        onOpenJoinLeagueDialog = { viewModel.onEvent((LeaguesEvent.OpenJoinLeagueDialog)) },
+        onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
+        code = state.joinLeagueDialogCode,
+        setCode = { viewModel.onEvent(LeaguesEvent.SetJoinLeagueDialogCode(it)) },
+        onJoinClick = { viewModel.onEvent(LeaguesEvent.JoinLeague) }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeaguesContent(leagues: List<League>, onLeagueClick: () -> Unit, onBackIconClick: () -> Unit) {
+fun LeaguesContent(
+    leagues: List<League>,
+    onLeagueClick: () -> Unit,
+    isJoinLeagueDialogOpen: Boolean,
+    onOpenJoinLeagueDialog: () -> Unit,
+    onDismissJoinLeagueDialog: () -> Unit,
+    code: String,
+    setCode: (code: String) -> Unit,
+    onJoinClick: () -> Unit
+) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Leagues") },
-                windowInsets = WindowInsets(0.dp),
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                actions = {
-                    IconButton(onClick = onBackIconClick) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                    IconButton(onClick = onBackIconClick) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                }
-            )
-        }) { paddingValues ->
+        topBar = { TopBar(onOpenJoinLeagueDialog) })
+    { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -109,7 +102,41 @@ fun LeaguesContent(leagues: List<League>, onLeagueClick: () -> Unit, onBackIconC
                 }
             }
         }
+        if (isJoinLeagueDialogOpen) {
+            JoinLeagueDialog(
+                code = code,
+                setCode = setCode,
+                onJoinClick = onJoinClick,
+                onDismiss = onDismissJoinLeagueDialog
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(onOpenJoinLeagueDialog: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = "Leagues") },
+        windowInsets = WindowInsets(0.dp),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+        actions = {
+            IconButton(onClick = onOpenJoinLeagueDialog) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+            IconButton(onClick = onOpenJoinLeagueDialog) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        }
+    )
 }
 
 @Composable

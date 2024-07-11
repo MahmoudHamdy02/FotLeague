@@ -6,6 +6,8 @@ import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Status
 import com.example.fotleague.models.User
 import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
+import com.example.fotleague.models.network.request.CreateLeagueRequest
+import com.example.fotleague.models.network.request.JoinLeagueRequest
 import com.example.fotleague.models.network.request.LoginRequest
 import com.example.fotleague.models.network.request.SignUpRequest
 import com.example.fotleague.models.network.response.LoginResponse
@@ -42,6 +44,13 @@ interface FotLeagueApi {
 
     @GET("/leagues/user/leagues")
     suspend fun getLeagues(): Response<List<League>>
+
+    @POST("/leagues")
+    suspend fun createLeague(@Body body: CreateLeagueRequest): Response<League>
+
+    @POST("/leagues/join")
+    suspend fun joinLeague(@Body body: JoinLeagueRequest): Response<Unit>
+
 
     @POST("/auth/signup")
     suspend fun signUp(@Body body: SignUpRequest): Response<SignUpResponse>
