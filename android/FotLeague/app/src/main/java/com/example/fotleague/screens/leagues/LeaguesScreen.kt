@@ -42,6 +42,7 @@ import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.League
+import com.example.fotleague.screens.leagues.components.CreateLeagueDialog
 import com.example.fotleague.screens.leagues.components.JoinLeagueDialog
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -61,10 +62,16 @@ fun LeaguesScreen(
         onLeagueClick = { navController.navigate(Screen.LeagueDetails.route) },
         isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
         onOpenJoinLeagueDialog = { viewModel.onEvent((LeaguesEvent.OpenJoinLeagueDialog)) },
+        onOpenCreateLeagueDialog = {viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)},
         onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
         code = state.joinLeagueDialogCode,
         setCode = { viewModel.onEvent(LeaguesEvent.SetJoinLeagueDialogCode(it)) },
-        onJoinClick = { viewModel.onEvent(LeaguesEvent.JoinLeague) }
+        onJoinClick = { viewModel.onEvent(LeaguesEvent.JoinLeague) },
+        isCreateLeagueDialogOpen = state.isCreateLeagueDialogOpen,
+        onDismissCreateLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseCreateLeagueDialog) },
+        name = state.createLeagueDialogName,
+        setName = { viewModel.onEvent(LeaguesEvent.SetCreateLeagueDialogName(it)) },
+        onCreateClick = { viewModel.onEvent(LeaguesEvent.CreateLeague) }
     )
 }
 
@@ -74,14 +81,25 @@ fun LeaguesContent(
     onLeagueClick: () -> Unit,
     isJoinLeagueDialogOpen: Boolean,
     onOpenJoinLeagueDialog: () -> Unit,
+    onOpenCreateLeagueDialog: () -> Unit,
     onDismissJoinLeagueDialog: () -> Unit,
     code: String,
     setCode: (code: String) -> Unit,
-    onJoinClick: () -> Unit
+    onJoinClick: () -> Unit,
+    isCreateLeagueDialogOpen: Boolean,
+    onDismissCreateLeagueDialog: () -> Unit,
+    name: String,
+    setName: (code: String) -> Unit,
+    onCreateClick: () -> Unit,
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
-        topBar = { TopBar(onOpenJoinLeagueDialog) })
+        topBar = {
+            TopBar(
+                onOpenJoinLeagueDialog = onOpenJoinLeagueDialog,
+                onOpenCreateLeagueDialog = onOpenCreateLeagueDialog
+            )
+        })
     { paddingValues ->
         Box(
             modifier = Modifier
@@ -110,18 +128,29 @@ fun LeaguesContent(
                 onDismiss = onDismissJoinLeagueDialog
             )
         }
+        if (isCreateLeagueDialogOpen) {
+            CreateLeagueDialog(
+                name = name,
+                setName = setName,
+                onCreateClick = onCreateClick,
+                onDismiss = onDismissCreateLeagueDialog
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(onOpenJoinLeagueDialog: () -> Unit) {
+private fun TopBar(
+    onOpenJoinLeagueDialog: () -> Unit,
+    onOpenCreateLeagueDialog: () -> Unit
+) {
     TopAppBar(
         title = { Text(text = "Leagues") },
         windowInsets = WindowInsets(0.dp),
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
         actions = {
-            IconButton(onClick = onOpenJoinLeagueDialog) {
+            IconButton(onClick = onOpenCreateLeagueDialog) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null,

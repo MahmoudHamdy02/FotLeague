@@ -1,11 +1,11 @@
 package com.example.fotleague.screens.leagues
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.League
+import com.example.fotleague.models.network.request.CreateLeagueRequest
 import com.example.fotleague.models.network.request.JoinLeagueRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,13 +51,28 @@ class LeaguesViewModel @Inject constructor(private val api: FotLeagueApi, authSt
                     _state.update { state -> state.copy(isJoinLeagueDialogOpen = false, joinLeagueDialogCode = "") }
                 }
             }
+
+            LeaguesEvent.CloseCreateLeagueDialog -> _state.update { state -> state.copy(isCreateLeagueDialogOpen = false) }
+            LeaguesEvent.OpenCreateLeagueDialog -> _state.update { state -> state.copy(isCreateLeagueDialogOpen = true) }
+            is LeaguesEvent.SetCreateLeagueDialogName -> _state.update { state -> state.copy(createLeagueDialogName = event.name) }
+            LeaguesEvent.CreateLeague -> {
+                viewModelScope.launch {
+                    createLeague()
+                    _state.update { state -> state.copy(isCreateLeagueDialogOpen = false, createLeagueDialogName = "") }
+                }
+            }
         }
     }
 
     private suspend fun joinLeague() {
         val response = api.joinLeague(JoinLeagueRequest(_state.value.joinLeagueDialogCode))
-        Log.d("LEAGUE", response.toString())
-        Log.d("LEAGUE", response.body().toString())
+        if (response.isSuccessful) {
+            getLeagues()
+        }
+    }
+
+    private suspend fun createLeague() {
+        val response = api.createLeague(CreateLeagueRequest(_state.value.createLeagueDialogName))
         if (response.isSuccessful) {
             getLeagues()
         }
@@ -66,8 +81,12 @@ class LeaguesViewModel @Inject constructor(private val api: FotLeagueApi, authSt
 
 data class LeaguesState(
     val leagues: List<League> = emptyList(),
+
     val isJoinLeagueDialogOpen: Boolean = false,
-    val joinLeagueDialogCode: String = ""
+    val joinLeagueDialogCode: String = "",
+
+    val isCreateLeagueDialogOpen: Boolean = false,
+    val createLeagueDialogName: String = ""
 )
 
 sealed interface LeaguesEvent {
@@ -75,4 +94,9 @@ sealed interface LeaguesEvent {
     data object CloseJoinLeagueDialog: LeaguesEvent
     data class SetJoinLeagueDialogCode(val code: String): LeaguesEvent
     data object JoinLeague: LeaguesEvent
+
+    data object OpenCreateLeagueDialog: LeaguesEvent
+    data object CloseCreateLeagueDialog: LeaguesEvent
+    data class SetCreateLeagueDialogName(val name: String): LeaguesEvent
+    data object CreateLeague: LeaguesEvent
 }
