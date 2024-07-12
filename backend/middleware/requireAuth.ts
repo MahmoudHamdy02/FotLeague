@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.session.cookie);
     if (req.isAuthenticated()) {
         req.authUser = req.user;
         next();

@@ -4,6 +4,8 @@ import { leagueController } from "../controllers/league.controller";
 
 export const leagueRouter = Router();
 
+leagueRouter.get("/:id", requireAuth, leagueController.getLeagueDetailsById);
+
 leagueRouter.post("/", requireAuth, leagueController.createLeague);
 
 leagueRouter.post("/join/", requireAuth, leagueController.joinLeague);

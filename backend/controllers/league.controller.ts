@@ -89,4 +89,22 @@ export const getUserLeagues = async (req: Request, res: Response) => {
     }
 };
 
+export const getLeagueDetailsById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        const leagueId = parseInt(id);
+
+        const league = await leagueService.getLeagueById(leagueId);
+
+        if (!league) return res.status(400).json({error: "No league found"});
+
+        const userScores = await leagueService.getLeagueUsersWithScores(leagueId);
+
+        return res.status(200).json({league, userScores});
+    } catch (error) {
+        return res.status(400).json({error: "Error getting user leagues"});
+    }
+};
+
 export * as leagueController from "./league.controller";

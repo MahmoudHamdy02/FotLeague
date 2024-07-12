@@ -5,14 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.example.fotleague.screens.auth.login.LoginScreen
 import com.example.fotleague.screens.auth.signup.SignupScreen
 import com.example.fotleague.screens.leaderboard.LeaderboardScreen
 import com.example.fotleague.screens.leagues.LeaguesScreen
-import com.example.fotleague.screens.leagues.leaguedetails.LeagueDetails
+import com.example.fotleague.screens.leagues.leaguedetails.LeagueDetailsScreen
 import com.example.fotleague.screens.matches.MatchesScreen
 import com.example.fotleague.screens.more.MoreScreen
 import com.example.fotleague.screens.stats.StatsScreen
@@ -74,8 +76,15 @@ fun Navigation() {
         }
 
         // Nested navigation
-        composable(Screen.LeagueDetails.route) {
-            LeagueDetails()
+        composable(
+            route = Screen.LeagueDetails.route + "/{leagueId}",
+            arguments = listOf(
+                navArgument("leagueId") {
+                    type = NavType.IntType
+                }
+            )
+        ) {
+            LeagueDetailsScreen()
         }
 
         // Auth

@@ -1,6 +1,7 @@
 import { pool } from "../db";
 import { League } from "../types/League";
 import { LeagueUser } from "../types/LeagueUser";
+import { UserScore } from "../types/UserScore";
 
 export const createLeague = async (name: string, ownerId: number, code: string): Promise<League> => {
     const client = await pool.connect();
@@ -28,6 +29,13 @@ export const getLeagueByCode = async (code: string): Promise<League | null> => {
         : null;
 };
 
+export const getLeagueById = async (id: number): Promise<League | null> => {
+    const data = await pool.query<League>("SELECT * FROM leagues WHERE id = $1;", [id]);
+    return data.rowCount === 1
+        ? data.rows[0]
+        : null;
+};
+
 export const addLeagueUser = async (userId: number, leagueId: number): Promise<LeagueUser> => {
     const data = await pool.query<LeagueUser>("INSERT INTO leagues_users(user_id, league_id) VALUES ($1, $2) RETURNING *;", [userId, leagueId]);
     return data.rows[0];
@@ -36,6 +44,11 @@ export const addLeagueUser = async (userId: number, leagueId: number): Promise<L
 export const getLeagueUsers = async (leagueId: number): Promise<number[]> => {
     const users = await pool.query<LeagueUser>("SELECT user_id FROM leagues_users WHERE league_id = $1", [leagueId]);
     return users.rows.map(user => user.user_id);
+};
+
+export const getLeagueUsersWithScores = async (leagueId: number): Promise<UserScore[]> => {
+    const users = await pool.query<UserScore>("SELECT U.id, U.name, COALESCE(SUM(S.score), 0) AS score FROM leagues_users AS LU JOIN users AS U ON LU.user_id = U.id LEFT JOIN scores AS S ON S.user_id = U.id WHERE LU.league_id = $1 GROUP BY U.id ORDER BY score DESC;", [leagueId]);
+    return users.rows;
 };
 
 export const getUserLeagues = async (userId: number): Promise<League[]> => {

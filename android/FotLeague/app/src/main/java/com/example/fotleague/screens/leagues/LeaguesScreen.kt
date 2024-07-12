@@ -59,7 +59,7 @@ fun LeaguesScreen(
 
     LeaguesContent(
         leagues = state.leagues,
-        onLeagueClick = { navController.navigate(Screen.LeagueDetails.route) },
+        onLeagueClick = { navController.navigate(Screen.LeagueDetails.route + "/$it") },
         isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
         onOpenJoinLeagueDialog = { viewModel.onEvent((LeaguesEvent.OpenJoinLeagueDialog)) },
         onOpenCreateLeagueDialog = {viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)},
@@ -78,7 +78,7 @@ fun LeaguesScreen(
 @Composable
 fun LeaguesContent(
     leagues: List<League>,
-    onLeagueClick: () -> Unit,
+    onLeagueClick: (leagueId: Int) -> Unit,
     isJoinLeagueDialogOpen: Boolean,
     onOpenJoinLeagueDialog: () -> Unit,
     onOpenCreateLeagueDialog: () -> Unit,
@@ -169,7 +169,7 @@ private fun TopBar(
 }
 
 @Composable
-fun LeaguesList(leagues: List<League>, onLeagueClick: () -> Unit) {
+fun LeaguesList(leagues: List<League>, onLeagueClick: (leagueId: Int) -> Unit) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
@@ -177,7 +177,7 @@ fun LeaguesList(leagues: List<League>, onLeagueClick: () -> Unit) {
             League(name = "Global", pos = 1)
         }
         items(leagues.drop(1)) { league ->
-            League(name = league.name, pos = 1, modifier = Modifier.clickable { onLeagueClick() })
+            League(name = league.name, pos = 1, modifier = Modifier.clickable { onLeagueClick(league.id) })
         }
     }
 }

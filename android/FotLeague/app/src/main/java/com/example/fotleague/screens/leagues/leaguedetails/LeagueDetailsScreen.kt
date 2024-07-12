@@ -14,13 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,8 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
-import com.example.fotleague.ui.navigation.TopBar
+import com.example.fotleague.models.UserScore
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -38,11 +48,37 @@ import com.example.fotleague.ui.theme.Gray
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun LeagueDetails() {
+fun LeagueDetailsScreen(
+    viewModel: LeagueDetailsViewModel = hiltViewModel()
+) {
+    val navController = LocalNavController.current
+
+    val state by viewModel.state.collectAsState()
+
+    LeagueDetailsContent(
+        leagueName = state.league.name,
+        ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
+        code = state.league.code,
+        userScores = state.userScores,
+        onBackArrowClick = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun LeagueDetailsContent(
+    leagueName: String,
+    ownerName: String,
+    code: String,
+    userScores: List<UserScore>,
+    onBackArrowClick: () -> Unit
+) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
-            TopBar(text = "Leagues")
+            TopBar(
+                onLeaveLeagueClick = {},
+                onBackArrowClick = onBackArrowClick
+            )
         }
     ) { paddingValues ->
         Box(
@@ -63,7 +99,7 @@ fun LeagueDetails() {
                     // League name and code
                     Row {
                         Text(
-                            text = "League name",
+                            text = leagueName,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -80,7 +116,7 @@ fun LeagueDetails() {
                                 tint = LightGray
                             )
                             Text(
-                                text = "jf8r1G",
+                                text = code,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -88,7 +124,7 @@ fun LeagueDetails() {
                     }
                     // League owner
                     Row {
-                        Text(text = "Owner: Mahmoud", fontSize = 18.sp)
+                        Text(text = "Owner: $ownerName", fontSize = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(color = DarkGray)
@@ -96,26 +132,60 @@ fun LeagueDetails() {
 
                 // Members table
                 Text(text = "Members", fontSize = 20.sp)
-                TableScreen()
+                ScoresTable(userScores = userScores)
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(
+    onLeaveLeagueClick: () -> Unit,
+    onBackArrowClick: () -> Unit,
+) {
+    TopAppBar(
+        title = { Text(text = "Leagues") },
+        windowInsets = WindowInsets(0.dp),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+        navigationIcon = {
+            IconButton(onClick = onBackArrowClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onLeaveLeagueClick) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        }
+    )
 }
 
 @Preview
 @Composable
 fun LeagueDetailsPreview() {
     FotLeagueTheme {
-        LeagueDetails()
+        LeagueDetailsContent(
+            leagueName = "League name",
+            ownerName = "owner",
+            code = "fn28gD",
+            userScores = emptyList(),
+            onBackArrowClick = {}
+        )
     }
 }
 
 @Composable
-fun TableScreen() {
-    // Just a fake data... a Pair of Int and String
-    val tableData = (1..20).mapIndexed { index, _ ->
-        index to "Item $index"
-    }
+fun ScoresTable(userScores: List<UserScore>) {
+
     // Each cell of a column must have the same weight.
     val column1Weight = .15f // 30%
     val column2Weight = .65f // 70%
@@ -134,12 +204,11 @@ fun TableScreen() {
             }
         }
         // Rows
-        items(tableData) {
-            val (id, text) = it
+        itemsIndexed(userScores) { index, userScore ->
             Row(Modifier.fillMaxWidth()) {
-                TableCell(text = id.toString(), weight = column1Weight)
-                TableCell(text = text, weight = column2Weight)
-                TableCell(text = id.toString(), weight = column3Weight)
+                TableCell(text = (index + 1).toString(), weight = column1Weight)
+                TableCell(text = userScore.name, weight = column2Weight)
+                TableCell(text = userScore.score.toString(), weight = column3Weight)
             }
             HorizontalDivider(color = DarkGray)
         }
