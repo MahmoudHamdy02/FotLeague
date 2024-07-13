@@ -51,9 +51,9 @@ fun LeaderboardScreen(
         numOfScores = state.numOfScores,
         userScores = state.scores,
         isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
-        onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown)},
-        onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown)},
-        onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it))}
+        onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown) },
+        onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown) },
+        onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it)) }
     )
 }
 
@@ -105,11 +105,20 @@ private fun LeaderboardContent(
                             contentDescription = "Copy",
                             tint = LightGray
                         )
-                        DropdownMenu(expanded = isNumOfScoresDropdownExpanded, onDismissRequest = onDismissNumOfScoresDropdown, modifier = Modifier.background(
-                            Background)) {
-                            DropdownMenuItem(text = { Text(text = "10") }, onClick = { onSelectNumOfScores(10) })
-                            DropdownMenuItem(text = { Text(text = "20") }, onClick = { onSelectNumOfScores(20) })
-                            DropdownMenuItem(text = { Text(text = "50") }, onClick = { onSelectNumOfScores(50) })
+                        DropdownMenu(
+                            expanded = isNumOfScoresDropdownExpanded,
+                            onDismissRequest = onDismissNumOfScoresDropdown,
+                            modifier = Modifier.background(Background)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "10") },
+                                onClick = { onSelectNumOfScores(10) })
+                            DropdownMenuItem(
+                                text = { Text(text = "20") },
+                                onClick = { onSelectNumOfScores(20) })
+                            DropdownMenuItem(
+                                text = { Text(text = "50") },
+                                onClick = { onSelectNumOfScores(50) })
                         }
                     }
                 }
