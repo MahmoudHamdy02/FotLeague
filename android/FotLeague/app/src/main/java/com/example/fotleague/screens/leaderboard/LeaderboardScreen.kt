@@ -2,6 +2,7 @@ package com.example.fotleague.screens.leaderboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -45,12 +48,24 @@ fun LeaderboardScreen(
     val state by viewModel.state.collectAsState()
 
     LeaderboardContent(
-        userScores = state.scores
+        numOfScores = state.numOfScores,
+        userScores = state.scores,
+        isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
+        onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown)},
+        onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown)},
+        onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it))}
     )
 }
 
 @Composable
-private fun LeaderboardContent(userScores: List<UserScore>) {
+private fun LeaderboardContent(
+    numOfScores: Int,
+    userScores: List<UserScore>,
+    isNumOfScoresDropdownExpanded: Boolean,
+    onDismissNumOfScoresDropdown: () -> Unit,
+    onExpandNumOfScoresDropdown: () -> Unit,
+    onSelectNumOfScores: (num: Int) -> Unit
+) {
     Scaffold(
         topBar = { TopBar() },
         contentWindowInsets = WindowInsets(0.dp)
@@ -77,10 +92,11 @@ private fun LeaderboardContent(userScores: List<UserScore>) {
                     Row(
                         modifier = Modifier
                             .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
+                            .clickable { onExpandNumOfScoresDropdown() }
                             .padding(horizontal = 8.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = "10",
+                            text = numOfScores.toString(),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -89,6 +105,12 @@ private fun LeaderboardContent(userScores: List<UserScore>) {
                             contentDescription = "Copy",
                             tint = LightGray
                         )
+                        DropdownMenu(expanded = isNumOfScoresDropdownExpanded, onDismissRequest = onDismissNumOfScoresDropdown, modifier = Modifier.background(
+                            Background)) {
+                            DropdownMenuItem(text = { Text(text = "10") }, onClick = { onSelectNumOfScores(10) })
+                            DropdownMenuItem(text = { Text(text = "20") }, onClick = { onSelectNumOfScores(20) })
+                            DropdownMenuItem(text = { Text(text = "50") }, onClick = { onSelectNumOfScores(50) })
+                        }
                     }
                 }
                 ScoresTable(userScores = userScores)
@@ -112,7 +134,12 @@ private fun TopBar() {
 private fun LeaderboardContentPreview() {
     FotLeagueTheme {
         LeaderboardContent(
-            userScores = emptyList()
+            numOfScores = 10,
+            userScores = emptyList(),
+            isNumOfScoresDropdownExpanded = false,
+            onDismissNumOfScoresDropdown = {},
+            onExpandNumOfScoresDropdown = {},
+            onSelectNumOfScores = {}
         )
     }
 }

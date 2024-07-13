@@ -24,14 +24,14 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi, au
         viewModelScope.launch {
             authStatus.getAuthUser().collect {
                 if (it != null) {
-                    getScores()
+                    getScores(_state.value.numOfScores)
                 }
             }
         }
     }
 
-    private suspend fun getScores() {
-        val scoresResponse = api.getGlobalScores()
+    private suspend fun getScores(numOfScores: Int) {
+        val scoresResponse = api.getGlobalScores(numOfScores)
         val scoresBody = scoresResponse.body()
         if (scoresResponse.isSuccessful && scoresBody != null) {
             _state.update { state -> state.copy(scores = scoresBody) }
@@ -39,14 +39,27 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi, au
     }
 
     fun onEvent(event: LeaderboardEvent) {
-
+        when (event) {
+            LeaderboardEvent.DismissNumOfScoresDropdown -> _state.update { it.copy(isNumOfScoresDropdownExpanded = false) }
+            LeaderboardEvent.ExpandNumOfScoresDropdown -> _state.update { it.copy(isNumOfScoresDropdownExpanded = true) }
+            is LeaderboardEvent.SelectNumOfScores -> {
+                _state.update { it.copy(numOfScores = event.num, isNumOfScoresDropdownExpanded = false) }
+                viewModelScope.launch {
+                    getScores(event.num)
+                }
+            }
+        }
     }
 }
 
 data class LeaderboardState(
-    val scores: List<UserScore> = emptyList()
+    val scores: List<UserScore> = emptyList(),
+    val isNumOfScoresDropdownExpanded: Boolean = false,
+    val numOfScores: Int = 10
 )
 
 sealed interface LeaderboardEvent {
-
+    data object ExpandNumOfScoresDropdown: LeaderboardEvent
+    data object DismissNumOfScoresDropdown: LeaderboardEvent
+    data class SelectNumOfScores(val num: Int): LeaderboardEvent
 }

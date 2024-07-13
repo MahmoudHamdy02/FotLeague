@@ -21,6 +21,7 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface FotLeagueApi {
 
@@ -45,7 +46,7 @@ interface FotLeagueApi {
 
 
     @GET("/scores/global")
-    suspend fun getGlobalScores(): Response<List<UserScore>>
+    suspend fun getGlobalScores(@Query("num") num: Int): Response<List<UserScore>>
 
 
     @GET("/leagues/user/leagues")
