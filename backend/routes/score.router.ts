@@ -9,4 +9,4 @@ scoreRouter.get("/user/:season", requireAuth, scoreController.getUserScoresBySea
 scoreRouter.get("/user/total/:season", requireAuth, scoreController.getTotalUserScoreBySeason);
 
 // TODO: Needs tests
-scoreRouter.get("/top-10-global", scoreController.getTopGlobalUsersBySeason);
+scoreRouter.get("/global", scoreController.getTopGlobalUsers);

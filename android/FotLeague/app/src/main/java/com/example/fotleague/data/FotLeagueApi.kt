@@ -5,6 +5,7 @@ import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Status
 import com.example.fotleague.models.User
+import com.example.fotleague.models.UserScore
 import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
 import com.example.fotleague.models.network.request.CreateLeagueRequest
 import com.example.fotleague.models.network.request.JoinLeagueRequest
@@ -41,6 +42,10 @@ interface FotLeagueApi {
 
     @PATCH("/predictions")
     suspend fun updatePrediction(@Body body: AddOrEditPredictionRequest): Response<Prediction>
+
+
+    @GET("/scores/global")
+    suspend fun getGlobalScores(): Response<List<UserScore>>
 
 
     @GET("/leagues/user/leagues")

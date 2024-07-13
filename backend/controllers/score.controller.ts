@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { scoreService } from "../services/score.service";
+import { matchService } from "../services/match.service";
 
 export const getTotalUserScoreBySeason = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
@@ -27,15 +28,17 @@ export const getUserScoresBySeason = async (req: Request, res: Response) => {
     }
 };
 
-export const getTopGlobalUsersBySeason = async (req: Request, res: Response) => {
-    const {season} = req.params;
+export const getTopGlobalUsers = async (req: Request, res: Response) => {
     const num = parseInt((req.query.num ?? "10").toString());
 
     try {
-        const results = await scoreService.getTopGlobalUsersBySeason(num, parseInt(season));
+        const season = await matchService.getCurrentSeason();
+
+        const results = await scoreService.getTopGlobalUsersBySeason(num, season);
 
         return res.status(200).json(results);
     } catch (error) {
+        console.log(error);
         return res.status(400).json({error: "Error getting top global users"});
     }
 };
