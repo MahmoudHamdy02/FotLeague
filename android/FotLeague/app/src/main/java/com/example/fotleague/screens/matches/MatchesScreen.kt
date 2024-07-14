@@ -23,11 +23,14 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,7 +57,6 @@ import com.example.fotleague.Route
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
-import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -88,9 +90,7 @@ fun MatchesScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopBar(text = "FotLeague", fontSize = 24, weight = FontWeight.Bold)
-        }
+        topBar = { TopBar() }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -152,9 +152,19 @@ fun MatchesScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar() {
+    TopAppBar(
+        title = { Text(text = "FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
+        windowInsets = WindowInsets(0.dp),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
+    )
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GameweeksRow(
+private fun GameweeksRow(
     selectedTabIndex: Int,
     setSelectedTabIndex: (Int) -> Unit,
     gameweeks: List<Int>,
@@ -179,7 +189,7 @@ fun GameweeksRow(
 }
 
 @Composable
-fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
+private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
     val navController = LocalNavController.current
     val authUser = LocalAuthUser.current
 
@@ -224,7 +234,7 @@ fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
 }
 
 @Composable
-fun Match(
+private fun Match(
     homeTeam: String,
     awayTeam: String,
     date: String,
