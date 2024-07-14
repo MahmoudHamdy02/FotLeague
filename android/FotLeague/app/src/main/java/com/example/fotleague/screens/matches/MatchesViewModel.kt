@@ -26,11 +26,10 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
         viewModelScope.launch {
             _state.update { state -> state.copy(isLoading = true) }
 
-            getPredictions()
-            getMatches()
 
             try {
-
+                getPredictions()
+                getMatches()
             } catch (e: Exception) {
                 _state.update { state ->
                     state.copy(
