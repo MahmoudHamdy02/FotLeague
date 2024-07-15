@@ -56,4 +56,9 @@ export const getUserLeagues = async (userId: number): Promise<League[]> => {
     return leagues.rows;
 };
 
+export const deleteLeagueUser = async (userId: number, leagueId: number): Promise<LeagueUser> => {
+    const data = await pool.query<LeagueUser>("DELETE FROM leagues_users WHERE user_id = $1 AND league_id = $2 RETURNING *;", [userId, leagueId]);
+    return data.rows[0];
+};
+
 export * as leagueService from "./league.service";

@@ -1,6 +1,7 @@
 package com.example.fotleague.data
 
 import com.example.fotleague.models.League
+import com.example.fotleague.models.LeagueUser
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Status
@@ -9,6 +10,7 @@ import com.example.fotleague.models.UserScore
 import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
 import com.example.fotleague.models.network.request.CreateLeagueRequest
 import com.example.fotleague.models.network.request.JoinLeagueRequest
+import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import com.example.fotleague.models.network.request.LoginRequest
 import com.example.fotleague.models.network.request.SignUpRequest
 import com.example.fotleague.models.network.response.GetLeagueDetailsResponse
@@ -60,6 +62,9 @@ interface FotLeagueApi {
 
     @POST("/leagues/join")
     suspend fun joinLeague(@Body body: JoinLeagueRequest): Response<Unit>
+
+    @POST("/leagues/leave")
+    suspend fun leaveLeague(@Body body: LeaveLeagueRequest): Response<LeagueUser>
 
 
     @POST("/auth/signup")

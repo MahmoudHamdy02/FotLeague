@@ -11,3 +11,5 @@ leagueRouter.post("/", requireAuth, leagueController.createLeague);
 leagueRouter.post("/join/", requireAuth, leagueController.joinLeague);
 
 leagueRouter.get("/user/leagues", requireAuth, leagueController.getUserLeagues);
+
+leagueRouter.post("/leave", requireAuth, leagueController.leaveLeague);

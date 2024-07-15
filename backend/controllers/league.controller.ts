@@ -107,4 +107,20 @@ export const getLeagueDetailsById = async (req: Request, res: Response) => {
     }
 };
 
+export const leaveLeague = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { leagueId } = req.body;
+    if (!validate([leagueId], ["number"], res)) return;
+
+    const league = await leagueService.getLeagueById(leagueId);
+
+    if (!league) return res.status(400).json({error: "No league found"});
+
+    if (league.owner_id === userId) return res.status(400).json({error: "You can't leave your own league"});
+
+    const leagueUser = await leagueService.deleteLeagueUser(userId, leagueId);
+
+    res.status(200).json(leagueUser);
+};
+
 export * as leagueController from "./league.controller";

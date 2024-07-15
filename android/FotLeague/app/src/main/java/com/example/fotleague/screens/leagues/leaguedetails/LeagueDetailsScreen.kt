@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
+import com.example.fotleague.Screen
 import com.example.fotleague.models.UserScore
 import com.example.fotleague.ui.components.ScoresTable
 import com.example.fotleague.ui.theme.Background
@@ -50,12 +52,21 @@ fun LeagueDetailsScreen(
 
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(state.leagueLeft) {
+        if (state.leagueLeft) {
+            navController.navigate(Screen.LeaguesScreen.route) {
+                popUpTo(Screen.LeaguesScreen.route)
+            }
+        }
+    }
+
     LeagueDetailsContent(
         leagueName = state.league.name,
         ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
         code = state.league.code,
         userScores = state.userScores,
-        onBackArrowClick = { navController.popBackStack() }
+        onBackArrowClick = { navController.popBackStack() },
+        onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague)}
     )
 }
 
@@ -65,13 +76,14 @@ private fun LeagueDetailsContent(
     ownerName: String,
     code: String,
     userScores: List<UserScore>,
-    onBackArrowClick: () -> Unit
+    onBackArrowClick: () -> Unit,
+    onLeaveLeague: () -> Unit
 ) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             TopBar(
-                onLeaveLeagueClick = {},
+                onLeaveLeagueClick = onLeaveLeague,
                 onBackArrowClick = onBackArrowClick
             )
         }
@@ -173,7 +185,8 @@ fun LeagueDetailsPreview() {
             ownerName = "owner",
             code = "fn28gD",
             userScores = emptyList(),
-            onBackArrowClick = {}
+            onBackArrowClick = {},
+            onLeaveLeague = {}
         )
     }
 }
