@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -62,6 +65,16 @@ private fun MoreContent(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            RowButton(
+                icon = Icons.Default.AccountCircle,
+                text = "Account",
+                onClick = {}
+            )
+            RowButton(
+                icon = Icons.Default.Settings,
+                text = "Settings",
+                onClick = {}
+            )
             RowButton(
                 icon = ImageVector.vectorResource(id = R.drawable.bug_report_24),
                 text = "Feedback and bug reports",
