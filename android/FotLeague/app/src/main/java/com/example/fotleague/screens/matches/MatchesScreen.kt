@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.matches
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,8 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.MainState
 import com.example.fotleague.Route
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
@@ -60,8 +64,6 @@ import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Score
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
-import com.example.fotleague.ui.components.picker.PickerState
-import com.example.fotleague.ui.components.picker.rememberPickerState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -69,81 +71,34 @@ import com.example.fotleague.ui.theme.LightGray
 import com.example.fotleague.ui.theme.LightGreen
 import com.example.fotleague.ui.theme.LightRed
 import com.example.fotleague.ui.theme.LightYellow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MatchesScreen(
     viewModel: MatchesViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
-    val gameweeks = (1..38).toList()
-
-    val scope = rememberCoroutineScope()
-
-    var selectedTabIndex by remember {
-        mutableIntStateOf(0)
-    }
-    val pagerState = rememberPagerState {
-        38
-    }
-
-    LaunchedEffect(pagerState.currentPage) {
-        selectedTabIndex = pagerState.currentPage
-    }
-
     MatchesContent(
-        error = state.error,
-        isLoading = state.isLoading,
-        selectedTabIndex = selectedTabIndex,
-        setSelectedTabIndex = { selectedTabIndex = it },
-        gameweeks = gameweeks,
-        scope = scope,
-        pagerState = pagerState,
-        predictionDialogOpen = state.predictionDialogOpen,
-        selectedMatch = state.selectedMatch,
-        homePickerState = state.homePickerState,
-        awayPickerState = state.awayPickerState,
-        predictions = state.predictions,
-        onSubmitPrediction = { viewModel.onEvent(MatchesEvent.SubmitPrediction) },
-        onUpdatePrediction = { viewModel.onEvent(MatchesEvent.UpdatePrediction) },
-        onClosePredictionDialog = { viewModel.onEvent(MatchesEvent.CloseDialog) },
-        matches = state.matches,
-        scores = state.scores,
-        onOpenPredictionDialog = { viewModel.onEvent(MatchesEvent.OpenDialog) },
-        onSelectMatch = { viewModel.onEvent(MatchesEvent.SelectMatch(it)) }
+        state = state,
+        onEvent = { viewModel.onEvent(it) }
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MatchesContent(
-    error: String?,
-    isLoading: Boolean,
-    selectedTabIndex: Int,
-    setSelectedTabIndex: (Int) -> Unit,
-    gameweeks: List<Int>,
-    scope: CoroutineScope,
-    pagerState: PagerState,
-    predictionDialogOpen: Boolean,
-    selectedMatch: Match,
-    homePickerState: PickerState,
-    awayPickerState: PickerState,
-    matches: List<Match>,
-    scores: List<Score>,
-    predictions: List<Prediction>,
-    onSubmitPrediction: () -> Unit,
-    onUpdatePrediction: () -> Unit,
-    onClosePredictionDialog: () -> Unit,
-    onOpenPredictionDialog: () -> Unit,
-    onSelectMatch: (match: Match) -> Unit
+    state: MatchesState,
+    onEvent: (event: MatchesEvent) -> Unit
 ) {
+    val pagerState = rememberPagerState {
+        38
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = { TopBar() }
@@ -154,18 +109,14 @@ private fun MatchesContent(
                 .background(Background)
                 .padding(paddingValues)
         ) {
-            if (error != null) {
-                Text(text = error, modifier = Modifier.align(Alignment.Center))
+            if (state.error != null) {
+                Text(text = state.error, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
                     GameweeksRow(
-                        selectedTabIndex = selectedTabIndex,
-                        setSelectedTabIndex = { setSelectedTabIndex(it) },
-                        gameweeks = gameweeks,
-                        scope = scope,
                         pagerState = pagerState
                     )
-                    if (isLoading || LocalAuthUser.current.isLoading) {
+                    if (state.isLoading || LocalAuthUser.current.isLoading) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
@@ -185,31 +136,33 @@ private fun MatchesContent(
                         ) { index ->
                             MatchesList(
                                 index = index,
-                                matches = matches,
-                                predictions = predictions,
-                                scores = scores,
-                                onOpenPredictionDialog = onOpenPredictionDialog,
-                                onSelectMatch = onSelectMatch
+                                matches = state.matches,
+                                predictions = state.predictions,
+                                scores = state.scores,
+                                onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
+                                onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) }
                             )
                         }
                     }
                 }
             }
         }
-        if (predictionDialogOpen) {
+        if (state.predictionDialogOpen) {
             SubmitPredictionDialog(
-                homeTeam = selectedMatch.home,
-                awayTeam = selectedMatch.away,
-                homePickerState = homePickerState,
-                awayPickerState = awayPickerState,
+                homeTeam = state.selectedMatch.home,
+                awayTeam = state.selectedMatch.away,
+                homePickerState = state.homePickerState,
+                awayPickerState = state.awayPickerState,
                 onSubmit =
-                if (predictions.any { it.matchId == selectedMatch.id }) {
-                    onUpdatePrediction
-                } else {
-                    onSubmitPrediction
+                {
+                    if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
+                        onEvent(MatchesEvent.UpdatePrediction)
+                    } else {
+                        onEvent(MatchesEvent.SubmitPrediction)
+                    }
                 },
-                onDismiss = onClosePredictionDialog,
-                edit = predictions.any { it.matchId == selectedMatch.id }
+                onDismiss = { onEvent(MatchesEvent.CloseDialog) },
+                edit = state.predictions.any { it.matchId == state.selectedMatch.id }
             )
         }
     }
@@ -227,13 +180,18 @@ private fun TopBar() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun GameweeksRow(
-    selectedTabIndex: Int,
-    setSelectedTabIndex: (Int) -> Unit,
-    gameweeks: List<Int>,
-    scope: CoroutineScope,
-    pagerState: PagerState
-) {
+private fun GameweeksRow(pagerState: PagerState) {
+    val gameweeks = (1..38).toList()
+
+    val scope = rememberCoroutineScope()
+
+    var selectedTabIndex by remember {
+        mutableIntStateOf(0)
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        selectedTabIndex = pagerState.currentPage
+    }
+
     ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
         gameweeks.forEachIndexed { index, i ->
             Tab(
@@ -242,7 +200,7 @@ private fun GameweeksRow(
                     scope.launch {
                         pagerState.animateScrollToPage(index)
                     }
-                    setSelectedTabIndex(index)
+                    selectedTabIndex = index
                 },
                 text = { Text(text = "Game Week $i") },
                 modifier = Modifier.background(Background)
@@ -278,18 +236,9 @@ private fun MatchesList(
                 Spacer(modifier = Modifier.height(12.dp))
             }
             items(matches.filter { match -> match.gameweek == index + 1 }) { match ->
-                val date = ZonedDateTime.parse(match.datetime)
-                    .withZoneSameInstant(ZoneId.systemDefault())
                 Match(
-                    match.home,
-                    match.away,
-                    date.format(DateTimeFormatter.ofPattern("d MMM")),
-                    date.format(DateTimeFormatter.ofPattern("h:mm a")),
-                    datetime = date,
+                    match = match,
                     prediction = predictions.find { it.matchId == match.id },
-                    status = match.matchStatus,
-                    homeScore = match.homeScore,
-                    awayScore = match.awayScore,
                     score = scores.find { it.matchId == match.id }?.score
                 ) {
                     if (!authUser.isLoggedIn) {
@@ -309,18 +258,13 @@ private fun MatchesList(
 
 @Composable
 private fun Match(
-    homeTeam: String,
-    awayTeam: String,
-    date: String,
-    time: String,
-    datetime: ZonedDateTime,
+    match: Match,
     prediction: Prediction?,
-    status: Int,
-    homeScore: Int,
-    awayScore: Int,
     score: Int?,
     onClick: () -> Unit
 ) {
+    val datetime = ZonedDateTime.parse(match.datetime).withZoneSameInstant(ZoneId.systemDefault())
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -364,7 +308,7 @@ private fun Match(
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                 val (homeRef, awayRef, centerRef, homeIconRef, awayIconRef, matchTimeRef) = createRefs()
                 Text(
-                    text = homeTeam,
+                    text = match.home,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(homeRef) {
@@ -373,7 +317,7 @@ private fun Match(
                     })
                 Icon(
                     painter = painterResource(
-                        id = Logos.getResourceId(homeTeam)
+                        id = Logos.getResourceId(match.home)
                     ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
@@ -384,7 +328,7 @@ private fun Match(
                         }
                         .size(24.dp)
                 )
-                if (status == MatchStatus.Upcoming.num) {
+                if (match.matchStatus == MatchStatus.Upcoming.num) {
                     Column(
                         modifier = Modifier
                             .widthIn(min = 60.dp)
@@ -396,14 +340,14 @@ private fun Match(
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = date,
+                            text = datetime.format(DateTimeFormatter.ofPattern("d MMM")),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             textAlign = TextAlign.Center,
                             lineHeight = 12.sp
                         )
                         Text(
-                            text = time,
+                            text = datetime.format(DateTimeFormatter.ofPattern("h:mm a")),
                             fontSize = 12.sp,
                             lineHeight = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -413,7 +357,7 @@ private fun Match(
                     }
                 } else {
                     Text(
-                        text = "$homeScore  -  $awayScore",
+                        text = "${match.homeScore}  -  ${match.awayScore}",
                         lineHeight = 8.sp,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -427,7 +371,7 @@ private fun Match(
                     val currentTime = ZonedDateTime.now()
                     val duration = Duration.between(datetime, currentTime)
                     Text(
-                        text = if (status == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
+                        text = if (match.matchStatus == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
                         fontSize = 11.sp,
                         lineHeight = 8.sp,
                         modifier = Modifier.constrainAs(matchTimeRef) {
@@ -437,7 +381,7 @@ private fun Match(
                 }
                 Icon(
                     painter = painterResource(
-                        id = Logos.getResourceId(awayTeam)
+                        id = Logos.getResourceId(match.away)
                     ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
@@ -449,7 +393,7 @@ private fun Match(
                         .size(24.dp)
                 )
                 Text(
-                    text = awayTeam,
+                    text = match.away,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(awayRef) {
@@ -466,16 +410,19 @@ private fun Match(
 private fun MatchPreview() {
     FotLeagueTheme {
         Match(
-            "Liverpool",
-            "Everton",
-            "27 Aug",
-            "9:00 PM",
-            ZonedDateTime.now(),
-            Prediction(0, 0, 0, 0),
-            1,
-            0,
-            0,
-            null,
+            match = Match(
+                id = 1,
+                home = "Liverpool",
+                away = "",
+                homeScore = 0,
+                awayScore = 0,
+                matchStatus = 1,
+                datetime = "2024-08-16 09:00:00",
+                season = 0,
+                gameweek = 1
+            ),
+            prediction = Prediction(0, 0, 0, 0),
+            score = null,
         ) {}
     }
 }
@@ -485,46 +432,48 @@ private fun MatchPreview() {
 private fun InProgressMatchPreview() {
     FotLeagueTheme {
         Match(
-            "Liverpool",
-            "Everton",
-            "27 Aug",
-            "9:00 PM",
-            ZonedDateTime.now().minusMinutes(30),
-            Prediction(0, 0, 0, 0),
-            2,
-            1,
-            0,
-            1,
+            match = Match(
+                id = 1,
+                home = "Liverpool",
+                away = "",
+                homeScore = 0,
+                awayScore = 0,
+                matchStatus = 2,
+                datetime = "2024-08-16 09:00:00",
+                season = 0,
+                gameweek = 1
+            ),
+            prediction = Prediction(0, 0, 0, 0),
+            score = null,
         ) {}
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MatchesContentPreview() {
-    FotLeagueTheme {
-        MatchesContent(
-            error = null,
-            isLoading = false,
-            selectedTabIndex = 0,
-            setSelectedTabIndex = {},
-            gameweeks = (1..38).toList(),
-            scope = rememberCoroutineScope(),
-            pagerState = rememberPagerState {
-                38
-            },
-            predictionDialogOpen = false,
-            selectedMatch = Match(0, "", "", 0, 0, 0, "", 0, 0),
-            homePickerState = rememberPickerState(),
-            awayPickerState = rememberPickerState(),
-            matches = listOf(Match(0, "", "", 0, 0, 0, "", 0, 0)),
-            scores = emptyList(),
-            predictions = emptyList(),
-            onSubmitPrediction = {},
-            onUpdatePrediction = {},
-            onClosePredictionDialog = {},
-            onOpenPredictionDialog = {},
-            onSelectMatch = {})
+    CompositionLocalProvider(LocalAuthUser provides MainState(isLoading = false)) {
+        CompositionLocalProvider(LocalNavController provides rememberNavController()) {
+            FotLeagueTheme {
+                MatchesContent(
+                    state = MatchesState(
+                        matches = listOf(
+                            Match(
+                                id = 1,
+                                home = "Liverpool",
+                                away = "",
+                                homeScore = 0,
+                                awayScore = 0,
+                                matchStatus = 1,
+                                datetime = "2024-08-16 09:00:00",
+                                season = 0,
+                                gameweek = 1
+                            )
+                        )
+                    ),
+                    onEvent = {}
+                )
+            }
+        }
     }
 }
