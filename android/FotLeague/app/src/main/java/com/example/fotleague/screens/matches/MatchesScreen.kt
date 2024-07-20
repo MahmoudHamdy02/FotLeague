@@ -54,14 +54,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
+import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
+import com.example.fotleague.ui.theme.LightGray
+import com.example.fotleague.ui.theme.LightGreen
+import com.example.fotleague.ui.theme.LightRed
+import com.example.fotleague.ui.theme.LightYellow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -133,7 +139,7 @@ fun MatchesScreen(
                 }
             }
         }
-        if (state.predictionDialogOpen)
+        if (state.predictionDialogOpen) {
             SubmitPredictionDialog(
                 homeTeam = state.selectedMatch.home,
                 awayTeam = state.selectedMatch.away,
@@ -149,6 +155,7 @@ fun MatchesScreen(
                 onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) },
                 edit = state.predictions.any { it.matchId == state.selectedMatch.id }
             )
+        }
     }
 }
 
@@ -206,7 +213,6 @@ private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewM
         ) {
             item {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = LocalAuthUser.current.isLoggedIn.toString())
             }
             items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
                 val date = ZonedDateTime.parse(match.datetime)
@@ -216,7 +222,12 @@ private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewM
                     match.away,
                     date.format(DateTimeFormatter.ofPattern("d MMM")),
                     date.format(DateTimeFormatter.ofPattern("h:mm a")),
-                    prediction = state.predictions.find { it.matchId == match.id }
+                    datetime = date,
+                    prediction = state.predictions.find { it.matchId == match.id },
+                    status = match.matchStatus,
+                    homeScore = match.homeScore,
+                    awayScore = match.awayScore,
+                    score = state.scores.find { it.matchId == match.id }?.score
                 ) {
                     if (!authUser.isLoggedIn) {
                         navController.navigate(Route.Auth.route)
@@ -239,40 +250,47 @@ private fun Match(
     awayTeam: String,
     date: String,
     time: String,
+    datetime: ZonedDateTime,
     prediction: Prediction?,
+    status: Int,
+    homeScore: Int,
+    awayScore: Int,
+    score: Int?,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height((80 - 16).dp)
+            .height((88 - 16).dp)
             .clickable { onClick() }
     ) {
+        val bgColor = if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0) LightRed else LightGray
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray)
+                .background(bgColor)
                 .align(Alignment.BottomCenter)
                 .padding(vertical = 0.dp),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
         ) {
-            if (prediction == null) {
-                Text(text = "Tap to submit prediction", color = DarkGray, fontSize = 13.sp)
-            } else {
-                Text(
-                    text = "Prediction: ${prediction.home} - ${prediction.away}",
-                    color = DarkGray,
-                    fontSize = 13.sp
-                )
-            }
+            val text =
+                if (prediction == null)
+                    "Tap to submit prediction"
+                else
+                    "Prediction: ${prediction.home} - ${prediction.away}"
+            Text(
+                text = text,
+                color = DarkGray,
+                fontSize = 13.sp
+            )
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp)
+                .height(48.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(Color.DarkGray)
                 .align(Alignment.TopCenter),
@@ -280,7 +298,7 @@ private fun Match(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
         ) {
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                val (homeRef, awayRef, datetimeRef, homeIconRef, awayIconRef) = createRefs()
+                val (homeRef, awayRef, centerRef, homeIconRef, awayIconRef, matchTimeRef) = createRefs()
                 Text(
                     text = homeTeam,
                     fontSize = 14.sp,
@@ -297,36 +315,61 @@ private fun Match(
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .constrainAs(homeIconRef) {
-                            end.linkTo(datetimeRef.start, margin = 8.dp)
+                            end.linkTo(centerRef.start, margin = 8.dp)
                             centerVerticallyTo(parent)
                         }
                         .size(24.dp)
                 )
-                Column(
-                    modifier = Modifier
-                        .widthIn(min = 60.dp)
-                        .fillMaxHeight()
-                        .constrainAs(datetimeRef) {
-                            centerTo(parent)
-                        },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
-                ) {
+                if (status == MatchStatus.Upcoming.num) {
+                    Column(
+                        modifier = Modifier
+                            .widthIn(min = 60.dp)
+                            .fillMaxHeight()
+                            .constrainAs(centerRef) {
+                                centerTo(parent)
+                            },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            text = date,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 12.sp
+                        )
+                        Text(
+                            text = time,
+                            fontSize = 12.sp,
+                            lineHeight = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center
+
+                        )
+                    }
+                } else {
                     Text(
-                        text = date,
-                        fontSize = 12.sp,
+                        text = "$homeScore  -  $awayScore",
+                        lineHeight = 8.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
-                        lineHeight = 12.sp
-                    )
-                    Text(
-                        text = time,
-                        fontSize = 12.sp,
-                        lineHeight = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center
+                        modifier = Modifier
+                            .widthIn(60.dp)
+                            .constrainAs(centerRef) {
+                                centerTo(parent)
+                            })
 
-                    )
+                    val currentTime = ZonedDateTime.now()
+                    val duration = Duration.between(datetime, currentTime)
+                    Text(
+                        text = if (status == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
+                        fontSize = 11.sp,
+                        lineHeight = 8.sp,
+                        modifier = Modifier.constrainAs(matchTimeRef) {
+                            top.linkTo(centerRef.bottom)
+                            centerHorizontallyTo(parent)
+                        })
                 }
                 Icon(
                     painter = painterResource(
@@ -336,7 +379,7 @@ private fun Match(
                     tint = Color.Unspecified,
                     modifier = Modifier
                         .constrainAs(awayIconRef) {
-                            start.linkTo(datetimeRef.end, margin = 8.dp)
+                            start.linkTo(centerRef.end, margin = 8.dp)
                             centerVerticallyTo(parent)
                         }
                         .size(24.dp)
@@ -358,6 +401,36 @@ private fun Match(
 @Composable
 private fun MatchPreview() {
     FotLeagueTheme {
-        Match("Liverpool", "Everton", "27 Aug", "9:00 PM", Prediction(0, 0, 0, 0)) {}
+        Match(
+            "Liverpool",
+            "Everton",
+            "27 Aug",
+            "9:00 PM",
+            ZonedDateTime.now(),
+            Prediction(0, 0, 0, 0),
+            1,
+            0,
+            0,
+            null,
+        ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun InProgressMatchPreview() {
+    FotLeagueTheme {
+        Match(
+            "Liverpool",
+            "Everton",
+            "27 Aug",
+            "9:00 PM",
+            ZonedDateTime.now().minusMinutes(30),
+            Prediction(0, 0, 0, 0),
+            2,
+            1,
+            0,
+            1,
+        ) {}
     }
 }

@@ -17,3 +17,7 @@ val LightGray = Color(0xFFF2F2F2)
 val Gray = Color(0xFFA1A1A1)
 val Primary = Color(0xFFFF2000)
 val PrimaryLight = Color(0xFFFF4545)
+val LightGreen = Color(0xFF97f75e)
+val LightYellow = Color(0xFFfaf78e)
+val LightRed = Color(0xFFfa7a7a)
+

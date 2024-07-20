@@ -4,6 +4,7 @@ import com.example.fotleague.models.League
 import com.example.fotleague.models.LeagueUser
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
+import com.example.fotleague.models.Score
 import com.example.fotleague.models.Status
 import com.example.fotleague.models.User
 import com.example.fotleague.models.UserScore
@@ -46,6 +47,9 @@ interface FotLeagueApi {
     @PATCH("/predictions")
     suspend fun updatePrediction(@Body body: AddOrEditPredictionRequest): Response<Prediction>
 
+
+    @GET("/scores/user")
+    suspend fun getUserScores(): Response<List<Score>>
 
     @GET("/scores/global")
     suspend fun getGlobalScores(@Query("num") num: Int): Response<List<UserScore>>

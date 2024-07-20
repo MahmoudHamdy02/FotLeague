@@ -4,6 +4,8 @@ import { scoreController } from "../controllers/score.controller";
 
 export const scoreRouter = Router();
 
+scoreRouter.get("/user", requireAuth, scoreController.getUserScores);
+
 scoreRouter.get("/user/:season", requireAuth, scoreController.getUserScoresBySeason);
 
 scoreRouter.get("/user/total/:season", requireAuth, scoreController.getTotalUserScoreBySeason);

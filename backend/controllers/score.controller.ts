@@ -15,6 +15,20 @@ export const getTotalUserScoreBySeason = async (req: Request, res: Response) => 
     }
 };
 
+export const getUserScores = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+
+    try {
+        const season = await matchService.getCurrentSeason();
+
+        const scores = await scoreService.getUserScoresBySeason(userId, season);
+
+        return res.status(200).json(scores);
+    } catch (error) {
+        return res.status(400).json({error: "Error getting user scores"});
+    }
+};
+
 export const getUserScoresBySeason = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const {season} = req.params;

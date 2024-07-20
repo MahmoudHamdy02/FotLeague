@@ -30,7 +30,7 @@ export const getCurrentSeason = async (): Promise<number> => {
 };
 
 export const getMatchesBySeason = async (season: number): Promise<Match[]> => {
-    const data = await pool.query<Match>("SELECT * FROM matches WHERE season = $1;", [season]);
+    const data = await pool.query<Match>("SELECT * FROM matches WHERE season = $1 ORDER BY datetime;", [season]);
     return data.rows;
 };
 

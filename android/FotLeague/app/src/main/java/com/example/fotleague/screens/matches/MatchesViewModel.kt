@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
+import com.example.fotleague.models.Score
 import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
 import com.example.fotleague.ui.components.picker.PickerState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,7 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
 
             try {
                 getPredictions()
+                getScores()
                 getMatches()
             } catch (e: Exception) {
                 _state.update { state ->
@@ -79,6 +81,18 @@ class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : View
         }
     }
 
+    private suspend fun getScores() {
+        val scores = api.getUserScores()
+        val scoresBody = scores.body()
+        if (scores.isSuccessful && scoresBody != null) {
+            _state.update { state ->
+                state.copy(
+                    scores = scoresBody,
+                )
+            }
+        }
+    }
+
     private fun submitPrediction() {
         viewModelScope.launch {
             api.addPrediction(
@@ -112,6 +126,7 @@ data class MatchesState(
     val homePickerState: PickerState = PickerState(),
     val awayPickerState: PickerState = PickerState(),
     val matches: List<Match> = emptyList(),
+    val scores: List<Score> = emptyList(),
     val predictions: List<Prediction> = emptyList(),
     val predictionDialogOpen: Boolean = false,
     val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0)
