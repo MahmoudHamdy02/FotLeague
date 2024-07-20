@@ -61,6 +61,7 @@ import com.example.fotleague.models.Score
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.components.picker.PickerState
+import com.example.fotleague.ui.components.picker.rememberPickerState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -495,5 +496,35 @@ private fun InProgressMatchPreview() {
             0,
             1,
         ) {}
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Preview
+@Composable
+private fun MatchesContentPreview() {
+    FotLeagueTheme {
+        MatchesContent(
+            error = null,
+            isLoading = false,
+            selectedTabIndex = 0,
+            setSelectedTabIndex = {},
+            gameweeks = (1..38).toList(),
+            scope = rememberCoroutineScope(),
+            pagerState = rememberPagerState {
+                38
+            },
+            predictionDialogOpen = false,
+            selectedMatch = Match(0, "", "", 0, 0, 0, "", 0, 0),
+            homePickerState = rememberPickerState(),
+            awayPickerState = rememberPickerState(),
+            matches = listOf(Match(0, "", "", 0, 0, 0, "", 0, 0)),
+            scores = emptyList(),
+            predictions = emptyList(),
+            onSubmitPrediction = {},
+            onUpdatePrediction = {},
+            onClosePredictionDialog = {},
+            onOpenPredictionDialog = {},
+            onSelectMatch = {})
     }
 }
