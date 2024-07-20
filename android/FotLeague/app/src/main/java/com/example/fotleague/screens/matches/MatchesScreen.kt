@@ -54,10 +54,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
+import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.models.Prediction
+import com.example.fotleague.models.Score
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
+import com.example.fotleague.ui.components.picker.PickerState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -94,6 +97,52 @@ fun MatchesScreen(
         selectedTabIndex = pagerState.currentPage
     }
 
+    MatchesContent(
+        error = state.error,
+        isLoading = state.isLoading,
+        selectedTabIndex = selectedTabIndex,
+        setSelectedTabIndex = { selectedTabIndex = it },
+        gameweeks = gameweeks,
+        scope = scope,
+        pagerState = pagerState,
+        predictionDialogOpen = state.predictionDialogOpen,
+        selectedMatch = state.selectedMatch,
+        homePickerState = state.homePickerState,
+        awayPickerState = state.awayPickerState,
+        predictions = state.predictions,
+        onSubmitPrediction = { viewModel.onEvent(MatchesEvent.SubmitPrediction) },
+        onUpdatePrediction = { viewModel.onEvent(MatchesEvent.UpdatePrediction) },
+        onClosePredictionDialog = { viewModel.onEvent(MatchesEvent.CloseDialog) },
+        matches = state.matches,
+        scores = state.scores,
+        onOpenPredictionDialog = { viewModel.onEvent(MatchesEvent.OpenDialog) },
+        onSelectMatch = { viewModel.onEvent(MatchesEvent.SelectMatch(it)) }
+    )
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun MatchesContent(
+    error: String?,
+    isLoading: Boolean,
+    selectedTabIndex: Int,
+    setSelectedTabIndex: (Int) -> Unit,
+    gameweeks: List<Int>,
+    scope: CoroutineScope,
+    pagerState: PagerState,
+    predictionDialogOpen: Boolean,
+    selectedMatch: Match,
+    homePickerState: PickerState,
+    awayPickerState: PickerState,
+    matches: List<Match>,
+    scores: List<Score>,
+    predictions: List<Prediction>,
+    onSubmitPrediction: () -> Unit,
+    onUpdatePrediction: () -> Unit,
+    onClosePredictionDialog: () -> Unit,
+    onOpenPredictionDialog: () -> Unit,
+    onSelectMatch: (match: Match) -> Unit
+) {
     Scaffold(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = { TopBar() }
@@ -104,18 +153,18 @@ fun MatchesScreen(
                 .background(Background)
                 .padding(paddingValues)
         ) {
-            if (state.error != null) {
-                Text(text = state.error!!, modifier = Modifier.align(Alignment.Center))
+            if (error != null) {
+                Text(text = error, modifier = Modifier.align(Alignment.Center))
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
                     GameweeksRow(
                         selectedTabIndex = selectedTabIndex,
-                        setSelectedTabIndex = { i -> selectedTabIndex = i },
+                        setSelectedTabIndex = { setSelectedTabIndex(it) },
                         gameweeks = gameweeks,
                         scope = scope,
                         pagerState = pagerState
                     )
-                    if (state.isLoading || LocalAuthUser.current.isLoading) {
+                    if (isLoading || LocalAuthUser.current.isLoading) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
@@ -133,27 +182,33 @@ fun MatchesScreen(
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) { index ->
-                            MatchesList(state = state, index = index, viewModel = viewModel)
+                            MatchesList(
+                                index = index,
+                                matches = matches,
+                                predictions = predictions,
+                                scores = scores,
+                                onOpenPredictionDialog = onOpenPredictionDialog,
+                                onSelectMatch = onSelectMatch
+                            )
                         }
                     }
                 }
             }
         }
-        if (state.predictionDialogOpen) {
+        if (predictionDialogOpen) {
             SubmitPredictionDialog(
-                homeTeam = state.selectedMatch.home,
-                awayTeam = state.selectedMatch.away,
-                homePickerState = state.homePickerState,
-                awayPickerState = state.awayPickerState,
-                onSubmit = {
-                    if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
-                        viewModel.onEvent(MatchesEvent.UpdatePrediction)
-                    } else {
-                        viewModel.onEvent(MatchesEvent.SubmitPrediction)
-                    }
+                homeTeam = selectedMatch.home,
+                awayTeam = selectedMatch.away,
+                homePickerState = homePickerState,
+                awayPickerState = awayPickerState,
+                onSubmit =
+                if (predictions.any { it.matchId == selectedMatch.id }) {
+                    onUpdatePrediction
+                } else {
+                    onSubmitPrediction
                 },
-                onDismiss = { viewModel.onEvent(MatchesEvent.CloseDialog) },
-                edit = state.predictions.any { it.matchId == state.selectedMatch.id }
+                onDismiss = onClosePredictionDialog,
+                edit = predictions.any { it.matchId == selectedMatch.id }
             )
         }
     }
@@ -196,7 +251,14 @@ private fun GameweeksRow(
 }
 
 @Composable
-private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewModel) {
+private fun MatchesList(
+    index: Int,
+    matches: List<Match>,
+    predictions: List<Prediction>,
+    scores: List<Score>,
+    onOpenPredictionDialog: () -> Unit,
+    onSelectMatch: (match: Match) -> Unit,
+) {
     val navController = LocalNavController.current
     val authUser = LocalAuthUser.current
 
@@ -214,7 +276,7 @@ private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewM
             item {
                 Spacer(modifier = Modifier.height(12.dp))
             }
-            items(state.matches.filter { match -> match.gameweek == index + 1 }) { match ->
+            items(matches.filter { match -> match.gameweek == index + 1 }) { match ->
                 val date = ZonedDateTime.parse(match.datetime)
                     .withZoneSameInstant(ZoneId.systemDefault())
                 Match(
@@ -223,17 +285,17 @@ private fun MatchesList(state: MatchesState, index: Int, viewModel: MatchesViewM
                     date.format(DateTimeFormatter.ofPattern("d MMM")),
                     date.format(DateTimeFormatter.ofPattern("h:mm a")),
                     datetime = date,
-                    prediction = state.predictions.find { it.matchId == match.id },
+                    prediction = predictions.find { it.matchId == match.id },
                     status = match.matchStatus,
                     homeScore = match.homeScore,
                     awayScore = match.awayScore,
-                    score = state.scores.find { it.matchId == match.id }?.score
+                    score = scores.find { it.matchId == match.id }?.score
                 ) {
                     if (!authUser.isLoggedIn) {
                         navController.navigate(Route.Auth.route)
                     } else {
-                        viewModel.onEvent(MatchesEvent.OpenDialog)
-                        viewModel.onEvent(MatchesEvent.SelectMatch(match))
+                        onOpenPredictionDialog()
+                        onSelectMatch(match)
                     }
                 }
             }
@@ -264,7 +326,8 @@ private fun Match(
             .height((88 - 16).dp)
             .clickable { onClick() }
     ) {
-        val bgColor = if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0) LightRed else LightGray
+        val bgColor =
+            if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0) LightRed else LightGray
         Row(
             modifier = Modifier
                 .fillMaxWidth()
