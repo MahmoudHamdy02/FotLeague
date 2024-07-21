@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.leagues.leaguedetails
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,7 +50,7 @@ fun LeagueDetailsScreen(
             title = "Leagues",
             showNavigateBackIcon = true,
             actions = {
-                IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) }) {
+                IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
                         contentDescription = null,
@@ -73,7 +76,10 @@ fun LeagueDetailsScreen(
         leagueName = state.league.name,
         ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
         code = state.league.code,
-        userScores = state.userScores
+        userScores = state.userScores,
+        isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
+        onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
+        onDismiss = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) }
     )
 }
 
@@ -83,8 +89,10 @@ private fun LeagueDetailsContent(
     ownerName: String,
     code: String,
     userScores: List<UserScore>,
+    isLeaveLeagueDialogOpen: Boolean,
+    onLeaveLeague: () -> Unit,
+    onDismiss: () -> Unit
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -133,6 +141,46 @@ private fun LeagueDetailsContent(
         Text(text = "Members", fontSize = 20.sp)
         ScoresTable(userScores = userScores)
     }
+
+    if (isLeaveLeagueDialogOpen) {
+        ConfirmLeaveLeagueDialog(
+            onLeaveLeague = onLeaveLeague,
+            onDismiss = onDismiss
+        )
+    }
+}
+
+@Composable
+private fun ConfirmLeaveLeagueDialog(
+    onDismiss: () -> Unit,
+    onLeaveLeague: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Leave league") },
+        text = { Text(text = "Are you sure you want to leave this league?") },
+        confirmButton = {
+            TextButton(onClick = onLeaveLeague) {
+                Text(text = "Leave")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        }
+    )
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ConfirmLeaveLeagueDialogPreview() {
+    FotLeagueTheme {
+        ConfirmLeaveLeagueDialog(
+            onLeaveLeague = {},
+            onDismiss = {}
+        )
+    }
 }
 
 @Preview
@@ -143,7 +191,10 @@ fun LeagueDetailsPreview() {
             leagueName = "League name",
             ownerName = "owner",
             code = "fn28gD",
-            userScores = emptyList()
+            userScores = emptyList(),
+            isLeaveLeagueDialogOpen = false,
+            onLeaveLeague = {},
+            onDismiss = {}
         )
     }
 }

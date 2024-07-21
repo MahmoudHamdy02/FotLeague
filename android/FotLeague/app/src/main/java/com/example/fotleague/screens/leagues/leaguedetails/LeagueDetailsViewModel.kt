@@ -47,6 +47,8 @@ class LeagueDetailsViewModel @Inject constructor(
             LeagueDetailsEvent.LeaveLeague -> {
                 viewModelScope.launch { leaveLeague() }
             }
+            LeagueDetailsEvent.CloseLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = false) }
+            LeagueDetailsEvent.OpenLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = true) }
         }
     }
 
@@ -81,9 +83,12 @@ class LeagueDetailsViewModel @Inject constructor(
 data class LeagueDetailsState(
     val league: League = League(0, "", 0, ""),
     val userScores: List<UserScore> = emptyList(),
-    val leagueLeft: Boolean = false
+    val leagueLeft: Boolean = false,
+    val isLeaveLeagueDialogOpen: Boolean = false
 )
 
 sealed interface LeagueDetailsEvent {
     data object LeaveLeague : LeagueDetailsEvent
+    data object OpenLeaveLeagueDialog : LeagueDetailsEvent
+    data object CloseLeaveLeagueDialog : LeagueDetailsEvent
 }
