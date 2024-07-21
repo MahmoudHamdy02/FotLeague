@@ -3,11 +3,9 @@ package com.example.fotleague.screens.leagues
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,13 +16,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,11 +33,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.League
 import com.example.fotleague.screens.leagues.components.CreateLeagueDialog
 import com.example.fotleague.screens.leagues.components.JoinLeagueDialog
+import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -53,6 +49,27 @@ import com.example.fotleague.ui.theme.LightGray
 fun LeaguesScreen(
     viewModel: LeaguesViewModel = hiltViewModel()
 ) {
+    LocalTopBar.current(
+        AppBarState(
+            title = "Leagues",
+            actions = {
+                IconButton(onClick = { viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog) }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        tint = LightGray
+                    )
+                }
+                IconButton(onClick = { viewModel.onEvent(LeaguesEvent.OpenJoinLeagueDialog) }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
+                        contentDescription = null,
+                        tint = LightGray
+                    )
+                }
+            }
+        )
+    )
     val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
@@ -61,8 +78,6 @@ fun LeaguesScreen(
         leagues = state.leagues,
         onLeagueClick = { navController.navigate(Screen.LeagueDetails.route + "/$it") },
         isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
-        onOpenJoinLeagueDialog = { viewModel.onEvent((LeaguesEvent.OpenJoinLeagueDialog)) },
-        onOpenCreateLeagueDialog = {viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)},
         onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
         code = state.joinLeagueDialogCode,
         setCode = { viewModel.onEvent(LeaguesEvent.SetJoinLeagueDialogCode(it)) },
@@ -80,8 +95,6 @@ fun LeaguesContent(
     leagues: List<League>,
     onLeagueClick: (leagueId: Int) -> Unit,
     isJoinLeagueDialogOpen: Boolean,
-    onOpenJoinLeagueDialog: () -> Unit,
-    onOpenCreateLeagueDialog: () -> Unit,
     onDismissJoinLeagueDialog: () -> Unit,
     code: String,
     setCode: (code: String) -> Unit,
@@ -92,80 +105,36 @@ fun LeaguesContent(
     setName: (code: String) -> Unit,
     onCreateClick: () -> Unit,
 ) {
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopBar(
-                onOpenJoinLeagueDialog = onOpenJoinLeagueDialog,
-                onOpenCreateLeagueDialog = onOpenCreateLeagueDialog
-            )
-        })
-    { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Background)
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-            ) {
-                if (!LocalAuthUser.current.isLoggedIn) {
-                    Text(text = "Log in to see your leagues")
-                } else {
-                    Header()
-                    LeaguesList(leagues = leagues, onLeagueClick = onLeagueClick)
-                }
-            }
-        }
-        if (isJoinLeagueDialogOpen) {
-            JoinLeagueDialog(
-                code = code,
-                setCode = setCode,
-                onJoinClick = onJoinClick,
-                onDismiss = onDismissJoinLeagueDialog
-            )
-        }
-        if (isCreateLeagueDialogOpen) {
-            CreateLeagueDialog(
-                name = name,
-                setName = setName,
-                onCreateClick = onCreateClick,
-                onDismiss = onDismissCreateLeagueDialog
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Background)
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+    ) {
+        if (!LocalAuthUser.current.isLoggedIn) {
+            Text(text = "Log in to see your leagues")
+        } else {
+            Header()
+            LeaguesList(leagues = leagues, onLeagueClick = onLeagueClick)
         }
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    onOpenJoinLeagueDialog: () -> Unit,
-    onOpenCreateLeagueDialog: () -> Unit
-) {
-    TopAppBar(
-        title = { Text(text = "Leagues") },
-        windowInsets = WindowInsets(0.dp),
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-        actions = {
-            IconButton(onClick = onOpenCreateLeagueDialog) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = LightGray
-                )
-            }
-            IconButton(onClick = onOpenJoinLeagueDialog) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
-                    contentDescription = null,
-                    tint = LightGray
-                )
-            }
-        }
-    )
+    if (isJoinLeagueDialogOpen) {
+        JoinLeagueDialog(
+            code = code,
+            setCode = setCode,
+            onJoinClick = onJoinClick,
+            onDismiss = onDismissJoinLeagueDialog
+        )
+    }
+    if (isCreateLeagueDialogOpen) {
+        CreateLeagueDialog(
+            name = name,
+            setName = setName,
+            onCreateClick = onCreateClick,
+            onDismiss = onDismissCreateLeagueDialog
+        )
+    }
 }
 
 @Composable
@@ -177,7 +146,10 @@ fun LeaguesList(leagues: List<League>, onLeagueClick: (leagueId: Int) -> Unit) {
             League(name = "Global", pos = 1)
         }
         items(leagues.drop(1)) { league ->
-            League(name = league.name, pos = 1, modifier = Modifier.clickable { onLeagueClick(league.id) })
+            League(
+                name = league.name,
+                pos = 1,
+                modifier = Modifier.clickable { onLeagueClick(league.id) })
         }
     }
 }

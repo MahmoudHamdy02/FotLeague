@@ -2,28 +2,18 @@ package com.example.fotleague.screens.auth.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,13 +29,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.fotleague.LocalNavController
+import com.example.fotleague.LocalTopBar
+import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
-import com.example.fotleague.ui.theme.LightGray
 import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
@@ -53,7 +41,7 @@ import com.example.fotleague.ui.theme.PrimaryLight
 fun SignupScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
-    val navController = LocalNavController.current
+    LocalTopBar.current(AppBarState(title = "Sign up", showNavigateBackIcon = true))
 
     val state by viewModel.state.collectAsState()
 
@@ -64,12 +52,10 @@ fun SignupScreen(
         setEmail = { viewModel.onEvent(SignUpEvent.SetEmail(it)) },
         password = state.password,
         setPassword = { viewModel.onEvent(SignUpEvent.SetPassword(it)) },
-        navController = navController,
         onSignUpClick = { viewModel.onEvent(SignUpEvent.SignUp) }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SignupScreenContent(
     username: String,
@@ -78,85 +64,60 @@ private fun SignupScreenContent(
     password: String,
     setPassword: (String) -> Unit,
     setUsername: (String) -> Unit,
-    navController: NavHostController,
     onSignUpClick: () -> Unit
 ) {
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopAppBar(
-                windowInsets = WindowInsets(0.dp),
-                title = { Text(text = "Sign up") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                })
-        }) { paddingValues ->
-        Box(
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Background)
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        Text(text = "Create an account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextField(
+                value = username,
+                onValueChange = { setUsername(it) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                label = { Text(text = "Username") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+            TextField(
+                value = email,
+                onValueChange = { setEmail(it) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                label = { Text(text = "Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            )
+            TextField(
+                value = password,
+                onValueChange = { setPassword(it) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                label = { Text(text = "Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+        }
+
+        Button(
+            onClick = { onSignUpClick() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                .width(280.dp)
+                .height(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    Brush.linearGradient(listOf(Primary, PrimaryLight))
+                )
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Background)
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                Text(text = "Create an account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextField(
-                        value = username,
-                        onValueChange = { setUsername(it) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Username") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-                        )
-                    TextField(
-                        value = email,
-                        onValueChange = { setEmail(it) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Email") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { setPassword(it) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Password") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                    )
-                }
-
-                Button(
-                    onClick = { onSignUpClick() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    modifier = Modifier
-                        .width(280.dp)
-                        .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            Brush.linearGradient(listOf(Primary, PrimaryLight))
-                        )
-                ) {
-                    Text(text = "Create account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-            }
+            Text(text = "Create account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -169,7 +130,6 @@ private fun SignupScreenPreview() {
             setEmail = {},
             password = "",
             setPassword = {},
-            navController = rememberNavController(),
             onSignUpClick = {}
         )
     }

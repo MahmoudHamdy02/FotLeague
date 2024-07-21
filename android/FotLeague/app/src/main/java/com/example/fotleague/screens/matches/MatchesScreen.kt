@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,14 +23,10 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.LocalTopBar
 import com.example.fotleague.MainState
 import com.example.fotleague.Route
 import com.example.fotleague.models.Match
@@ -64,6 +60,7 @@ import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Score
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
 import com.example.fotleague.ui.Logos
+import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -81,6 +78,8 @@ import java.time.format.DateTimeFormatter
 fun MatchesScreen(
     viewModel: MatchesViewModel = hiltViewModel()
 ) {
+    LocalTopBar.current(AppBarState(title = "FotLeague"))
+
     val state by viewModel.state.collectAsState()
 
     MatchesContent(
@@ -99,84 +98,64 @@ private fun MatchesContent(
         38
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = { TopBar() }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Background)
-                .padding(paddingValues)
-        ) {
-            if (state.error != null) {
-                Text(text = state.error, modifier = Modifier.align(Alignment.Center))
-            } else {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    GameweeksRow(
-                        pagerState = pagerState
-                    )
-                    if (state.isLoading || LocalAuthUser.current.isLoading) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(48.dp)
-                            )
-                        }
-                    } else {
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        ) { index ->
-                            MatchesList(
-                                index = index,
-                                matches = state.matches,
-                                predictions = state.predictions,
-                                scores = state.scores,
-                                onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
-                                onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) }
-                            )
-                        }
-                    }
-                }
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Background)) {
+        GameweeksRow(
+            pagerState = pagerState
+        )
+        if (state.error != null) {
+            Text(text = state.error)
+        } else if (state.isLoading || LocalAuthUser.current.isLoading) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(48.dp)
+                )
+            }
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) { index ->
+                MatchesList(
+                    index = index,
+                    matches = state.matches,
+                    predictions = state.predictions,
+                    scores = state.scores,
+                    onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
+                    onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) }
+                )
             }
         }
-        if (state.predictionDialogOpen) {
-            SubmitPredictionDialog(
-                homeTeam = state.selectedMatch.home,
-                awayTeam = state.selectedMatch.away,
-                homePickerState = state.homePickerState,
-                awayPickerState = state.awayPickerState,
-                onSubmit =
-                {
-                    if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
-                        onEvent(MatchesEvent.UpdatePrediction)
-                    } else {
-                        onEvent(MatchesEvent.SubmitPrediction)
-                    }
-                },
-                onDismiss = { onEvent(MatchesEvent.CloseDialog) },
-                edit = state.predictions.any { it.matchId == state.selectedMatch.id }
-            )
-        }
+    }
+
+    if (state.predictionDialogOpen) {
+        SubmitPredictionDialog(
+            homeTeam = state.selectedMatch.home,
+            awayTeam = state.selectedMatch.away,
+            homePickerState = state.homePickerState,
+            awayPickerState = state.awayPickerState,
+            onSubmit =
+            {
+                if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
+                    onEvent(MatchesEvent.UpdatePrediction)
+                } else {
+                    onEvent(MatchesEvent.SubmitPrediction)
+                }
+            },
+            onDismiss = { onEvent(MatchesEvent.CloseDialog) },
+            edit = state.predictions.any { it.matchId == state.selectedMatch.id }
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar() {
-    TopAppBar(
-        title = { Text(text = "FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
-        windowInsets = WindowInsets(0.dp),
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
-    )
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

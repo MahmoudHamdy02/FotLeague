@@ -3,25 +3,17 @@ package com.example.fotleague.screens.leagues.leaguedetails
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.UserScore
 import com.example.fotleague.ui.components.ScoresTable
+import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -48,6 +42,21 @@ import com.example.fotleague.ui.theme.LightGray
 fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel()
 ) {
+    LocalTopBar.current(
+        AppBarState(
+            title = "Leagues",
+            showNavigateBackIcon = true,
+            actions = {
+                IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
+                        contentDescription = null,
+                        tint = LightGray
+                    )
+                }
+            })
+    )
+
     val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
@@ -64,9 +73,7 @@ fun LeagueDetailsScreen(
         leagueName = state.league.name,
         ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
         code = state.league.code,
-        userScores = state.userScores,
-        onBackArrowClick = { navController.popBackStack() },
-        onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague)}
+        userScores = state.userScores
     )
 }
 
@@ -76,104 +83,56 @@ private fun LeagueDetailsContent(
     ownerName: String,
     code: String,
     userScores: List<UserScore>,
-    onBackArrowClick: () -> Unit,
-    onLeaveLeague: () -> Unit
 ) {
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopBar(
-                onLeaveLeagueClick = onLeaveLeague,
-                onBackArrowClick = onBackArrowClick
-            )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Background)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                // League info
-                Column {
-                    // League name and code
-                    Row {
-                        Text(
-                            text = leagueName,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Row(
-                            modifier = Modifier
-                                .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.copy_24),
-                                contentDescription = "Copy",
-                                tint = LightGray
-                            )
-                            Text(
-                                text = code,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                    // League owner
-                    Row {
-                        Text(text = "Owner: $ownerName", fontSize = 18.sp)
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(color = DarkGray)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Background)
+            .padding(horizontal = 16.dp)
+            .padding(top = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        // League info
+        Column {
+            // League name and code
+            Row {
+                Text(
+                    text = leagueName,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier
+                        .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.copy_24),
+                        contentDescription = "Copy",
+                        tint = LightGray
+                    )
+                    Text(
+                        text = code,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
-
-                // Members table
-                Text(text = "Members", fontSize = 20.sp)
-                ScoresTable(userScores = userScores)
             }
+            // League owner
+            Row {
+                Text(text = "Owner: $ownerName", fontSize = 18.sp)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(color = DarkGray)
         }
+
+        // Members table
+        Text(text = "Members", fontSize = 20.sp)
+        ScoresTable(userScores = userScores)
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    onLeaveLeagueClick: () -> Unit,
-    onBackArrowClick: () -> Unit,
-) {
-    TopAppBar(
-        title = { Text(text = "Leagues") },
-        windowInsets = WindowInsets(0.dp),
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-        navigationIcon = {
-            IconButton(onClick = onBackArrowClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = LightGray
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = onLeaveLeagueClick) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
-                    contentDescription = null,
-                    tint = LightGray
-                )
-            }
-        }
-    )
 }
 
 @Preview
@@ -184,9 +143,7 @@ fun LeagueDetailsPreview() {
             leagueName = "League name",
             ownerName = "owner",
             code = "fn28gD",
-            userScores = emptyList(),
-            onBackArrowClick = {},
-            onLeaveLeague = {}
+            userScores = emptyList()
         )
     }
 }

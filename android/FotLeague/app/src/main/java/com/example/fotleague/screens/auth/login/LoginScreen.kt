@@ -3,12 +3,10 @@ package com.example.fotleague.screens.auth.login
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,21 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,8 +43,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
 import com.example.fotleague.Screen
+import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -66,6 +59,8 @@ import com.example.fotleague.ui.theme.PrimaryLight
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    LocalTopBar.current(AppBarState(title = "Log in", showNavigateBackIcon = true))
+
     val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
@@ -82,7 +77,6 @@ fun LoginScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginScreenContent(
     email: String,
@@ -94,112 +88,87 @@ private fun LoginScreenContent(
     onLogin: () -> Unit,
     navController: NavHostController
 ) {
-    Scaffold(
-        contentWindowInsets = WindowInsets(0.dp),
-        topBar = {
-            TopAppBar(
-                windowInsets = WindowInsets(0.dp),
-                title = { Text(text = "Log in") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                })
-        }) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Background)
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                Text(text = "Log in to FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextField(
-                        value = email,
-                        onValueChange = { setEmail(it) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Email") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { setPassword(it) },
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
-                        label = { Text(text = "Password") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = isRememberMeChecked,
-                            onCheckedChange = { setIsRememberMeChecked(it) })
-                        Text(text = "Stay signed in?")
-                    }
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Background)
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Text(text = "Log in to FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
-                Button(
-                    onClick = { onLogin() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    modifier = Modifier
-                        .width(280.dp)
-                        .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            Brush.linearGradient(listOf(Primary, PrimaryLight))
-                        )
-                ) {
-                    Text(text = "Log in", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(Modifier.width(280.dp), verticalAlignment = Alignment.CenterVertically) {
-                        HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
-                        Text(
-                            text = "or continue with",
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
-                        HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        SocialLoginButton(iconResourceId = R.drawable.google)
-                        SocialLoginButton(iconResourceId = R.drawable.facebook)
-                        SocialLoginButton(iconResourceId = R.drawable.twitter)
-                    }
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Don't have an account?")
-                    Text(
-                        text = "Register now",
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable {
-                            navController.navigate(Screen.Auth.SignupScreen.route)
-                        })
-                }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextField(
+                value = email,
+                onValueChange = { setEmail(it) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                label = { Text(text = "Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            )
+            TextField(
+                value = password,
+                onValueChange = { setPassword(it) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
+                label = { Text(text = "Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = isRememberMeChecked,
+                    onCheckedChange = { setIsRememberMeChecked(it) })
+                Text(text = "Stay signed in?")
             }
+        }
+
+        Button(
+            onClick = { onLogin() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            modifier = Modifier
+                .width(280.dp)
+                .height(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    Brush.linearGradient(listOf(Primary, PrimaryLight))
+                )
+        ) {
+            Text(text = "Log in", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(Modifier.width(280.dp), verticalAlignment = Alignment.CenterVertically) {
+                HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
+                Text(
+                    text = "or continue with",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+                HorizontalDivider(modifier = Modifier.weight(0.3f), color = Gray)
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                SocialLoginButton(iconResourceId = R.drawable.google)
+                SocialLoginButton(iconResourceId = R.drawable.facebook)
+                SocialLoginButton(iconResourceId = R.drawable.twitter)
+            }
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Don't have an account?")
+            Text(
+                text = "Register now",
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable {
+                    navController.navigate(Screen.Auth.SignupScreen.route)
+                })
         }
     }
 }
