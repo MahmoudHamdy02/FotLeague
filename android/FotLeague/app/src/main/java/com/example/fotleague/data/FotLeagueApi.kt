@@ -20,6 +20,7 @@ import com.example.fotleague.models.network.response.LogoutResponse
 import com.example.fotleague.models.network.response.SignUpResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -69,6 +70,9 @@ interface FotLeagueApi {
 
     @POST("/leagues/leave")
     suspend fun leaveLeague(@Body body: LeaveLeagueRequest): Response<LeagueUser>
+
+    @DELETE("/leagues/{id}")
+    suspend fun deleteLeague(@Path("id") id: Int): Response<League>
 
 
     @POST("/auth/signup")

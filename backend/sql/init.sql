@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS predictions(
 );
 
 CREATE TABLE IF NOT EXISTS leagues_users(
-    user_id INT NOT NULL REFERENCES users(id),
-    league_id INT NOT NULL REFERENCES leagues(id),
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    league_id INT NOT NULL REFERENCES leagues(id) ON DELETE CASCADE,
     PRIMARY KEY(user_id, league_id)
 );
 

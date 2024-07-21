@@ -61,4 +61,9 @@ export const deleteLeagueUser = async (userId: number, leagueId: number): Promis
     return data.rows[0];
 };
 
+export const deleteLeague = async (leagueId: number): Promise<League> => {
+    const league = await pool.query<League>("DELETE FROM leagues WHERE id = $1 RETURNING *;", [leagueId]);
+    return league.rows[0];
+};
+
 export * as leagueService from "./league.service";

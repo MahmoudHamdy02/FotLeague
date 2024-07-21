@@ -47,8 +47,13 @@ class LeagueDetailsViewModel @Inject constructor(
             LeagueDetailsEvent.LeaveLeague -> {
                 viewModelScope.launch { leaveLeague() }
             }
+            LeagueDetailsEvent.DeleteLeague -> {
+                viewModelScope.launch { deleteLeague() }
+            }
             LeagueDetailsEvent.CloseLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = false) }
             LeagueDetailsEvent.OpenLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = true) }
+            LeagueDetailsEvent.CloseDeleteLeagueDialog -> _state.update { it.copy(isDeleteLeagueDialogOpen = false) }
+            LeagueDetailsEvent.OpenDeleteLeagueDialog -> _state.update { it.copy(isDeleteLeagueDialogOpen = true) }
         }
     }
 
@@ -78,17 +83,32 @@ class LeagueDetailsViewModel @Inject constructor(
         }
     }
 
+    private suspend fun deleteLeague() {
+        if (leagueId != null) {
+            val leagueDetailsResponse = api.deleteLeague(leagueId)
+            Log.d("DELETE", leagueDetailsResponse.toString())
+            if (leagueDetailsResponse.isSuccessful) {
+                _state.update { state ->
+                    state.copy(leagueLeft = true)
+                }
+            }
+        }
+    }
 }
 
 data class LeagueDetailsState(
     val league: League = League(0, "", 0, ""),
     val userScores: List<UserScore> = emptyList(),
     val leagueLeft: Boolean = false,
-    val isLeaveLeagueDialogOpen: Boolean = false
+    val isLeaveLeagueDialogOpen: Boolean = false,
+    val isDeleteLeagueDialogOpen: Boolean = false
 )
 
 sealed interface LeagueDetailsEvent {
     data object LeaveLeague : LeagueDetailsEvent
+    data object DeleteLeague : LeagueDetailsEvent
     data object OpenLeaveLeagueDialog : LeagueDetailsEvent
     data object CloseLeaveLeagueDialog : LeagueDetailsEvent
+    data object OpenDeleteLeagueDialog : LeagueDetailsEvent
+    data object CloseDeleteLeagueDialog : LeagueDetailsEvent
 }

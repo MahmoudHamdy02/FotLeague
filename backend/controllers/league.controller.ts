@@ -112,15 +112,40 @@ export const leaveLeague = async (req: Request, res: Response) => {
     const { leagueId } = req.body;
     if (!validate([leagueId], ["number"], res)) return;
 
-    const league = await leagueService.getLeagueById(leagueId);
+    try {
+        const league = await leagueService.getLeagueById(leagueId);
 
-    if (!league) return res.status(400).json({error: "No league found"});
+        if (!league) return res.status(400).json({error: "No league found"});
 
-    if (league.owner_id === userId) return res.status(400).json({error: "You can't leave your own league"});
+        if (league.owner_id === userId) return res.status(400).json({error: "You can't leave your own league"});
 
-    const leagueUser = await leagueService.deleteLeagueUser(userId, leagueId);
+        const leagueUser = await leagueService.deleteLeagueUser(userId, leagueId);
 
-    res.status(200).json(leagueUser);
+        res.status(200).json(leagueUser);
+    } catch (error) {
+        return res.status(400).json({error: "Error leaving league"});
+    }
+};
+
+export const deleteLeague = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { id } = req.params;
+
+    try {
+        console.log(userId, id);
+        const leagueId = parseInt(id);
+        const league = await leagueService.getLeagueById(leagueId);
+
+        if (!league) return res.status(400).json({error: "No league found"});
+
+        if (userId !== league.owner_id) return res.status(401).json({error: "League can only be deleted by its owner"});
+
+        const deletedLeague = await leagueService.deleteLeague(leagueId);
+
+        res.status(200).json(deletedLeague);
+    } catch (error) {
+        return res.status(400).json({error: "Error deleting league"});
+    }
 };
 
 export * as leagueController from "./league.controller";

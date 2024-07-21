@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
@@ -45,24 +48,37 @@ import com.example.fotleague.ui.theme.LightGray
 fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+
+    val authUser = LocalAuthUser.current
+
+    // TODO: Prevent icon flash by introducing loading state
     LocalTopBar.current(
         AppBarState(
             title = "Leagues",
             showNavigateBackIcon = true,
             actions = {
-                IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
-                        contentDescription = null,
-                        tint = LightGray
-                    )
+                if (state.league.ownerId == authUser.user.id) {
+                    IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = LightGray
+                        )
+                    }
+                } else {
+                    IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
+                            contentDescription = null,
+                            tint = LightGray
+                        )
+                    }
                 }
             })
     )
 
     val navController = LocalNavController.current
-
-    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state.leagueLeft) {
         if (state.leagueLeft) {
@@ -79,7 +95,10 @@ fun LeagueDetailsScreen(
         userScores = state.userScores,
         isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
         onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
-        onDismiss = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) }
+        isDeleteLeagueDialogOpen = state.isDeleteLeagueDialogOpen,
+        onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague)},
+        onDismissLeaveLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) },
+        onDismissDeleteLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseDeleteLeagueDialog) }
     )
 }
 
@@ -91,7 +110,10 @@ private fun LeagueDetailsContent(
     userScores: List<UserScore>,
     isLeaveLeagueDialogOpen: Boolean,
     onLeaveLeague: () -> Unit,
-    onDismiss: () -> Unit
+    isDeleteLeagueDialogOpen: Boolean,
+    onDeleteLeague: () -> Unit,
+    onDismissLeaveLeagueDialog: () -> Unit,
+    onDismissDeleteLeagueDialog: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -145,7 +167,13 @@ private fun LeagueDetailsContent(
     if (isLeaveLeagueDialogOpen) {
         ConfirmLeaveLeagueDialog(
             onLeaveLeague = onLeaveLeague,
-            onDismiss = onDismiss
+            onDismiss = onDismissLeaveLeagueDialog
+        )
+    }
+    if (isDeleteLeagueDialogOpen) {
+        ConfirmDeleteLeagueDialog(
+            onDeleteLeague = onDeleteLeague,
+            onDismiss = onDismissDeleteLeagueDialog
         )
     }
 }
@@ -172,12 +200,45 @@ private fun ConfirmLeaveLeagueDialog(
     )
 }
 
+@Composable
+private fun ConfirmDeleteLeagueDialog(
+    onDismiss: () -> Unit,
+    onDeleteLeague: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Delete league") },
+        text = { Text(text = "Are you sure you want to delete this league?") },
+        confirmButton = {
+            TextButton(onClick = onDeleteLeague) {
+                Text(text = "Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        }
+    )
+}
+
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ConfirmLeaveLeagueDialogPreview() {
     FotLeagueTheme {
         ConfirmLeaveLeagueDialog(
             onLeaveLeague = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ConfirmDeleteLeagueDialogPreview() {
+    FotLeagueTheme {
+        ConfirmDeleteLeagueDialog(
+            onDeleteLeague = {},
             onDismiss = {}
         )
     }
@@ -194,7 +255,10 @@ fun LeagueDetailsPreview() {
             userScores = emptyList(),
             isLeaveLeagueDialogOpen = false,
             onLeaveLeague = {},
-            onDismiss = {}
+            onDeleteLeague = {},
+            isDeleteLeagueDialogOpen = false,
+            onDismissLeaveLeagueDialog = {},
+            onDismissDeleteLeagueDialog = {}
         )
     }
 }
