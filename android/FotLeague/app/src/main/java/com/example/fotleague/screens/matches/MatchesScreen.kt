@@ -78,7 +78,7 @@ import java.time.format.DateTimeFormatter
 fun MatchesScreen(
     viewModel: MatchesViewModel = hiltViewModel()
 ) {
-    LocalTopBar.current(AppBarState(title = "FotLeague"))
+    LocalTopBar.current(AppBarState(title = "FotLeague", titleFontWeight = FontWeight.Bold))
 
     val state by viewModel.state.collectAsState()
 
@@ -105,7 +105,13 @@ private fun MatchesContent(
             pagerState = pagerState
         )
         if (state.error != null) {
-            Text(text = state.error)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = state.error)
+            }
         } else if (state.isLoading || LocalAuthUser.current.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
