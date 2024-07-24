@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,29 +28,57 @@ import com.example.fotleague.ui.theme.FotLeagueTheme
 fun StatsScreen() {
     LocalTopBar.current(AppBarState(title = "Stats"))
 
-    val list = remember {
-        mapOf(
-            Pair("Current season score", "99"),
-            Pair("Best season score", "102"),
-            Pair("Current global position", "52"),
-            Pair("Best global position", "30"),
-            Pair("Leagues joined", "12"),
-            Pair("Top 3 league finishes", "10")
-        )
-    }
+    val seasonList = mapOf(
+        Pair("Current season score", "99"),
+        Pair("Current global position", "52"),
+    )
+    val allTimeList = mapOf(
+        Pair("Best season score", "102"),
+        Pair("Best global position", "30"),
+    )
+    val leaguesList = mapOf(
+        Pair("Leagues joined", "12"),
+        Pair("Top 3 league finishes", "10")
+    )
 
-    StatsContent(list = list)
+    StatsContent(seasonList, allTimeList, leaguesList)
 }
 
 @Composable
-private fun StatsContent(list: Map<String, String>) {
+private fun StatsContent(
+    seasonList: Map<String, String>,
+    allTimeList: Map<String, String>,
+    leaguesList: Map<String, String>
+) {
     LazyColumn(
         modifier = Modifier
+            .fillMaxSize()
             .background(Background)
             .padding(horizontal = 16.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(list.toList()) {
+        item {
+            Text(text = "Season", fontWeight = FontWeight.SemiBold, fontSize = 24.sp)
+        }
+        items(seasonList.toList()) {
+            StatsItem(text = it.first, value = it.second)
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = DarkGray)
+        }
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "All Time", fontWeight = FontWeight.SemiBold, fontSize = 24.sp)
+        }
+        items(allTimeList.toList()) {
+            StatsItem(text = it.first, value = it.second)
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(color = DarkGray)
+        }
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Leagues", fontWeight = FontWeight.SemiBold, fontSize = 24.sp)
+        }
+        items(leaguesList.toList()) {
             StatsItem(text = it.first, value = it.second)
             Spacer(modifier = Modifier.height(12.dp))
             HorizontalDivider(color = DarkGray)
@@ -75,11 +103,15 @@ private fun StatsItem(text: String, value: String) {
 private fun StatsContentPreview() {
     FotLeagueTheme {
         StatsContent(
-            list = mapOf(
+            seasonList = mapOf(
                 Pair("Current season score", "99"),
-                Pair("Best season score", "102"),
                 Pair("Current global position", "52"),
+            ),
+            allTimeList = mapOf(
+                Pair("Best season score", "102"),
                 Pair("Best global position", "30"),
+            ),
+            leaguesList = mapOf(
                 Pair("Leagues joined", "12"),
                 Pair("Top 3 league finishes", "10")
             )
