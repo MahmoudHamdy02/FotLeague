@@ -6,13 +6,10 @@ import requests
 # FotMob website
 url = "https://www.fotmob.com/api/leagues?id=47"
 backend = "http://backend:3000"
+timeout = 60 * 15
 
 # Wait until backend starts up
 sleep(15)
-
-# Get token from fotmob website
-x_fm_req = requests.get('http://46.101.91.154:6006/')
-token = x_fm_req.json()
 
 # Health check
 print("Pinging backend")
@@ -27,8 +24,14 @@ while True:
 
     matches = requests.get(f"{backend}/matches/{currentSeason}").json()
 
+    # Get token from fotmob website
+    x_fm_req = requests.get('http://46.101.91.154:6006/')
+    token = x_fm_req.json()
     fotmob = requests.get(url, headers=token)
     data = json.loads(fotmob.text)
+
+    # Ping more frequently if there is an ongoing match
+    timeout = 60 * 5 if data["matches"]["hasOngoingMatch"] else 60 * 15
 
     updatedMatches = data["matches"]["allMatches"]
 
@@ -69,4 +72,4 @@ while True:
             requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"]})
         
     break
-    sleep(300)
+    sleep(timeout)
