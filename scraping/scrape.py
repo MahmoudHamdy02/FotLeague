@@ -18,15 +18,17 @@ print(requests.get(f"{backend}/").text)
 fotmob_date_format = '%Y-%m-%dT%H:%M:%SZ'
 db_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
-# Infinite loop that runs every 5 minutes
+# Infinite loop that runs every 5/15 minutes
 while True:
     currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
 
     matches = requests.get(f"{backend}/matches/{currentSeason}").json()
 
     # Get token from fotmob website
+    print("Getting token")
     x_fm_req = requests.get('http://46.101.91.154:6006/')
     token = x_fm_req.json()
+    print("Getting FotMob data")
     fotmob = requests.get(url, headers=token)
     data = json.loads(fotmob.text)
 
