@@ -16,6 +16,7 @@ print("Pinging backend")
 print(requests.get(f"{backend}/").text)
 
 fotmob_date_format = '%Y-%m-%dT%H:%M:%SZ'
+fotmob_date_format_ms = '%Y-%m-%dT%H:%M:%S.%fZ'
 db_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 # Infinite loop that runs every 5/15 minutes
@@ -68,7 +69,10 @@ while True:
         
         # only update if match data has changed
         # convert datetime to compare them
-        updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format)
+        try: # In rare cases Fotmob returns match times with milliseconds for some reason
+            updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format)
+        except ValueError:
+            updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format_ms)
         matchDateTime = datetime.strptime(match["datetime"], db_date_format)
         if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"]:
             requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"]})
