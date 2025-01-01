@@ -9,7 +9,7 @@ backend = "http://backend:3000"
 timeout = 60 * 15
 
 # Wait until backend starts up
-sleep(15)
+sleep(20)
 
 # Health check
 print("Pinging backend")
@@ -64,8 +64,8 @@ while True:
             home_score = int(updatedMatch["status"]["scoreStr"].split("-")[0].strip())
             away_score = int(updatedMatch["status"]["scoreStr"].split("-")[1].strip())
         else:
-            home_score = None
-            away_score = None
+            home_score = 0
+            away_score = 0
         
         # only update if match data has changed
         # convert datetime to compare them
@@ -75,6 +75,7 @@ while True:
             updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format_ms)
         matchDateTime = datetime.strptime(match["datetime"], db_date_format)
         if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"]:
+            print("updating id:", match["id"])
             requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"]})
         
     break
