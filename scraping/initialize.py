@@ -12,7 +12,8 @@ import requests
 
 # FotMob website
 url = "https://www.fotmob.com/api/leagues?id=47"
-
+x_fm_req = requests.get('http://46.101.91.154:6006/')
+token = x_fm_req.json()
 
 # Health check
 print("Pinging backend")
@@ -22,15 +23,15 @@ print(requests.get(f"http://localhost:3001/").text)
 # Infinite loop that runs every 5 minutes
 print(datetime.now(), "Pinging FotMob...")
 # Get data from fotmob API
-fotmob = requests.get("https://www.fotmob.com/api/leagues?id=47")
-
+fotmob = requests.get("https://www.fotmob.com/api/leagues?id=47", headers=token)
+data = json.loads(fotmob.text)
 # Convert to JSON
-js = json.loads(fotmob.text)
+# js = json.loads(fotmob.text)
 
-season = js["details"]["latestSeason"]
+season = data["details"]["latestSeason"]
 
 # Select matches
-matches = js["matches"]["allMatches"]
+matches = data["matches"]["allMatches"]
 
 matchesJSON = []
 
