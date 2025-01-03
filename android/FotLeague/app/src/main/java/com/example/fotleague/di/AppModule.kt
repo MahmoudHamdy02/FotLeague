@@ -43,7 +43,7 @@ object AppModule {
                     .addInterceptor(ReceivedCookiesInterceptor(dataStoreUtil))
                     .build()
             )
-            .baseUrl("http://mahmoud-PC.local:3001")
+            .baseUrl("http://192.168.1.69:3001")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)

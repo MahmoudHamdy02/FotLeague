@@ -249,7 +249,14 @@ private fun Match(
     onClick: () -> Unit
 ) {
     val datetime = ZonedDateTime.parse(match.datetime).withZoneSameInstant(ZoneId.systemDefault())
-
+    val currentTime = ZonedDateTime.now()
+    val currentDate = currentTime.toLocalDate()
+    val matchDate = when (datetime.toLocalDate()) {
+        currentDate -> "Today"
+        currentDate.plusDays(1) -> "Tomorrow"
+        currentDate.minusDays(1) -> "Yesterday"
+        else -> datetime.format(DateTimeFormatter.ofPattern("d MMM"))
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -325,7 +332,7 @@ private fun Match(
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = datetime.format(DateTimeFormatter.ofPattern("d MMM")),
+                            text = matchDate,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             textAlign = TextAlign.Center,
@@ -353,7 +360,6 @@ private fun Match(
                                 centerTo(parent)
                             })
 
-                    val currentTime = ZonedDateTime.now()
                     val duration = Duration.between(datetime, currentTime)
                     Text(
                         text = if (match.matchStatus == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
