@@ -17,6 +17,7 @@ import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.models.Match
+import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.models.Prediction
 import com.example.fotleague.models.Score
 
@@ -52,11 +53,13 @@ fun MatchesList(
                     prediction = predictions.find { it.matchId == match.id },
                     score = scores.find { it.matchId == match.id }?.score
                 ) {
-                    if (!authUser.isLoggedIn) {
-                        navController.navigate(Route.Auth.route)
-                    } else {
-                        onOpenPredictionDialog()
-                        onSelectMatch(match)
+                    if (match.matchStatus != MatchStatus.Played.num && match.matchStatus != MatchStatus.InProgress.num) {
+                        if (!authUser.isLoggedIn) {
+                            navController.navigate(Route.Auth.route)
+                        } else {
+                            onOpenPredictionDialog()
+                            onSelectMatch(match)
+                        }
                     }
                 }
             }
