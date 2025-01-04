@@ -44,10 +44,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun Match(
-    match: Match,
-    prediction: Prediction?,
-    score: Int?,
-    onClick: () -> Unit
+    match: Match, prediction: Prediction?, score: Int?, onClick: () -> Unit
 ) {
     val datetime = ZonedDateTime.parse(match.datetime).withZoneSameInstant(ZoneId.systemDefault())
     val currentTime = ZonedDateTime.now()
@@ -58,14 +55,14 @@ fun Match(
         currentDate.minusDays(1) -> "Yesterday"
         else -> datetime.format(DateTimeFormatter.ofPattern("d MMM"))
     }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height((88 - 16).dp)
-            .clickable { onClick() }
-    ) {
-        val bgColor =
-            if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0) LightRed else LightGray
+    val bgColor =
+        if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0 || (prediction == null && match.matchStatus == MatchStatus.Played.num)) LightRed else LightGray
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height((88 - 16).dp)
+        .clickable { onClick() }) {
+        // Bottom Rectangle
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,16 +75,16 @@ fun Match(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
         ) {
             val text =
-                if (prediction == null)
-                    "Tap to submit prediction"
-                else
-                    "Prediction: ${prediction.home} - ${prediction.away}"
+                if (prediction == null) {
+                    if (match.matchStatus == MatchStatus.Played.num)
+                        "No prediction submitted"
+                    else "Tap to submit prediction"
+                } else "Prediction: ${prediction.home} - ${prediction.away}"
             Text(
-                text = text,
-                color = DarkGray,
-                fontSize = 13.sp
+                text = text, color = DarkGray, fontSize = 13.sp
             )
         }
+        // Top Rectangle
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,18 +97,16 @@ fun Match(
         ) {
             ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                 val (homeRef, awayRef, centerRef, homeIconRef, awayIconRef, matchTimeRef) = createRefs()
-                Text(
-                    text = match.home,
+                Text(text = match.home,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(homeRef) {
                         end.linkTo(homeIconRef.start, margin = 8.dp)
                         centerVerticallyTo(parent)
                     })
-                Icon(
-                    painter = painterResource(
-                        id = Logos.getResourceId(match.home)
-                    ),
+                Icon(painter = painterResource(
+                    id = Logos.getResourceId(match.home)
+                ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
                     modifier = Modifier
@@ -119,8 +114,7 @@ fun Match(
                             end.linkTo(centerRef.start, margin = 8.dp)
                             centerVerticallyTo(parent)
                         }
-                        .size(24.dp)
-                )
+                        .size(24.dp))
                 if (match.matchStatus == MatchStatus.Upcoming.num) {
                     Column(
                         modifier = Modifier
@@ -149,8 +143,7 @@ fun Match(
                         )
                     }
                 } else {
-                    Text(
-                        text = "${match.homeScore}  -  ${match.awayScore}",
+                    Text(text = "${match.homeScore}  -  ${match.awayScore}",
                         lineHeight = 8.sp,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -162,8 +155,7 @@ fun Match(
                             })
 
                     val duration = Duration.between(datetime, currentTime)
-                    Text(
-                        text = if (match.matchStatus == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
+                    Text(text = if (match.matchStatus == MatchStatus.InProgress.num) "${duration.toMinutes()}'" else "FT",
                         fontSize = 11.sp,
                         lineHeight = 8.sp,
                         modifier = Modifier.constrainAs(matchTimeRef) {
@@ -171,10 +163,9 @@ fun Match(
                             centerHorizontallyTo(parent)
                         })
                 }
-                Icon(
-                    painter = painterResource(
-                        id = Logos.getResourceId(match.away)
-                    ),
+                Icon(painter = painterResource(
+                    id = Logos.getResourceId(match.away)
+                ),
                     contentDescription = "Team Icon",
                     tint = Color.Unspecified,
                     modifier = Modifier
@@ -182,10 +173,8 @@ fun Match(
                             start.linkTo(centerRef.end, margin = 8.dp)
                             centerVerticallyTo(parent)
                         }
-                        .size(24.dp)
-                )
-                Text(
-                    text = match.away,
+                        .size(24.dp))
+                Text(text = match.away,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.constrainAs(awayRef) {
@@ -237,6 +226,50 @@ private fun InProgressMatchPreview() {
             ),
             prediction = Prediction(0, 0, 0, 0),
             score = null,
+        ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun PlayedAndPredictedMatchPreview() {
+    FotLeagueTheme {
+        Match(
+            match = Match(
+                id = 1,
+                home = "Liverpool",
+                away = "Everton",
+                homeScore = 2,
+                awayScore = 0,
+                matchStatus = 3,
+                datetime = "2024-08-16T19:00:00.000Z",
+                season = 0,
+                gameweek = 1
+            ),
+            prediction = Prediction(0, 0, 1, 0),
+            score = 1,
+        ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun PlayedAndNotPredictedMatchPreview() {
+    FotLeagueTheme {
+        Match(
+            match = Match(
+                id = 1,
+                home = "Liverpool",
+                away = "Everton",
+                homeScore = 2,
+                awayScore = 0,
+                matchStatus = 3,
+                datetime = "2024-08-16T19:00:00.000Z",
+                season = 0,
+                gameweek = 1
+            ),
+            prediction = null,
+            score = 0,
         ) {}
     }
 }
