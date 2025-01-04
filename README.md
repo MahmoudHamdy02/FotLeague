@@ -48,7 +48,7 @@ This repeats every 5 minutes in an infinite loop.
 
 ## Native Android App
 
-Todo
+The app is built with Kotlin using Jetpack Compose, utilizing MVVM archeticture. The used libraries are Room, Retrofit and Dagger-Hilt.
 
 ## Website
 
