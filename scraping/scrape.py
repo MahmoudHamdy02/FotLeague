@@ -34,6 +34,7 @@ while True:
     data = json.loads(fotmob.text)
 
     # Ping more frequently if there is an ongoing match
+    # TODO: hasOngoingMatch sometimes returns True even though it should be False
     timeout = 60 * 5 if data["matches"]["hasOngoingMatch"] else 60 * 15
 
     updatedMatches = data["matches"]["allMatches"]
