@@ -14,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
 import com.example.fotleague.MainState
 import com.example.fotleague.models.Match
+import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
 import com.example.fotleague.screens.matches.components.MatchesList
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
@@ -57,6 +59,14 @@ private fun MatchesContent(
 ) {
     val pagerState = rememberPagerState {
         38
+    }
+    LaunchedEffect(state) {
+        if (!state.isLoading) {
+            val gameweek =
+                state.matches.filter { it.matchStatus == MatchStatus.Played.num || it.matchStatus == MatchStatus.InProgress.num }
+                    .maxByOrNull { it.datetime }!!.gameweek
+            pagerState.animateScrollToPage(gameweek - 1)
+        }
     }
 
     Column(
