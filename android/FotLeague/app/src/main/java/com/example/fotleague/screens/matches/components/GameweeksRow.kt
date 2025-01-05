@@ -25,7 +25,7 @@ fun GameweeksRow(pagerState: PagerState) {
     val scope = rememberCoroutineScope()
 
     var selectedTabIndex by remember {
-        mutableIntStateOf(0)
+        mutableIntStateOf(pagerState.currentPage)
     }
     LaunchedEffect(pagerState.currentPage) {
         selectedTabIndex = pagerState.currentPage
