@@ -2,6 +2,7 @@ package com.example.fotleague.screens.matches
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.Prediction
@@ -18,10 +19,15 @@ import java.net.ConnectException
 import javax.inject.Inject
 
 @HiltViewModel
-class MatchesViewModel @Inject constructor(private val api: FotLeagueApi) : ViewModel() {
+class MatchesViewModel @Inject constructor(
+    private val api: FotLeagueApi,
+    val authStatus: AuthStatus
+) : ViewModel() {
 
     private val _state = MutableStateFlow(MatchesState())
     val state: StateFlow<MatchesState> = _state.asStateFlow()
+
+    val authState = authStatus.getAuthState()
 
     init {
         viewModelScope.launch {

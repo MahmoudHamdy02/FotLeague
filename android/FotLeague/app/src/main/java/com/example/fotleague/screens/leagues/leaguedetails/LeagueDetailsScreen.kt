@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
@@ -49,8 +48,7 @@ fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-
-    val authUser = LocalAuthUser.current
+    val authState by viewModel.authState.collectAsState()
 
     // TODO: Prevent icon flash by introducing loading state
     LocalTopBar.current(
@@ -58,7 +56,7 @@ fun LeagueDetailsScreen(
             title = "Leagues",
             showNavigateBackIcon = true,
             actions = {
-                if (state.league.ownerId == authUser.user.id) {
+                if (state.league.ownerId == authState.user!!.id) {
                     IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -74,6 +72,7 @@ fun LeagueDetailsScreen(
                             tint = LightGray
                         )
                     }
+
                 }
             })
     )
@@ -96,7 +95,7 @@ fun LeagueDetailsScreen(
         isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
         onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
         isDeleteLeagueDialogOpen = state.isDeleteLeagueDialogOpen,
-        onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague)},
+        onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague) },
         onDismissLeaveLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) },
         onDismissDeleteLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseDeleteLeagueDialog) }
     )

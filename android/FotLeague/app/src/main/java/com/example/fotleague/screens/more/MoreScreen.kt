@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +26,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
 import com.example.fotleague.ui.navigation.AppBarState
@@ -38,10 +39,10 @@ fun MoreScreen(
 ) {
     LocalTopBar.current(AppBarState(title = "More"))
 
-    val authUser = LocalAuthUser.current
+    val authState by viewModel.authState.collectAsState()
 
     MoreContent(
-        isLoggedIn = authUser.isLoggedIn,
+        isLoggedIn = authState.isLoggedIn,
         onLogOutClick = { viewModel.onEvent(MoreEvent.Logout) }
     )
 }

@@ -16,16 +16,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LeaguesViewModel @Inject constructor(private val api: FotLeagueApi, authStatus: AuthStatus) :
+class LeaguesViewModel @Inject constructor(
+    private val api: FotLeagueApi,
+    val authStatus: AuthStatus
+) :
     ViewModel() {
 
     private val _state = MutableStateFlow(LeaguesState())
     val state: StateFlow<LeaguesState> = _state.asStateFlow()
 
+    val authState = authStatus.getAuthState()
+
     init {
         viewModelScope.launch {
-            authStatus.getAuthUser().collect {
-                if (it != null) {
+            authState.collect {
+                if (it.isLoggedIn) {
                     getLeagues()
                 }
             }
@@ -42,23 +47,63 @@ class LeaguesViewModel @Inject constructor(private val api: FotLeagueApi, authSt
 
     fun onEvent(event: LeaguesEvent) {
         when (event) {
-            LeaguesEvent.CloseJoinLeagueDialog -> _state.update { state -> state.copy(isJoinLeagueDialogOpen = false) }
-            LeaguesEvent.OpenJoinLeagueDialog -> _state.update { state -> state.copy(isJoinLeagueDialogOpen = true) }
-            is LeaguesEvent.SetJoinLeagueDialogCode -> _state.update { state -> state.copy(joinLeagueDialogCode = event.code) }
+            LeaguesEvent.CloseJoinLeagueDialog -> _state.update { state ->
+                state.copy(
+                    isJoinLeagueDialogOpen = false
+                )
+            }
+
+            LeaguesEvent.OpenJoinLeagueDialog -> _state.update { state ->
+                state.copy(
+                    isJoinLeagueDialogOpen = true
+                )
+            }
+
+            is LeaguesEvent.SetJoinLeagueDialogCode -> _state.update { state ->
+                state.copy(
+                    joinLeagueDialogCode = event.code
+                )
+            }
+
             LeaguesEvent.JoinLeague -> {
                 viewModelScope.launch {
                     joinLeague()
-                    _state.update { state -> state.copy(isJoinLeagueDialogOpen = false, joinLeagueDialogCode = "") }
+                    _state.update { state ->
+                        state.copy(
+                            isJoinLeagueDialogOpen = false,
+                            joinLeagueDialogCode = ""
+                        )
+                    }
                 }
             }
 
-            LeaguesEvent.CloseCreateLeagueDialog -> _state.update { state -> state.copy(isCreateLeagueDialogOpen = false) }
-            LeaguesEvent.OpenCreateLeagueDialog -> _state.update { state -> state.copy(isCreateLeagueDialogOpen = true) }
-            is LeaguesEvent.SetCreateLeagueDialogName -> _state.update { state -> state.copy(createLeagueDialogName = event.name) }
+            LeaguesEvent.CloseCreateLeagueDialog -> _state.update { state ->
+                state.copy(
+                    isCreateLeagueDialogOpen = false
+                )
+            }
+
+            LeaguesEvent.OpenCreateLeagueDialog -> _state.update { state ->
+                state.copy(
+                    isCreateLeagueDialogOpen = true
+                )
+            }
+
+            is LeaguesEvent.SetCreateLeagueDialogName -> _state.update { state ->
+                state.copy(
+                    createLeagueDialogName = event.name
+                )
+            }
+
             LeaguesEvent.CreateLeague -> {
                 viewModelScope.launch {
                     createLeague()
-                    _state.update { state -> state.copy(isCreateLeagueDialogOpen = false, createLeagueDialogName = "") }
+                    _state.update { state ->
+                        state.copy(
+                            isCreateLeagueDialogOpen = false,
+                            createLeagueDialogName = ""
+                        )
+                    }
                 }
             }
         }
@@ -90,13 +135,13 @@ data class LeaguesState(
 )
 
 sealed interface LeaguesEvent {
-    data object OpenJoinLeagueDialog: LeaguesEvent
-    data object CloseJoinLeagueDialog: LeaguesEvent
-    data class SetJoinLeagueDialogCode(val code: String): LeaguesEvent
-    data object JoinLeague: LeaguesEvent
+    data object OpenJoinLeagueDialog : LeaguesEvent
+    data object CloseJoinLeagueDialog : LeaguesEvent
+    data class SetJoinLeagueDialogCode(val code: String) : LeaguesEvent
+    data object JoinLeague : LeaguesEvent
 
-    data object OpenCreateLeagueDialog: LeaguesEvent
-    data object CloseCreateLeagueDialog: LeaguesEvent
-    data class SetCreateLeagueDialogName(val name: String): LeaguesEvent
-    data object CreateLeague: LeaguesEvent
+    data object OpenCreateLeagueDialog : LeaguesEvent
+    data object CloseCreateLeagueDialog : LeaguesEvent
+    data class SetCreateLeagueDialogName(val name: String) : LeaguesEvent
+    data object CreateLeague : LeaguesEvent
 }

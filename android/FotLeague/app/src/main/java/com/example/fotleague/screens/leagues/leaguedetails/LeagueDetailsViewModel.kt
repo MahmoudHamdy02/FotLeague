@@ -28,13 +28,15 @@ class LeagueDetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow(LeagueDetailsState())
     val state: StateFlow<LeagueDetailsState> = _state.asStateFlow()
 
+    val authState = authStatus.getAuthState()
+
     private val leagueId = savedStateHandle.get<Int>("leagueId")
 
     init {
         if (leagueId != null) {
             viewModelScope.launch {
-                authStatus.getAuthUser().collect {
-                    if (it != null) {
+                authState.collect {
+                    if (it.isLoggedIn) {
                         getLeague(leagueId)
                     }
                 }

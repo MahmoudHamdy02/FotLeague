@@ -24,10 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.fotleague.LocalAuthUser
+import com.example.fotleague.AuthState
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
-import com.example.fotleague.MainState
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
@@ -44,9 +43,11 @@ fun MatchesScreen(
     LocalTopBar.current(AppBarState(title = "FotLeague", titleFontWeight = FontWeight.Bold))
 
     val state by viewModel.state.collectAsState()
+    val authState by viewModel.authState.collectAsState()
 
     MatchesContent(
         state = state,
+        authState = authState,
         onEvent = { viewModel.onEvent(it) }
     )
 }
@@ -55,6 +56,7 @@ fun MatchesScreen(
 @Composable
 private fun MatchesContent(
     state: MatchesState,
+    authState: AuthState,
     onEvent: (event: MatchesEvent) -> Unit
 ) {
     val pagerState = rememberPagerState {
@@ -85,7 +87,7 @@ private fun MatchesContent(
             ) {
                 Text(text = state.error)
             }
-        } else if (state.isLoading || LocalAuthUser.current.isLoading) {
+        } else if (state.isLoading || authState.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -108,6 +110,7 @@ private fun MatchesContent(
                     matches = state.matches,
                     predictions = state.predictions,
                     scores = state.scores,
+                    isLoggedIn = authState.isLoggedIn,
                     onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
                     onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) }
                 )
@@ -121,6 +124,7 @@ private fun MatchesContent(
             awayTeam = state.selectedMatch.away,
             homePickerState = state.homePickerState,
             awayPickerState = state.awayPickerState,
+            isLoggedIn = authState.isLoggedIn,
             onSubmit =
             {
                 if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
@@ -139,28 +143,27 @@ private fun MatchesContent(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MatchesContentPreview() {
-    CompositionLocalProvider(LocalAuthUser provides MainState(isLoading = false)) {
-        CompositionLocalProvider(LocalNavController provides rememberNavController()) {
-            FotLeagueTheme {
-                MatchesContent(
-                    state = MatchesState(
-                        matches = listOf(
-                            Match(
-                                id = 1,
-                                home = "Liverpool",
-                                away = "",
-                                homeScore = 0,
-                                awayScore = 0,
-                                matchStatus = 1,
-                                datetime = "2024-08-16T19:00:00.000Z",
-                                season = 0,
-                                gameweek = 1
-                            )
+    CompositionLocalProvider(LocalNavController provides rememberNavController()) {
+        FotLeagueTheme {
+            MatchesContent(
+                state = MatchesState(
+                    matches = listOf(
+                        Match(
+                            id = 1,
+                            home = "Liverpool",
+                            away = "",
+                            homeScore = 0,
+                            awayScore = 0,
+                            matchStatus = 1,
+                            datetime = "2024-08-16T19:00:00.000Z",
+                            season = 0,
+                            gameweek = 1
                         )
-                    ),
-                    onEvent = {}
-                )
-            }
+                    )
+                ),
+                authState = AuthState(),
+                onEvent = {}
+            )
         }
     }
 }

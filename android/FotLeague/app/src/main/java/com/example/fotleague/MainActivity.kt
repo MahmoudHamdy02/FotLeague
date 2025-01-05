@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,10 +26,6 @@ import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-val LocalAuthUser = compositionLocalOf<MainState> {
-    error("No LocalAuthUser provided")
-}
-
 val LocalTopBar = compositionLocalOf<(appBarState: AppBarState) -> Unit> {
     error("No appBarState provided")
 }
@@ -43,6 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val viewModel: MainViewModel by viewModels()
+        viewModel.init()
 
         LifecycleUtil.restartAppEvent.observe(this) {
             if (it) {
@@ -55,8 +51,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-
-                val state by viewModel.state.collectAsState()
 
                 var appBarState by remember {
                     mutableStateOf(AppBarState())
@@ -75,12 +69,10 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         CompositionLocalProvider(LocalNavController provides navController) {
-                            CompositionLocalProvider(LocalAuthUser provides state) {
-                                CompositionLocalProvider(LocalTopBar provides {
-                                    appBarState = it
-                                }) {
-                                    Navigation()
-                                }
+                            CompositionLocalProvider(LocalTopBar provides {
+                                appBarState = it
+                            }) {
+                                Navigation()
                             }
                         }
                     }

@@ -44,7 +44,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun Match(
-    match: Match, prediction: Prediction?, score: Int?, onClick: () -> Unit
+    match: Match, prediction: Prediction?, score: Int?, isLoggedIn: Boolean, onClick: () -> Unit
 ) {
     val datetime = ZonedDateTime.parse(match.datetime).withZoneSameInstant(ZoneId.systemDefault())
     val currentTime = ZonedDateTime.now()
@@ -56,7 +56,7 @@ fun Match(
         else -> datetime.format(DateTimeFormatter.ofPattern("d MMM"))
     }
     val bgColor =
-        if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0 || (prediction == null && match.matchStatus == MatchStatus.Played.num)) LightRed else LightGray
+        if (score == 3) LightGreen else if (score == 1) LightYellow else if (score == 0 || (score != null && prediction == null && match.matchStatus == MatchStatus.Played.num)) LightRed else LightGray
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -76,7 +76,7 @@ fun Match(
         ) {
             val text =
                 if (prediction == null) {
-                    if (match.matchStatus == MatchStatus.Played.num)
+                    if (match.matchStatus == MatchStatus.Played.num && !isLoggedIn)
                         "No prediction submitted"
                     else "Tap to submit prediction"
                 } else "Prediction: ${prediction.home} - ${prediction.away}"
@@ -204,6 +204,7 @@ private fun MatchPreview() {
             ),
             prediction = Prediction(0, 0, 0, 0),
             score = null,
+            isLoggedIn = true,
         ) {}
     }
 }
@@ -225,6 +226,7 @@ private fun InProgressMatchPreview() {
                 gameweek = 1
             ),
             prediction = Prediction(0, 0, 0, 0),
+            isLoggedIn = true,
             score = null,
         ) {}
     }
@@ -248,6 +250,7 @@ private fun PlayedAndPredictedMatchPreview() {
             ),
             prediction = Prediction(0, 0, 1, 0),
             score = 1,
+            isLoggedIn = true,
         ) {}
     }
 }
@@ -270,6 +273,7 @@ private fun PlayedAndNotPredictedMatchPreview() {
             ),
             prediction = null,
             score = 0,
+            isLoggedIn = true,
         ) {}
     }
 }

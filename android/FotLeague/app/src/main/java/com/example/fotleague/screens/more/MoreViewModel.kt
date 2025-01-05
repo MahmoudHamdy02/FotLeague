@@ -2,6 +2,7 @@ package com.example.fotleague.screens.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.LifecycleUtil
 import com.example.fotleague.data.FotLeagueApi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,11 +11,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MoreViewModel @Inject constructor(
-    val api: FotLeagueApi
+    val api: FotLeagueApi,
+    authStatus: AuthStatus
 ) : ViewModel() {
 
+    val authState = authStatus.getAuthState()
+
     fun onEvent(event: MoreEvent) {
-        when(event) {
+        when (event) {
             MoreEvent.Logout -> logout()
         }
     }

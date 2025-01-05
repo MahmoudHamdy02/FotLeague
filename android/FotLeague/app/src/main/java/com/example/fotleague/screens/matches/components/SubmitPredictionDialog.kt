@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.ui.Logos
@@ -45,12 +44,20 @@ import com.example.fotleague.ui.theme.Gray
 import com.example.fotleague.ui.theme.LightGray
 
 @Composable
-fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, homePickerState: PickerState, awayPickerState: PickerState, onDismiss: () -> Unit, onSubmit: () -> Unit, edit: Boolean) {
+fun SubmitPredictionDialog(
+    homeTeam: String,
+    awayTeam: String,
+    homePickerState: PickerState,
+    awayPickerState: PickerState,
+    isLoggedIn: Boolean,
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
+    edit: Boolean
+) {
     val homeGoals = remember { (0..15).map { it.toString() } }
     val awayGoals = remember { (0..15).map { it.toString() } }
 
     val navController = LocalNavController.current
-    val authUser = LocalAuthUser.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -148,7 +155,7 @@ fun SubmitPredictionDialog(homeTeam: String, awayTeam: String, homePickerState: 
                 }
                 Button(
                     onClick = {
-                        if (!authUser.isLoggedIn) {
+                        if (!isLoggedIn) {
                             navController.navigate(Route.Auth.route)
                         } else {
                             onSubmit()
@@ -177,6 +184,7 @@ private fun SubmitPredictionModalPreview() {
             awayPickerState = rememberPickerState(),
             onDismiss = {},
             onSubmit = {},
+            isLoggedIn = true,
             edit = false
         )
     }

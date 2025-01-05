@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fotleague.LifecycleUtil
-import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.LoginRequest
-import com.example.fotleague.models.network.request.SignUpRequest
-import com.example.fotleague.screens.matches.MatchesState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +32,13 @@ class LoginViewModel @Inject constructor(
 
     private fun login() {
         viewModelScope.launch {
-            val response = api.login(LoginRequest(_state.value.email, _state.value.password, _state.value.rememberMe))
+            val response = api.login(
+                LoginRequest(
+                    _state.value.email,
+                    _state.value.password,
+                    _state.value.rememberMe
+                )
+            )
             Log.d("LOGIN", response.body().toString())
             LifecycleUtil.onSetRestartTrue()
         }
@@ -49,8 +52,8 @@ data class LoginState(
 )
 
 sealed interface LoginEvent {
-    data class SetEmail(val email: String): LoginEvent
-    data class SetPassword(val password: String): LoginEvent
-    data class SetRememberMe(val rememberMe: Boolean): LoginEvent
+    data class SetEmail(val email: String) : LoginEvent
+    data class SetPassword(val password: String) : LoginEvent
+    data class SetRememberMe(val rememberMe: Boolean) : LoginEvent
     data object Login : LoginEvent
 }

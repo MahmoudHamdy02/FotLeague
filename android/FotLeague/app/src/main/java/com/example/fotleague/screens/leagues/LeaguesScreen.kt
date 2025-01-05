@@ -31,10 +31,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalAuthUser
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
+import com.example.fotleague.Route
 import com.example.fotleague.Screen
 import com.example.fotleague.models.League
 import com.example.fotleague.screens.leagues.components.CreateLeagueDialog
@@ -49,18 +49,35 @@ import com.example.fotleague.ui.theme.LightGray
 fun LeaguesScreen(
     viewModel: LeaguesViewModel = hiltViewModel()
 ) {
+    val navController = LocalNavController.current
+
+    val state by viewModel.state.collectAsState()
+    val authState by viewModel.authState.collectAsState()
+
     LocalTopBar.current(
         AppBarState(
             title = "Leagues",
             actions = {
-                IconButton(onClick = { viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog) }) {
+                IconButton(onClick = {
+                    if (!authState.isLoggedIn) {
+                        navController.navigate(Route.Auth.route)
+                    } else {
+                        viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)
+                    }
+                }) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = null,
                         tint = LightGray
                     )
                 }
-                IconButton(onClick = { viewModel.onEvent(LeaguesEvent.OpenJoinLeagueDialog) }) {
+                IconButton(onClick = {
+                    if (!authState.isLoggedIn) {
+                        navController.navigate(Route.Auth.route)
+                    } else {
+                        viewModel.onEvent(LeaguesEvent.OpenJoinLeagueDialog)
+                    }
+                }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.person_add_24),
                         contentDescription = null,
@@ -70,9 +87,6 @@ fun LeaguesScreen(
             }
         )
     )
-    val navController = LocalNavController.current
-
-    val state by viewModel.state.collectAsState()
 
     LeaguesContent(
         leagues = state.leagues,
@@ -86,7 +100,8 @@ fun LeaguesScreen(
         onDismissCreateLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseCreateLeagueDialog) },
         name = state.createLeagueDialogName,
         setName = { viewModel.onEvent(LeaguesEvent.SetCreateLeagueDialogName(it)) },
-        onCreateClick = { viewModel.onEvent(LeaguesEvent.CreateLeague) }
+        onCreateClick = { viewModel.onEvent(LeaguesEvent.CreateLeague) },
+        isLoggedIn = authState.isLoggedIn
     )
 }
 
@@ -104,6 +119,7 @@ fun LeaguesContent(
     name: String,
     setName: (code: String) -> Unit,
     onCreateClick: () -> Unit,
+    isLoggedIn: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -111,7 +127,7 @@ fun LeaguesContent(
             .background(color = Background)
             .padding(horizontal = 16.dp, vertical = 24.dp),
     ) {
-        if (!LocalAuthUser.current.isLoggedIn) {
+        if (!isLoggedIn) {
             Text(text = "Log in to see your leagues")
         } else {
             Header()
