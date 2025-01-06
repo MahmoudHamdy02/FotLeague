@@ -22,19 +22,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // Todo: add another api and builder to automatically restart the app if token is expired and 401 error is received
-
     @Provides
     @Singleton
     fun provideFotLeagueApi(dataStoreUtil: DataStoreUtil): FotLeagueApi {
-//        var address: String?
-//        runBlocking {
-//            address = getAddress()
-//        }
-//        Log.d("NET", address ?: "No address found")
-//        if (address == null) {
-//            return null
-//        }
         return Retrofit.Builder()
             .client(
                 OkHttpClient
@@ -43,7 +33,7 @@ object AppModule {
                     .addInterceptor(ReceivedCookiesInterceptor(dataStoreUtil))
                     .build()
             )
-            .baseUrl("http://192.168.1.69:3001")
+            .baseUrl("http://mahmoudspi.duckdns.org:1234/")
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)
@@ -54,19 +44,6 @@ object AppModule {
     fun provideDataStoreUtil(@ApplicationContext context: Context): DataStoreUtil {
         return DataStoreUtil(context)
     }
-
-    // Temporary until backend is hosted
-//    private suspend fun getAddress(): String? {
-//        try {
-//            val address = withContext(Dispatchers.IO) {
-//                InetAddress.getByName("mahmoud-PC.local")
-//            }
-//            Log.d("NET", address.hostAddress ?: "No address")
-//            return address.hostAddress
-//        } catch (e: Exception) {
-//            return null
-//        }
-//    }
 
     @Provides
     @Singleton
