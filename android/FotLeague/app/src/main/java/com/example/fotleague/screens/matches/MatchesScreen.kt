@@ -62,7 +62,7 @@ private fun MatchesContent(
     val pagerState = rememberPagerState {
         38
     }
-    LaunchedEffect(state) {
+    LaunchedEffect(state.isLoading) {
         if (!state.isLoading) {
             val gameweek =
                 state.matches.filter { it.matchStatus == MatchStatus.Played.num || it.matchStatus == MatchStatus.InProgress.num }
