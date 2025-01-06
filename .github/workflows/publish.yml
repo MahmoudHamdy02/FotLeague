@@ -27,7 +27,7 @@ jobs:
           context: ./backend
           file: backend/Dockerfile
           push: true
-          tags: mahmoudhamdy02/fotleague:scraping
+          tags: mahmoudhamdy02/fotleague:backend
 
       - name: build and push scraping
         id: build-push-scraping
