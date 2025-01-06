@@ -25,8 +25,8 @@ while True:
 
     matches = requests.get(f"{backend}/matches/{currentSeason}").json()
 
+    print(datetime.now())
     # Get token from fotmob website
-    print("Getting token")
     x_fm_req = requests.get('http://46.101.91.154:6006/')
     token = x_fm_req.json()
     print("Getting FotMob data")
@@ -78,6 +78,5 @@ while True:
         if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"]:
             print("updating id:", match["id"])
             requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"]})
-        
-    break
+
     sleep(timeout)
