@@ -1,6 +1,6 @@
 services:
   watchtower:
-    image: containrrr/watchtower
+    image: containrrr/watchtower:armhf-latest
     environment:
     - WATCHTOWER_CLEANUP=true
     volumes:
