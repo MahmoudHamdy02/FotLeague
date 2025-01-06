@@ -8,4 +8,6 @@ RUN npm install
 
 COPY . .
 
+RUN npx tsc
+
 CMD [ "npm", "run", "start" ]
