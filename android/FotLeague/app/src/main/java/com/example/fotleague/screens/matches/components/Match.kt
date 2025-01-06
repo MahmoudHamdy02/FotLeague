@@ -76,7 +76,7 @@ fun Match(
         ) {
             val text =
                 if (prediction == null) {
-                    if (match.matchStatus == MatchStatus.Played.num && !isLoggedIn)
+                    if (match.matchStatus == MatchStatus.Played.num || match.matchStatus == MatchStatus.InProgress.num)
                         "No prediction submitted"
                     else "Tap to submit prediction"
                 } else "Prediction: ${prediction.home} - ${prediction.away}"
