@@ -24,17 +24,17 @@ jobs:
         id: build-push-backend
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./backend
           file: backend/Dockerfile
           push: true
-          tags: mahmoudhamdy02/fotleague:latest
+          tags: mahmoudhamdy02/backend:latest
 
       - name: build and push scraping
         id: build-push-scraping
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: ./scraping
           file: scraping/Dockerfile
           push: true
-          tags: mahmoudhamdy02/fotleague:latest
+          tags: mahmoudhamdy02/scraping:latest
 
