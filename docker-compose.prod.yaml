@@ -5,9 +5,8 @@ services:
     - WATCHTOWER_CLEANUP=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30 <your-container-name>
+    command: --interval 30
   backend:
-    container_name: backend
     image: mahmoudhamdy02/fotleague:backend
     expose:
       - 3000
