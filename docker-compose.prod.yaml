@@ -23,7 +23,7 @@ services:
         condition: service_healthy
     command: sh -c "node dist/server.js"
     healthcheck:
-      test: ["CMD-SHELL", '[[ $(curl -sw "%{http_code}" -o /dev/null http://localhost:3001) == "200" ]] && exit 0']
+      test: ["CMD-SHELL", '[[ $(curl -sw "%{http_code}" -o /dev/null http://localhost:3000) == "200" ]] && exit 0']
       interval: 15s
       timeout: 30s
       retries: 15
