@@ -3,6 +3,7 @@ package com.example.fotleague.screens.leagues.leaguedetails
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +26,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -78,6 +82,7 @@ fun LeagueDetailsScreen(
     )
 
     val navController = LocalNavController.current
+    val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(state.leagueLeft) {
         if (state.leagueLeft) {
@@ -88,6 +93,7 @@ fun LeagueDetailsScreen(
     }
 
     LeagueDetailsContent(
+        clipboardManager = clipboardManager,
         leagueName = state.league.name,
         ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
         code = state.league.code,
@@ -103,6 +109,7 @@ fun LeagueDetailsScreen(
 
 @Composable
 private fun LeagueDetailsContent(
+    clipboardManager: ClipboardManager,
     leagueName: String,
     ownerName: String,
     code: String,
@@ -132,8 +139,10 @@ private fun LeagueDetailsContent(
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.weight(1f))
+                // Copy code button
                 Row(
                     modifier = Modifier
+                        .clickable { clipboardManager.setText(AnnotatedString(code)) }
                         .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -247,7 +256,9 @@ private fun ConfirmDeleteLeagueDialogPreview() {
 @Composable
 fun LeagueDetailsPreview() {
     FotLeagueTheme {
+        val clipboardManager = LocalClipboardManager.current
         LeagueDetailsContent(
+            clipboardManager = clipboardManager,
             leagueName = "League name",
             ownerName = "owner",
             code = "fn28gD",
