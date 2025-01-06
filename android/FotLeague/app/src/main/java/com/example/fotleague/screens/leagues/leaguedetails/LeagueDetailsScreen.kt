@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -142,8 +143,9 @@ private fun LeagueDetailsContent(
                 // Copy code button
                 Row(
                     modifier = Modifier
-                        .clickable { clipboardManager.setText(AnnotatedString(code)) }
                         .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { clipboardManager.setText(AnnotatedString(code)) }
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
