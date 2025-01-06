@@ -9,7 +9,7 @@ backend = "http://backend:3000"
 timeout = 60 * 15
 
 # Wait until backend starts up
-sleep(20)
+sleep(60)
 
 # Health check
 print("Pinging backend")
