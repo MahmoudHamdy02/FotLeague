@@ -16,7 +16,11 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      # - /app/node_modules # Uncomment for prod. In dev local node_modules is used
+    healthcheck:
+      test: ["CMD-SHELL", '[[ $(curl -sw "%{http_code}" -o /dev/null http://localhost:3000) == "200" ]] && exit 0']
+      interval: 5s
+      timeout: 30s
+      retries: 5
   db:
     image: postgres
     environment:
@@ -46,6 +50,9 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PORT=${PORT}
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   fotleague-db:

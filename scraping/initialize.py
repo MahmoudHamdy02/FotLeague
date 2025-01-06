@@ -59,12 +59,6 @@ for i, match in enumerate(matches):
         "match_status": status
     })
 
-print(len(matchesJSON))
-
-# matchesJSON.pop(161)
-
-# print(len(matchesJSON))
 
 # Send to backend
 print(requests.post(f"http://localhost:3001/matches/init", json={"matches": matchesJSON}))
-#sleep(300)

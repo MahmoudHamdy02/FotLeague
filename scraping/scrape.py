@@ -3,17 +3,39 @@ import json
 from time import sleep
 import requests
 
+def initialize(matches, season):
+    matchesJSON = []
+    # 1 - Upcoming
+    # 2 - In Progress
+    # 3 - Played
+    # 4 - Aborted
+    for i, match in enumerate(matches):
+        status = 1
+        if match["status"]["started"] and not match["status"]["finished"]:
+            status = 2
+        elif match["status"]["started"] and match["status"]["finished"]:
+            status = 3
+        elif match["status"]["cancelled"]:
+            status = 4
+        
+        matchesJSON.append({
+            "gameweek": match["round"],
+            "season": int(season.split("/")[1]),
+            "home": match["home"]["shortName"],
+            "away": match["away"]["shortName"],
+            "home_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[0].strip(),
+            "away_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[1].strip(),
+            "datetime": match["status"]["utcTime"],
+            "match_status": status
+        })
+    # Send to backend
+    print(requests.post(f"http://backend:3000/matches/init", json={"matches": matchesJSON}))
+    print("Initialized")
+
 # FotMob website
 url = "https://www.fotmob.com/api/leagues?id=47"
 backend = "http://backend:3000"
 timeout = 60 * 15
-
-# Wait until backend starts up
-sleep(60)
-
-# Health check
-print("Pinging backend")
-print(requests.get(f"{backend}/").text)
 
 fotmob_date_format = '%Y-%m-%dT%H:%M:%SZ'
 fotmob_date_format_ms = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -21,15 +43,10 @@ db_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 # Infinite loop that runs every 5/15 minutes
 while True:
-    currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
-
-    matches = requests.get(f"{backend}/matches/{currentSeason}").json()
-
-    print(datetime.now())
     # Get token from fotmob website
     x_fm_req = requests.get('http://46.101.91.154:6006/')
     token = x_fm_req.json()
-    print("Getting FotMob data")
+    print(f"{datetime.now()} Getting FotMob data")
     fotmob = requests.get(url, headers=token)
     data = json.loads(fotmob.text)
 
@@ -38,6 +55,14 @@ while True:
     timeout = 60 * 5 if data["matches"]["hasOngoingMatch"] else 60 * 15
 
     updatedMatches = data["matches"]["allMatches"]
+    season = data["details"]["latestSeason"]
+
+    currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
+    if currentSeason is None:
+        initialize(updatedMatches, season)
+
+    currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
+    matches = requests.get(f"{backend}/matches/{currentSeason}").json()
 
     # Get corresponding updated matches for each database match
     for match in matches:
