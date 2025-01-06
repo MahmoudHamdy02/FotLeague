@@ -28,6 +28,7 @@ jobs:
           file: backend/Dockerfile
           push: true
           tags: mahmoudhamdy02/fotleague:backend
+          platforms: linux/amd64,linux/arm/v6
 
       - name: build and push scraping
         id: build-push-scraping
@@ -37,4 +38,5 @@ jobs:
           file: scraping/Dockerfile
           push: true
           tags: mahmoudhamdy02/fotleague:scraping
+          platforms: linux/amd64,linux/arm/v6
 
