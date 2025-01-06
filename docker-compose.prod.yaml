@@ -1,0 +1,43 @@
+services:
+  backend:
+    build: ./backend
+    expose:
+      - 3000
+    environment:
+      - PORT=${PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=fotleague
+      - SESSION_SECRET=${SESSION_SECRET}
+    ports:
+      - "${PORT}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=fotleague
+    volumes:
+      - fotleague-db:/var/lib/postgresql/data
+      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d fotleague"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  python:
+    build: ./scraping
+    volumes:
+      - ./scraping:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=${PORT}
+
+volumes:
+  fotleague-db:
