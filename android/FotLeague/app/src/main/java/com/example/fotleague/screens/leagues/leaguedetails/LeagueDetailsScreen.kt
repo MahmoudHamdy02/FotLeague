@@ -1,5 +1,10 @@
 package com.example.fotleague.screens.leagues.leaguedetails
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -21,6 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,6 +55,7 @@ import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
+import kotlinx.coroutines.delay
 
 @Composable
 fun LeagueDetailsScreen(
@@ -139,26 +149,8 @@ private fun LeagueDetailsContent(
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                // Copy code button
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable { clipboardManager.setText(AnnotatedString(code)) }
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.copy_24),
-                        contentDescription = "Copy",
-                        tint = LightGray
-                    )
-                    Text(
-                        text = code,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+
+                CopyLeagueCodeButton(clipboardManager = clipboardManager, code = code)
             }
             // League owner
             Row {
@@ -183,6 +175,63 @@ private fun LeagueDetailsContent(
         ConfirmDeleteLeagueDialog(
             onDeleteLeague = onDeleteLeague,
             onDismiss = onDismissDeleteLeagueDialog
+        )
+    }
+}
+
+@Composable
+private fun CopyLeagueCodeButton(clipboardManager: ClipboardManager, code: String) {
+    var clicked by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(clicked) {
+        if (clicked) {
+            delay(1000)
+            clicked = false
+        }
+    }
+    Row(
+        modifier = Modifier
+            .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
+            .clip(RoundedCornerShape(4.dp))
+            .clickable {
+                clipboardManager.setText(AnnotatedString(code))
+                clicked = true
+            }
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        AnimatedContent(
+            targetState = clicked,
+            label = "Copy animation",
+            transitionSpec = {
+                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(
+                    animationSpec = tween(
+                        300
+                    )
+                )
+            }
+        ) { clicked ->
+            when (clicked) {
+                false -> Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.copy_24),
+                    contentDescription = "Copy",
+                    tint = LightGray
+                )
+
+                true -> {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Copied",
+                        tint = LightGray
+                    )
+                }
+            }
+        }
+        Text(
+            text = code,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
         )
     }
 }
