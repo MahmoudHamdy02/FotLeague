@@ -205,9 +205,9 @@ private fun CopyLeagueCodeButton(clipboardManager: ClipboardManager, code: Strin
             targetState = clicked,
             label = "Copy animation",
             transitionSpec = {
-                fadeIn(animationSpec = tween(300)) togetherWith fadeOut(
+                fadeIn(animationSpec = tween(250)) togetherWith fadeOut(
                     animationSpec = tween(
-                        300
+                        250
                     )
                 )
             }
