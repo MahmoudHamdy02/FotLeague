@@ -3,7 +3,8 @@ package com.example.fotleague.screens.auth.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fotleague.LifecycleUtil
+import com.example.fotleague.AuthState
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.LoginRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val api: FotLeagueApi
+    private val api: FotLeagueApi,
+    private val authStatus: AuthStatus
 ) : ViewModel() {
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
@@ -40,7 +42,15 @@ class LoginViewModel @Inject constructor(
                 )
             )
             Log.d("LOGIN", response.body().toString())
-            LifecycleUtil.onSetRestartTrue()
+            authStatus.setAuthState(
+                AuthState(
+                    user = response.body(),
+                    isLoading = false,
+                    isLoggedIn = true
+                )
+            )
+            _state.update { state -> state.copy(isLoggedIn = true) }
+//            LifecycleUtil.onSetRestartTrue()
         }
     }
 }
@@ -48,7 +58,8 @@ class LoginViewModel @Inject constructor(
 data class LoginState(
     val email: String = "",
     val password: String = "",
-    val rememberMe: Boolean = false
+    val rememberMe: Boolean = false,
+    val isLoggedIn: Boolean = false
 )
 
 sealed interface LoginEvent {

@@ -18,7 +18,8 @@ export const login = (req: Request, res: Response) => {
         req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; // 1 Month
         req.session.save();
     }
-    res.json({message: "Signed in"});
+    const {password: _, ...details} = req.user!;
+    res.json(details);
 };
 
 export const signup = async (req: Request, res: Response) => {

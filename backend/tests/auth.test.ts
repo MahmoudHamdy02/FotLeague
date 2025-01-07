@@ -82,7 +82,10 @@ describe("Auth System", () => {
         const res = await request(app).post("/auth/login")
                 .send({email: newUser.email, password: newUser.password, rememberMe: false});
         expect(res.statusCode).toEqual(200);
-        expect(res.body.message).toEqual("Signed in");
+        expect(res.body.email).toEqual(newUser.email);
+        expect(res.body.name).toEqual(newUser.name);
+        expect(res.body.role).toEqual(UserRole.User);
+        expect(typeof res.body.id).toEqual("number");
         cookie = res.headers["set-cookie"][0];
     });
 
@@ -150,7 +153,10 @@ describe("Reset password", () => {
         const res = await request(app).post("/auth/login")
                 .send({email: newUser.email, password: newUser.password + "4", rememberMe: false});
         expect(res.statusCode).toEqual(200);
-        expect(res.body.message).toEqual("Signed in");
+        expect(res.body.email).toEqual(newUser.email);
+        expect(res.body.name).toEqual(newUser.name);
+        expect(res.body.role).toEqual(UserRole.User);
+        expect(typeof res.body.id).toEqual("number");
         cookie = res.headers["set-cookie"][0];
     });
 
