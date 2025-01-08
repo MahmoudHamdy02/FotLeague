@@ -32,8 +32,13 @@ class MatchesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            Log.d("FETCH", "INITIALIZED")
             fetchData()
+        }
+        viewModelScope.launch {
             observeLogin()
+        }
+        viewModelScope.launch {
             observeLogout()
         }
     }
@@ -66,7 +71,8 @@ class MatchesViewModel @Inject constructor(
     private suspend fun observeLogout() {
         authStatus.logoutTrigger.collect {
             if (it) {
-                _state.update { MatchesState() }
+                Log.d("FETCH", "Logout collected")
+                _state.update { state -> MatchesState(matches = state.matches) }
             }
         }
     }
@@ -86,6 +92,7 @@ class MatchesViewModel @Inject constructor(
         val predictionsBody = predictions.body()
 
         if (predictions.isSuccessful && predictionsBody != null) {
+            Log.d("FETCH", predictionsBody.toString())
             _state.update { state ->
                 state.copy(
                     predictions = predictionsBody,
@@ -98,6 +105,7 @@ class MatchesViewModel @Inject constructor(
         val matches = api.getMatches(2025)
         val matchesBody = matches.body()
         if (matches.isSuccessful && matchesBody != null) {
+            Log.d("FETCH", matchesBody.toString())
             _state.update { state ->
                 state.copy(
                     matches = matchesBody,
@@ -111,6 +119,7 @@ class MatchesViewModel @Inject constructor(
         val scores = api.getUserScores()
         val scoresBody = scores.body()
         if (scores.isSuccessful && scoresBody != null) {
+            Log.d("FETCH", scoresBody.toString())
             _state.update { state ->
                 state.copy(
                     scores = scoresBody,

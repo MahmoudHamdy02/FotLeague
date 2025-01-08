@@ -68,7 +68,7 @@ fun LoginScreen(
 
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) {
-            navController.popBackStack()
+            navController.popBackStack(Screen.MatchesScreen.route, false)
         }
     }
 

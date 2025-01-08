@@ -32,8 +32,9 @@ class MoreViewModel @Inject constructor(
     private fun logout() {
         viewModelScope.launch {
             api.logout()
-            authStatus.logoutTrigger.value = true
             authStatus.setAuthState(AuthState(isLoading = false, isLoggedIn = false))
+            authStatus.logoutTrigger.value = true
+            authStatus.logoutTrigger.value = false
             _state.update { state -> state.copy(onLogout = true) }
         }
     }

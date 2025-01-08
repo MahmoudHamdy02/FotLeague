@@ -3,8 +3,10 @@ package com.example.fotleague.screens.auth.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fotleague.AuthState
 import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
+import com.example.fotleague.models.User
 import com.example.fotleague.models.network.request.SignUpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,8 +44,25 @@ class SignUpViewModel @Inject constructor(
             )
             Log.d("SIGNUP", response.body().toString())
             Log.d("SIGNUP", response.headers()["Set-Cookie"] ?: "No cookie found")
-            authStatus.loginTrigger.value = true
-            _state.update { state -> state.copy(onSignup = true) }
+            val userResponse = response.body()
+            if (userResponse != null) {
+                val user = User(
+                    id = userResponse.id,
+                    name = userResponse.name,
+                    email = userResponse.email,
+                    role = userResponse.role
+                )
+                authStatus.setAuthState(
+                    AuthState(
+                        user = user,
+                        isLoggedIn = true,
+                        isLoading = false
+                    )
+                )
+                authStatus.loginTrigger.value = true
+                authStatus.loginTrigger.value = false
+                _state.update { state -> state.copy(onSignup = true) }
+            }
 //            LifecycleUtil.onSetRestartTrue()
         }
     }

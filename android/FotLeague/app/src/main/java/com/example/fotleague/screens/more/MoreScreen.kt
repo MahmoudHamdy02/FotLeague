@@ -49,7 +49,7 @@ fun MoreScreen(
 
     LaunchedEffect(state.onLogout) {
         if (state.onLogout) {
-            navController.navigate(Screen.MatchesScreen.route)
+            navController.popBackStack(Screen.MatchesScreen.route, false)
         }
     }
 
