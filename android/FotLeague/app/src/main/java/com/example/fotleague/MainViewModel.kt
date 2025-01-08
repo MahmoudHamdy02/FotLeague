@@ -1,5 +1,6 @@
 package com.example.fotleague
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fotleague.data.FotLeagueApi
@@ -28,6 +29,7 @@ class MainViewModel @Inject constructor(val api: FotLeagueApi, val authStatus: A
                     authStatus.setAuthState(AuthState(isLoading = false, isLoggedIn = false))
                 }
             } catch (e: Exception) {
+                Log.d("CONN", e.toString())
                 authStatus.setAuthState(AuthState(error = "Connection failed", isLoading = false))
             }
         }

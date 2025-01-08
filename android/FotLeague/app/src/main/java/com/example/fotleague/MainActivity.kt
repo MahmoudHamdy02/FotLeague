@@ -6,11 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,13 +23,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.navigation.BottomNavigation
-import com.example.fotleague.ui.navigation.TopBar
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import dagger.hilt.android.AndroidEntryPoint
-
-val LocalTopBar = compositionLocalOf<(appBarState: AppBarState) -> Unit> {
-    error("No appBarState provided")
-}
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -49,8 +47,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(
+                    contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.statusBars),
                     modifier = Modifier.fillMaxSize(),
-                    topBar = { TopBar(appBarState, navController::navigateUp) },
                     bottomBar = {
                         if (currentRoute in bottomBarRoutes) {
                             BottomNavigation(navController)
@@ -61,11 +59,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         CompositionLocalProvider(LocalNavController provides navController) {
-                            CompositionLocalProvider(LocalTopBar provides {
-                                appBarState = it
-                            }) {
-                                Navigation()
-                            }
+                            Navigation()
                         }
                     }
                 }

@@ -1,5 +1,14 @@
 package com.example.fotleague
 
+import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -56,13 +65,25 @@ fun Navigation() {
     NavHost(
         navController = LocalNavController.current,
         startDestination = Screen.MatchesScreen.route,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
     ) {
         // Bottom navigation
         composable(Screen.MatchesScreen.route) {
             MatchesScreen()
         }
-        composable(Screen.LeaguesScreen.route) {
+        composable(Screen.LeaguesScreen.route,
+            exitTransition = {
+                Log.d("ANIM", this.targetState.destination.route ?: "")
+                if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
+                    Log.d("ANIM", "here")
+                    ExitTransition.KeepUntilTransitionsFinished
+//                    fadeOut(animationSpec = tween(1000))
+                } else {
+                    ExitTransition.None
+                }
+            }) {
             LeaguesScreen()
         }
         composable(Screen.LeaderboardScreen.route) {
@@ -82,7 +103,23 @@ fun Navigation() {
                 navArgument("leagueId") {
                     type = NavType.IntType
                 }
-            )
+            ),
+            enterTransition = {
+                fadeIn(
+                    animationSpec = tween(300, easing = LinearEasing)
+                ) + slideIntoContainer(
+                    animationSpec = tween(200, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
+            exitTransition = {
+                fadeOut(
+                    animationSpec = tween(300, easing = LinearEasing)
+                ) + slideOutOfContainer(
+                    animationSpec = tween(200, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
         ) {
             LeagueDetailsScreen()
         }

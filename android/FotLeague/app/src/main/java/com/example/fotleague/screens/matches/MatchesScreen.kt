@@ -4,14 +4,22 @@ import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -26,30 +34,38 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.AuthState
 import com.example.fotleague.LocalNavController
-import com.example.fotleague.LocalTopBar
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
 import com.example.fotleague.screens.matches.components.MatchesList
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
-import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.FotLeagueTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchesScreen(
     viewModel: MatchesViewModel = hiltViewModel()
 ) {
-    LocalTopBar.current(AppBarState(title = "FotLeague", titleFontWeight = FontWeight.Bold))
+    val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
     val authState by viewModel.authState.collectAsState()
 
-    MatchesContent(
-        state = state,
-        authState = authState,
-        onEvent = { viewModel.onEvent(it) }
-    )
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
+        topBar = {
+            TopAppBar(title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) })
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            MatchesContent(
+                state = state,
+                authState = authState,
+                onEvent = { viewModel.onEvent(it) }
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

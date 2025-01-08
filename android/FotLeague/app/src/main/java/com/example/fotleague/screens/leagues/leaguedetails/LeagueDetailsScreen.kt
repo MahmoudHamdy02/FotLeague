@@ -9,20 +9,29 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,53 +52,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalNavController
-import com.example.fotleague.LocalTopBar
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.UserScore
 import com.example.fotleague.screens.leagues.components.ConfirmDeleteLeagueDialog
 import com.example.fotleague.screens.leagues.components.ConfirmLeaveLeagueDialog
 import com.example.fotleague.ui.components.ScoresTable
-import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val authState by viewModel.authState.collectAsState()
-
-    // TODO: Prevent icon flash by introducing loading state
-    LocalTopBar.current(
-        AppBarState(
-            title = "Leagues",
-            showNavigateBackIcon = true,
-            actions = {
-                if (state.league.ownerId == authState.user!!.id) {
-                    IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                } else {
-                    IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-
-                }
-            })
-    )
 
     val navController = LocalNavController.current
     val clipboardManager = LocalClipboardManager.current
@@ -102,19 +83,60 @@ fun LeagueDetailsScreen(
         }
     }
 
-    LeagueDetailsContent(
-        clipboardManager = clipboardManager,
-        leagueName = state.league.name,
-        ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
-        code = state.league.code,
-        userScores = state.userScores,
-        isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
-        onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
-        isDeleteLeagueDialogOpen = state.isDeleteLeagueDialogOpen,
-        onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague) },
-        onDismissLeaveLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) },
-        onDismissDeleteLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseDeleteLeagueDialog) }
-    )
+    Scaffold(
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Leagues") },
+                actions = {
+                    if (state.league.ownerId == authState.user!!.id) {
+                        IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = LightGray
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
+                                contentDescription = null,
+                                tint = LightGray
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+                navigationIcon = {
+                    IconButton(onClick = navController::popBackStack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = LightGray
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            LeagueDetailsContent(
+                clipboardManager = clipboardManager,
+                leagueName = state.league.name,
+                ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
+                code = state.league.code,
+                userScores = state.userScores,
+                isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
+                onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
+                isDeleteLeagueDialogOpen = state.isDeleteLeagueDialogOpen,
+                onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague) },
+                onDismissLeaveLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) },
+                onDismissDeleteLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseDeleteLeagueDialog) }
+            )
+        }
+
+    }
 }
 
 @Composable
