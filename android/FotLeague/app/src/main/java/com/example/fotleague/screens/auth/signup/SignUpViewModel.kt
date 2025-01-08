@@ -63,7 +63,6 @@ class SignUpViewModel @Inject constructor(
                 authStatus.loginTrigger.value = false
                 _state.update { state -> state.copy(onSignup = true) }
             }
-//            LifecycleUtil.onSetRestartTrue()
         }
     }
 }

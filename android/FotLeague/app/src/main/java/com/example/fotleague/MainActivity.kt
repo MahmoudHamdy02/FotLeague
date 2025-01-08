@@ -38,12 +38,6 @@ class MainActivity : ComponentActivity() {
         val viewModel: MainViewModel by viewModels()
         viewModel.init()
 
-//        LifecycleUtil.restartAppEvent.observe(this) {
-//            if (it) {
-//                restart()
-//            }
-//        }
-
         setContent {
             FotLeagueTheme {
                 val navController = rememberNavController()
@@ -79,13 +73,4 @@ class MainActivity : ComponentActivity() {
         }
 
     }
-
-//    private fun restart() {
-//        Log.d("LIFECYCLE", "restart")
-//        LifecycleUtil.onSetRestartFalse()
-//        val intent = Intent(this, MainActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//        finish()
-//        startActivity(intent)
-//    }
 }
