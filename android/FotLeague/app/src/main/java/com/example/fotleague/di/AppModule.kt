@@ -2,6 +2,7 @@ package com.example.fotleague.di
 
 import android.content.Context
 import com.example.fotleague.AuthStatus
+import com.example.fotleague.R
 import com.example.fotleague.data.AddCookiesInterceptor
 import com.example.fotleague.data.DataStoreUtil
 import com.example.fotleague.data.FotLeagueApi
@@ -24,7 +25,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFotLeagueApi(dataStoreUtil: DataStoreUtil): FotLeagueApi {
+    fun provideFotLeagueApi(
+        dataStoreUtil: DataStoreUtil,
+        @ApplicationContext context: Context
+    ): FotLeagueApi {
         return Retrofit.Builder()
             .client(
                 OkHttpClient
@@ -33,7 +37,7 @@ object AppModule {
                     .addInterceptor(ReceivedCookiesInterceptor(dataStoreUtil))
                     .build()
             )
-            .baseUrl("http://mahmoudspi.duckdns.org:1234/")
+            .baseUrl(context.getString(R.string.backend))
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(FotLeagueApi::class.java)
