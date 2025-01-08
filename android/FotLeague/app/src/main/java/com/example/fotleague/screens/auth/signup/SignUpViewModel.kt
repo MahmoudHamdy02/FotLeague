@@ -3,7 +3,7 @@ package com.example.fotleague.screens.auth.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fotleague.LifecycleUtil
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.SignUpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val api: FotLeagueApi
+    private val api: FotLeagueApi,
+    val authStatus: AuthStatus
 ) : ViewModel() {
     private val _state = MutableStateFlow(SignUpState())
     val state: StateFlow<SignUpState> = _state.asStateFlow()
@@ -32,10 +33,18 @@ class SignUpViewModel @Inject constructor(
 
     private fun signUp() {
         viewModelScope.launch {
-            val response = api.signUp(SignUpRequest(_state.value.email, _state.value.password, _state.value.username))
+            val response = api.signUp(
+                SignUpRequest(
+                    _state.value.email,
+                    _state.value.password,
+                    _state.value.username
+                )
+            )
             Log.d("SIGNUP", response.body().toString())
             Log.d("SIGNUP", response.headers()["Set-Cookie"] ?: "No cookie found")
-            LifecycleUtil.onSetRestartTrue()
+            authStatus.loginTrigger.value = true
+            _state.update { state -> state.copy(onSignup = true) }
+//            LifecycleUtil.onSetRestartTrue()
         }
     }
 }
@@ -43,12 +52,13 @@ class SignUpViewModel @Inject constructor(
 data class SignUpState(
     val email: String = "",
     val password: String = "",
-    val username: String = ""
+    val username: String = "",
+    val onSignup: Boolean = false
 )
 
 sealed interface SignUpEvent {
-    data class SetUsername(val username: String): SignUpEvent
-    data class SetEmail(val email: String): SignUpEvent
-    data class SetPassword(val password: String): SignUpEvent
+    data class SetUsername(val username: String) : SignUpEvent
+    data class SetEmail(val email: String) : SignUpEvent
+    data class SetPassword(val password: String) : SignUpEvent
     data object SignUp : SignUpEvent
 }

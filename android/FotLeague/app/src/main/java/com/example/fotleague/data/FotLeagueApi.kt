@@ -15,7 +15,6 @@ import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import com.example.fotleague.models.network.request.LoginRequest
 import com.example.fotleague.models.network.request.SignUpRequest
 import com.example.fotleague.models.network.response.GetLeagueDetailsResponse
-import com.example.fotleague.models.network.response.LoginResponse
 import com.example.fotleague.models.network.response.LogoutResponse
 import com.example.fotleague.models.network.response.SignUpResponse
 import retrofit2.Response
@@ -79,7 +78,7 @@ interface FotLeagueApi {
     suspend fun signUp(@Body body: SignUpRequest): Response<SignUpResponse>
 
     @POST("/auth/login")
-    suspend fun login(@Body body: LoginRequest): Response<LoginResponse>
+    suspend fun login(@Body body: LoginRequest): Response<User>
 
     @POST("/auth/logout")
     suspend fun logout(): Response<LogoutResponse>

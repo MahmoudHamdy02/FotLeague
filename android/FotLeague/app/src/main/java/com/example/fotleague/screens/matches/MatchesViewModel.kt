@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.matches
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fotleague.AuthStatus
@@ -21,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MatchesViewModel @Inject constructor(
     private val api: FotLeagueApi,
-    val authStatus: AuthStatus
+    val authStatus: AuthStatus,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MatchesState())
@@ -31,23 +32,42 @@ class MatchesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _state.update { state -> state.copy(isLoading = true) }
+            fetchData()
+            observeLogin()
+            observeLogout()
+        }
+    }
 
-
-            try {
-                getPredictions()
-                getScores()
-                getMatches()
-            } catch (e: Exception) {
-                _state.update { state ->
-                    state.copy(
-                        error = if (e is ConnectException) "Failed to connect to server" else "An error occurred",
-                        isLoading = false
-                    )
-                }
+    private suspend fun fetchData() {
+        _state.update { state -> state.copy(isLoading = true) }
+        try {
+            getPredictions()
+            getScores()
+            getMatches()
+        } catch (e: Exception) {
+            _state.update { state ->
+                state.copy(
+                    error = if (e is ConnectException) "Failed to connect to server" else "An error occurred",
+                    isLoading = false
+                )
             }
+        }
+    }
 
+    private suspend fun observeLogin() {
+        authStatus.loginTrigger.collect {
+            if (it) {
+                Log.d("FETCH", "Refetching data")
+                fetchData()
+            }
+        }
+    }
 
+    private suspend fun observeLogout() {
+        authStatus.logoutTrigger.collect {
+            if (it) {
+                _state.update { MatchesState() }
+            }
         }
     }
 

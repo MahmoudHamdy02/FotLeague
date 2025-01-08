@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,7 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.fotleague.LocalNavController
 import com.example.fotleague.LocalTopBar
+import com.example.fotleague.Screen
 import com.example.fotleague.ui.navigation.AppBarState
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -43,7 +46,15 @@ fun SignupScreen(
 ) {
     LocalTopBar.current(AppBarState(title = "Sign up", showNavigateBackIcon = true))
 
+    val navController = LocalNavController.current
+
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(state.onSignup) {
+        if (state.onSignup) {
+            navController.navigate(Screen.MatchesScreen.route)
+        }
+    }
 
     SignupScreenContent(
         username = state.username,

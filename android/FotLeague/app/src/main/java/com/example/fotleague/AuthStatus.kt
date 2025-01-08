@@ -15,6 +15,8 @@ data class AuthState(
 
 class AuthStatus @Inject constructor(val api: FotLeagueApi) {
 
+    val loginTrigger = MutableStateFlow(false)
+    val logoutTrigger = MutableStateFlow(false)
     private var authState = MutableStateFlow(AuthState())
 
     fun setAuthState(state: AuthState) {

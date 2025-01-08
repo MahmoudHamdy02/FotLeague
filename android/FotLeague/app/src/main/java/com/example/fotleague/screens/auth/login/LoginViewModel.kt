@@ -50,6 +50,8 @@ class LoginViewModel @Inject constructor(
                 )
             )
             _state.update { state -> state.copy(isLoggedIn = true) }
+            authStatus.loginTrigger.value = true
+//            LifecycleUtil.fetchDataEvent.value = true
 //            LifecycleUtil.onSetRestartTrue()
         }
     }
