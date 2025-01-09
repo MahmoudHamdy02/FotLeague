@@ -5,10 +5,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -67,7 +64,9 @@ fun Navigation() {
         startDestination = Screen.MatchesScreen.route,
         modifier = Modifier.fillMaxSize(),
         enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
         // Bottom navigation
         composable(Screen.MatchesScreen.route) {
@@ -105,17 +104,13 @@ fun Navigation() {
                 }
             ),
             enterTransition = {
-                fadeIn(
-                    animationSpec = tween(300, easing = LinearEasing)
-                ) + slideIntoContainer(
+                slideIntoContainer(
                     animationSpec = tween(200, easing = EaseOut),
                     towards = AnimatedContentTransitionScope.SlideDirection.Start
                 )
             },
             exitTransition = {
-                fadeOut(
-                    animationSpec = tween(300, easing = LinearEasing)
-                ) + slideOutOfContainer(
+                slideOutOfContainer(
                     animationSpec = tween(200, easing = EaseOut),
                     towards = AnimatedContentTransitionScope.SlideDirection.End
                 )
