@@ -42,10 +42,9 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidPath
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,7 +54,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.PathParser
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -139,23 +137,36 @@ private fun LoginScreenContent(
             .drawWithCache {
                 onDrawBehind {
                     val path =
-                        PathParser
-                            .createPathFromPathData("M0 0H360V56.7889C192.305 10.8926 75.5466 150.969 0 113.578V0Z")
-                            .asComposePath()
+                        PathParser()
+                            .parsePathString("M0 0H360V56.7889C192.305 10.8926 75.5466 150.969 0 113.578V0Z")
+                            .toPath()
                     val pathSize = path.getBounds().size
                     val matrix = Matrix()
                     matrix.postScale(size.width / pathSize.width, size.width / pathSize.width)
-                    path.asAndroidPath().transform(matrix)
-                    // TODO: Brush doesn't work when rendering top app bar
-                    val brush = Brush.linearGradient(
-                        start = Offset.Zero,
-                        end = Offset(-topPadding.toPx(), path.getBounds().height-topPadding.toPx()),
-                        colorStops = arrayOf(
-                            0f to Color(0xFFFF2000),
-                            1f to Color(0x40FF2000),
-                        ))
+                    path
+                        .asAndroidPath()
+                        .transform(matrix)
+
+                    val bottomPath =
+                        PathParser()
+                            .parsePathString("M0 144C42.5887 79.049 184.885 112.783 240 0V144H0Z")
+                            .toPath()
+                    bottomPath.moveTo(0f, 0f)
+                    var bottomPathSize = bottomPath.getBounds().size
+                    val bottomMatrix = Matrix()
+                    bottomMatrix.postScale(
+                        (2f/3f)*size.width / bottomPathSize.width,
+                        (2f/3f)*size.width / bottomPathSize.width
+                    )
+                    bottomPath
+                        .asAndroidPath()
+                        .transform(bottomMatrix)
+                    bottomPathSize = bottomPath.getBounds().size
+
                     path.translate(Offset(0f, -topPadding.toPx()))
-                    drawPath(path, brush)
+                    bottomPath.translate(Offset(size.width/3f, size.height - bottomPathSize.height))
+                    drawPath(path, Primary)
+                    drawPath(bottomPath, Primary)
                 }
             }
             .padding(horizontal = 16.dp, vertical = 24.dp),
