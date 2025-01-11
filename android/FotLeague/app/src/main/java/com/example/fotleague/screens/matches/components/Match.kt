@@ -44,7 +44,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun Match(
-    match: Match, prediction: Prediction?, score: Int?, isLoggedIn: Boolean, onClick: () -> Unit
+    match: Match, prediction: Prediction?, score: Int?, onClick: () -> Unit
 ) {
     val datetime = ZonedDateTime.parse(match.datetime).withZoneSameInstant(ZoneId.systemDefault())
     val currentTime = ZonedDateTime.now()
@@ -204,7 +204,6 @@ private fun MatchPreview() {
             ),
             prediction = Prediction(0, 0, 0, 0),
             score = null,
-            isLoggedIn = true,
         ) {}
     }
 }
@@ -226,7 +225,6 @@ private fun InProgressMatchPreview() {
                 gameweek = 1
             ),
             prediction = Prediction(0, 0, 0, 0),
-            isLoggedIn = true,
             score = null,
         ) {}
     }
@@ -250,7 +248,6 @@ private fun PlayedAndPredictedMatchPreview() {
             ),
             prediction = Prediction(0, 0, 1, 0),
             score = 1,
-            isLoggedIn = true,
         ) {}
     }
 }
@@ -273,7 +270,6 @@ private fun PlayedAndNotPredictedMatchPreview() {
             ),
             prediction = null,
             score = 0,
-            isLoggedIn = true,
         ) {}
     }
 }

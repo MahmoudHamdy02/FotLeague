@@ -50,8 +50,7 @@ fun MatchesList(
                 Match(
                     match = match,
                     prediction = predictions.find { it.matchId == match.id },
-                    score = scores.find { it.matchId == match.id }?.score,
-                    isLoggedIn = isLoggedIn,
+                    score = scores.find { it.matchId == match.id }?.score
                 ) {
                     if (match.matchStatus != MatchStatus.Played.num && match.matchStatus != MatchStatus.InProgress.num) {
                         if (!isLoggedIn) {
