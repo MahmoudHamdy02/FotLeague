@@ -5,6 +5,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -66,7 +67,12 @@ fun Navigation() {
         composable(Screen.LeaguesScreen.route,
             exitTransition = {
                 if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
-                    ExitTransition.KeepUntilTransitionsFinished
+                    fadeOut(animationSpec = tween(250, easing = EaseOut), 0.5f) + slideOutOfContainer(
+                        animationSpec = tween(400, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    ) {
+                        it/5
+                    }
                 } else {
                     ExitTransition.None
                 }
@@ -93,13 +99,13 @@ fun Navigation() {
             ),
             enterTransition = {
                 slideIntoContainer(
-                    animationSpec = tween(200, easing = EaseOut),
+                    animationSpec = tween(250, easing = EaseOut),
                     towards = AnimatedContentTransitionScope.SlideDirection.Start
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    animationSpec = tween(200, easing = EaseOut),
+                    animationSpec = tween(250, easing = EaseOut),
                     towards = AnimatedContentTransitionScope.SlideDirection.End
                 )
             }
