@@ -8,9 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -29,28 +27,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             FotLeagueTheme {
                 val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
 
-//                Scaffold(
-//                    contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.statusBars),
-//                    modifier = Modifier.fillMaxSize(),
-//                    bottomBar = {
-//                        if (currentRoute in bottomBarRoutes) {
-//                            BottomNavigation(navController)
-//                        }
-//                    }
-//                ) { innerPadding ->
-//                    Box(
-//                        modifier = Modifier.padding(innerPadding)
-//                    ) {
                 Surface(modifier = Modifier.background(Background)) {
                     CompositionLocalProvider(LocalNavController provides navController) {
                         Navigation()
                     }
                 }
-//                    }
-//                }
             }
         }
 

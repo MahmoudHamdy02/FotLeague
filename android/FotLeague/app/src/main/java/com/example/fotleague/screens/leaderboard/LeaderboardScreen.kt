@@ -51,7 +51,6 @@ fun LeaderboardScreen(
     val state by viewModel.state.collectAsState()
 
     Scaffold(
-//        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         bottomBar = {
             BottomNavigation(navController)
         },
@@ -64,6 +63,8 @@ fun LeaderboardScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             LeaderboardContent(
+                error = state.error,
+                isLoading = state.isLoading,
                 numOfScores = state.numOfScores,
                 userScores = state.scores,
                 isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
@@ -77,6 +78,8 @@ fun LeaderboardScreen(
 
 @Composable
 private fun LeaderboardContent(
+    error: String?,
+    isLoading: Boolean,
     numOfScores: Int,
     userScores: List<UserScore>,
     isNumOfScoresDropdownExpanded: Boolean,
@@ -131,7 +134,13 @@ private fun LeaderboardContent(
                 }
             }
         }
-        ScoresTable(userScores = userScores)
+        if (error != null) {
+            Text(text = error)
+        } else if (isLoading) {
+            Text(text = "Loading...")
+        } else {
+            ScoresTable(userScores = userScores)
+        }
     }
 }
 
@@ -140,6 +149,8 @@ private fun LeaderboardContent(
 private fun LeaderboardContentPreview() {
     FotLeagueTheme {
         LeaderboardContent(
+            error = null,
+            isLoading = false,
             numOfScores = 10,
             userScores = emptyList(),
             isNumOfScoresDropdownExpanded = false,

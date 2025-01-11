@@ -1,6 +1,5 @@
 package com.example.fotleague
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -44,14 +43,6 @@ sealed class Route(val route: String) {
     data object Auth : Route("auth")
 }
 
-val bottomBarRoutes = setOf(
-    Screen.MatchesScreen.route,
-    Screen.LeaguesScreen.route,
-    Screen.LeaderboardScreen.route,
-    Screen.StatsScreen.route,
-    Screen.MoreScreen.route
-)
-
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("No LocalNavController provided")
 }
@@ -74,11 +65,8 @@ fun Navigation() {
         }
         composable(Screen.LeaguesScreen.route,
             exitTransition = {
-                Log.d("ANIM", this.targetState.destination.route ?: "")
                 if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
-                    Log.d("ANIM", "here")
                     ExitTransition.KeepUntilTransitionsFinished
-//                    fadeOut(animationSpec = tween(1000))
                 } else {
                     ExitTransition.None
                 }

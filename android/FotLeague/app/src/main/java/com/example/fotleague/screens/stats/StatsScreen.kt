@@ -47,7 +47,6 @@ fun StatsScreen() {
     val navController = LocalNavController.current
 
     Scaffold(
-//        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         bottomBar = {
             BottomNavigation(navController)
         },

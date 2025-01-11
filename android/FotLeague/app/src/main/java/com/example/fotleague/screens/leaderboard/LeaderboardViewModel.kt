@@ -26,10 +26,19 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi) :
     }
 
     private suspend fun getScores(numOfScores: Int) {
-        val scoresResponse = api.getGlobalScores(numOfScores)
-        val scoresBody = scoresResponse.body()
-        if (scoresResponse.isSuccessful && scoresBody != null) {
-            _state.update { state -> state.copy(scores = scoresBody) }
+        try {
+            val scoresResponse = api.getGlobalScores(numOfScores)
+            val scoresBody = scoresResponse.body()
+            if (scoresResponse.isSuccessful && scoresBody != null) {
+                _state.update { state -> state.copy(scores = scoresBody) }
+            }
+        } catch (e: Exception) {
+            _state.update { state ->
+                state.copy(
+                    error = "Failed to connect to server",
+                    isLoading = false
+                )
+            }
         }
     }
 
@@ -59,6 +68,8 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi) :
 }
 
 data class LeaderboardState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
     val scores: List<UserScore> = emptyList(),
     val isNumOfScoresDropdownExpanded: Boolean = false,
     val numOfScores: Int = 10

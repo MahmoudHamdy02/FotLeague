@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -51,12 +52,14 @@ fun MatchesScreen(
     val authState by viewModel.authState.collectAsState()
 
     Scaffold(
-//        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         bottomBar = {
             BottomNavigation(navController)
         },
         topBar = {
-            TopAppBar(title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) })
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+                title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) }
+            )
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -80,7 +83,7 @@ private fun MatchesContent(
         38
     }
     LaunchedEffect(state.isLoading) {
-        if (!state.isLoading) {
+        if (!state.isLoading && state.error == null) {
             val gameweek =
                 state.matches.filter { it.matchStatus == MatchStatus.Played.num || it.matchStatus == MatchStatus.InProgress.num }
                     .maxByOrNull { it.datetime }!!.gameweek

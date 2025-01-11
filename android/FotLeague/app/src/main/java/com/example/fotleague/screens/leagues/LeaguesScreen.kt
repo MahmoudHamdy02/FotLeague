@@ -59,7 +59,6 @@ fun LeaguesScreen(
     val authState by viewModel.authState.collectAsState()
 
     Scaffold(
-//        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         bottomBar = {
             BottomNavigation(navController)
         },

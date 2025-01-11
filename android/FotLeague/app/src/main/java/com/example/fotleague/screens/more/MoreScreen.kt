@@ -57,7 +57,6 @@ fun MoreScreen(
     }
 
     Scaffold(
-//        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         bottomBar = {
             BottomNavigation(navController)
         },
