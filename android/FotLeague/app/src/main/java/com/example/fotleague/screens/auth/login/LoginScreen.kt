@@ -1,5 +1,6 @@
 package com.example.fotleague.screens.auth.login
 
+import android.graphics.Matrix
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +38,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,8 +52,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.PathParser
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -78,10 +86,11 @@ fun LoginScreen(
     }
 
     Scaffold(
+        containerColor = Background,
         topBar = {
             TopAppBar(
-                title = { Text("Sign up") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+                title = { Text("Log in", fontWeight = FontWeight.Medium) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 navigationIcon = {
                     IconButton(onClick = navController::popBackStack) {
                         Icon(
@@ -94,8 +103,9 @@ fun LoginScreen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             LoginScreenContent(
+                topPadding = paddingValues.calculateTopPadding(),
                 email = state.email,
                 setEmail = { viewModel.onEvent(LoginEvent.SetEmail(it)) },
                 password = state.password,
@@ -111,6 +121,7 @@ fun LoginScreen(
 
 @Composable
 private fun LoginScreenContent(
+    topPadding: Dp,
     email: String,
     setEmail: (String) -> Unit,
     password: String,
@@ -125,10 +136,33 @@ private fun LoginScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Background)
+            .drawWithCache {
+                onDrawBehind {
+                    val path =
+                        PathParser
+                            .createPathFromPathData("M0 0H360V56.7889C192.305 10.8926 75.5466 150.969 0 113.578V0Z")
+                            .asComposePath()
+                    val pathSize = path.getBounds().size
+                    val matrix = Matrix()
+                    matrix.postScale(size.width / pathSize.width, size.width / pathSize.width)
+                    path.asAndroidPath().transform(matrix)
+                    // TODO: Brush doesn't work when rendering top app bar
+                    val brush = Brush.linearGradient(
+                        start = Offset.Zero,
+                        end = Offset(-topPadding.toPx(), path.getBounds().height-topPadding.toPx()),
+                        colorStops = arrayOf(
+                            0f to Color(0xFFFF2000),
+                            1f to Color(0x40FF2000),
+                        ))
+                    path.translate(Offset(0f, -topPadding.toPx()))
+                    drawPath(path, brush)
+                }
+            }
             .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp, alignment = Alignment.CenterVertically)
     ) {
+
         Text(text = "Log in to FotLeague", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -227,6 +261,7 @@ private fun SocialLoginButton(iconResourceId: Int) {
 private fun LoginScreenPreview() {
     FotLeagueTheme {
         LoginScreenContent(
+            topPadding = (1).dp,
             email = "",
             setEmail = {},
             password = "",
