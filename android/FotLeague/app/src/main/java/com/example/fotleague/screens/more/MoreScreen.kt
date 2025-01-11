@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +39,7 @@ import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
+import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
@@ -62,8 +65,8 @@ fun MoreScreen(
         },
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                title = { Text(text = "More") }
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+                title = { Text(text = "More", fontWeight = FontWeight.Medium) }
             )
         }
     ) { paddingValues ->
@@ -93,16 +96,19 @@ private fun MoreContent(
             text = "Account",
             onClick = {}
         )
+        HorizontalDivider()
         RowButton(
             icon = Icons.Default.Settings,
             text = "Settings",
             onClick = {}
         )
+        HorizontalDivider()
         RowButton(
             icon = ImageVector.vectorResource(id = R.drawable.bug_report_24),
             text = "Feedback and bug reports",
             onClick = {}
         )
+        HorizontalDivider()
         if (isLoggedIn) {
             RowButton(
                 icon = ImageVector.vectorResource(id = R.drawable.logout_24),

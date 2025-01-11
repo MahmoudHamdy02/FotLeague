@@ -56,8 +56,8 @@ fun LeaderboardScreen(
         },
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                title = { Text(text = "Leaderboard") }
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+                title = { Text(text = "Leaderboard", fontWeight = FontWeight.Medium) }
             )
         }
     ) { paddingValues ->

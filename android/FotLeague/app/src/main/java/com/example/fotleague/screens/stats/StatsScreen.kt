@@ -52,8 +52,8 @@ fun StatsScreen() {
         },
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                title = { Text(text = "Stats") }
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+                title = { Text(text = "Stats", fontWeight = FontWeight.Medium) }
             )
         }
     ) { paddingValues ->

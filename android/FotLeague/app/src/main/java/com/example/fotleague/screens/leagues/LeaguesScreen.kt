@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -196,8 +197,8 @@ fun League(name: String, pos: Int, modifier: Modifier = Modifier) {
 @Composable
 private fun TopBar(onCreateClick: () -> Unit, onJoinClick: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Leagues") },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+        title = { Text(text = "Leagues", fontWeight = FontWeight.Medium) },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
         actions = {
             IconButton(onClick = onCreateClick) {
                 Icon(
