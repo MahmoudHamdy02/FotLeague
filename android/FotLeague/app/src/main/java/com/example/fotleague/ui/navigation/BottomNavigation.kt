@@ -71,8 +71,16 @@ fun BottomNavigation(navController: NavHostController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         items.forEach { item ->
+            // TODO: Use nested sealed classes for navigation, check if routes matches any subroute
+            // TODO: to keep highlight while transitioning into nested screen
             val isSelected =
-                currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
+                currentDestination?.hierarchy?.any {
+                    it.route == item.screen.route
+                            ||
+                            (item.screen.route == Screen.LeaguesScreen.route && it.route?.startsWith(
+                                Screen.LeagueDetails.route
+                            ) ?: false)
+                } == true
             NavigationBarItem(selected = isSelected, label = {
                 Text(
                     text = item.title,
