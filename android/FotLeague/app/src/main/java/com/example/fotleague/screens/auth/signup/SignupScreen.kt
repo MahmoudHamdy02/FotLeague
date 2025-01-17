@@ -36,11 +36,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.fotleague.LocalNavController
 import com.example.fotleague.Screen
+import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
@@ -64,10 +66,11 @@ fun SignupScreen(
     }
 
     Scaffold(
+        containerColor = Background,
         topBar = {
             TopAppBar(
-                title = { Text("Sign up") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+                title = { Text("Sign up", fontWeight = FontWeight.Medium) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 navigationIcon = {
                     IconButton(onClick = navController::popBackStack) {
                         Icon(
@@ -80,8 +83,9 @@ fun SignupScreen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             SignupScreenContent(
+                topPadding = paddingValues.calculateTopPadding(),
                 username = state.username,
                 setUsername = { viewModel.onEvent(SignUpEvent.SetUsername(it)) },
                 email = state.email,
@@ -97,6 +101,7 @@ fun SignupScreen(
 
 @Composable
 private fun SignupScreenContent(
+    topPadding: Dp,
     username: String,
     email: String,
     setEmail: (String) -> Unit,
@@ -110,9 +115,10 @@ private fun SignupScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Background)
+            .drawTopAndBottomCurves(topPadding)
             .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+        verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterVertically)
     ) {
         Text(text = "Create an account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
@@ -163,6 +169,7 @@ private fun SignupScreenContent(
 private fun SignupScreenPreview() {
     FotLeagueTheme {
         SignupScreenContent(
+            topPadding = (0).dp,
             username = "",
             setUsername = {},
             email = "",
