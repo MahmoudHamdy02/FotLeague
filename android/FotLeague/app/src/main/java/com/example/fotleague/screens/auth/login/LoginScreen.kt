@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -44,6 +46,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -104,6 +107,8 @@ fun LoginScreen(
                 setEmail = { viewModel.onEvent(LoginEvent.SetEmail(it)) },
                 password = state.password,
                 setPassword = { viewModel.onEvent(LoginEvent.SetPassword(it)) },
+                isPasswordVisible = state.isPasswordVisible,
+                togglePasswordVisibility = { viewModel.onEvent(LoginEvent.TogglePasswordVisibility) },
                 isRememberMeChecked = state.rememberMe,
                 setIsRememberMeChecked = { viewModel.onEvent(LoginEvent.SetRememberMe(it)) },
                 onLogin = { viewModel.onEvent(LoginEvent.Login) },
@@ -120,6 +125,8 @@ private fun LoginScreenContent(
     setEmail: (String) -> Unit,
     password: String,
     setPassword: (String) -> Unit,
+    isPasswordVisible: Boolean,
+    togglePasswordVisibility: () -> Unit,
     isRememberMeChecked: Boolean,
     setIsRememberMeChecked: (Boolean) -> Unit,
     onLogin: () -> Unit,
@@ -151,8 +158,19 @@ private fun LoginScreenContent(
                 onValueChange = { setPassword(it) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
                 label = { Text(text = "Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    val image = if (isPasswordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    val description = if (isPasswordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = togglePasswordVisibility) {
+                        Icon(imageVector = image, description)
+                    }
+                }
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
@@ -239,6 +257,8 @@ private fun LoginScreenPreview() {
             setEmail = {},
             password = "",
             setPassword = {},
+            isPasswordVisible = false,
+            togglePasswordVisibility = {},
             isRememberMeChecked = false,
             setIsRememberMeChecked = {},
             onLogin = {},

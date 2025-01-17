@@ -29,6 +29,7 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.SetEmail -> _state.update { state -> state.copy(email = event.email) }
             is LoginEvent.SetPassword -> _state.update { state -> state.copy(password = event.password) }
             is LoginEvent.SetRememberMe -> _state.update { state -> state.copy(rememberMe = event.rememberMe) }
+            LoginEvent.TogglePasswordVisibility -> _state.update { state -> state.copy(isPasswordVisible = !state.isPasswordVisible) }
         }
     }
 
@@ -59,6 +60,7 @@ class LoginViewModel @Inject constructor(
 data class LoginState(
     val email: String = "",
     val password: String = "",
+    val isPasswordVisible: Boolean = false,
     val rememberMe: Boolean = false,
     val isLoggedIn: Boolean = false
 )
@@ -66,6 +68,7 @@ data class LoginState(
 sealed interface LoginEvent {
     data class SetEmail(val email: String) : LoginEvent
     data class SetPassword(val password: String) : LoginEvent
+    data object TogglePasswordVisibility : LoginEvent
     data class SetRememberMe(val rememberMe: Boolean) : LoginEvent
     data object Login : LoginEvent
 }
