@@ -6,12 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -25,13 +31,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.AuthState
 import com.example.fotleague.LocalNavController
+import com.example.fotleague.Route
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
@@ -41,6 +52,8 @@ import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
+import com.example.fotleague.ui.theme.Primary
+import com.example.fotleague.ui.theme.PrimaryLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +72,24 @@ fun MatchesScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
-                title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) }
+                title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) },
+                actions = {
+                    if (!authState.isLoggedIn) {
+                        Button(
+                            onClick = { navController.navigate(Route.Auth.route)},
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(16.dp))
+                                .width(72.dp)
+                                .height(36.dp)
+                                .background(
+                                    Brush.linearGradient(listOf(Primary, PrimaryLight))
+                                )) {
+                            Text("Log in", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
             )
         }
     ) { paddingValues ->
