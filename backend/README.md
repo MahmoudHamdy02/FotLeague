@@ -14,4 +14,4 @@ npm run test
 The database is initialised on startup using the init.sql commands
 
 Postgres schema:
-![FotLeague](./images/FotLeague.drawio.png)
+![FotLeague](../images/FotLeague.drawio.png)
