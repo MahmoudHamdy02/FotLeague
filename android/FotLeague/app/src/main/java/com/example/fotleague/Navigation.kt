@@ -128,7 +128,7 @@ fun Navigation() {
                 }
             )
         ) {
-            LeagueSettingsScreen()
+            LeagueSettingsScreen(navController = navController)
         }
 
         // Auth

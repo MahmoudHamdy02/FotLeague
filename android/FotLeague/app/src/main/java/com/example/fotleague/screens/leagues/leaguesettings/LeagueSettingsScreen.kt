@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -30,16 +31,29 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.fotleague.R
+import com.example.fotleague.Screen
+import com.example.fotleague.screens.leagues.components.ConfirmDeleteLeagueDialog
+import com.example.fotleague.screens.leagues.components.ConfirmLeaveLeagueDialog
 import com.example.fotleague.ui.components.RowButton
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 
 @Composable
 fun LeagueSettingsScreen(
-    viewModel: LeagueSettingsViewModel = hiltViewModel()
+    viewModel: LeagueSettingsViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(state.leagueLeft) {
+        if (state.leagueLeft) {
+            navController.navigate(Screen.LeaguesScreen.route) {
+                popUpTo(Screen.LeaguesScreen.route)
+            }
+        }
+    }
 
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
@@ -47,7 +61,8 @@ fun LeagueSettingsScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             LeagueSettingsContent(
-                isLeagueOwner = state.isLeagueOwner
+                state = state,
+                onEvent = { viewModel.onEvent(it) }
             )
         }
 
@@ -56,7 +71,8 @@ fun LeagueSettingsScreen(
 
 @Composable
 private fun LeagueSettingsContent(
-    isLeagueOwner: Boolean
+    state: LeagueSettingsState,
+    onEvent: (LeagueSettingsEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -78,19 +94,32 @@ private fun LeagueSettingsContent(
             onClick = {}
         )
         HorizontalDivider()
-        if (isLeagueOwner) {
+        if (state.isLeagueOwner) {
             RowButton(
                 icon = Icons.Default.Delete,
                 text = "Delete league",
-                onClick = {}
+                onClick = { onEvent(LeagueSettingsEvent.OpenDeleteLeagueDialog) }
             )
         } else {
             RowButton(
                 icon = ImageVector.vectorResource(id = R.drawable.logout_24),
                 text = "Leave league",
-                onClick = {}
+                onClick = { onEvent(LeagueSettingsEvent.OpenLeaveLeagueDialog) }
             )
         }
+    }
+
+    if (state.isLeaveLeagueDialogOpen) {
+        ConfirmLeaveLeagueDialog(
+            onLeaveLeague = { onEvent(LeagueSettingsEvent.LeaveLeague) },
+            onDismiss = { onEvent(LeagueSettingsEvent.CloseLeaveLeagueDialog) }
+        )
+    }
+    if (state.isDeleteLeagueDialogOpen) {
+        ConfirmDeleteLeagueDialog(
+            onDeleteLeague = { onEvent(LeagueSettingsEvent.DeleteLeague) },
+            onDismiss = { onEvent(LeagueSettingsEvent.CloseDeleteLeagueDialog) }
+        )
     }
 }
 

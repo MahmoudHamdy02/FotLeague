@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -56,8 +55,6 @@ import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.UserScore
-import com.example.fotleague.screens.leagues.components.ConfirmDeleteLeagueDialog
-import com.example.fotleague.screens.leagues.components.ConfirmLeaveLeagueDialog
 import com.example.fotleague.ui.components.ScoresTable
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -65,7 +62,6 @@ import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel(),
@@ -76,22 +72,12 @@ fun LeagueDetailsScreen(
 
     val clipboardManager = LocalClipboardManager.current
 
-    LaunchedEffect(state.leagueLeft) {
-        if (state.leagueLeft) {
-            navController.navigate(Screen.LeaguesScreen.route) {
-                popUpTo(Screen.LeaguesScreen.route)
-            }
-        }
-    }
-
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         topBar = {
             TopBar(
-                isLeagueOwner = state.league.ownerId == authState.user!!.id,
                 onBackArrowClick = navController::popBackStack,
-                onEvent = { viewModel.onEvent(it) },
-                onNavigate = { navController.navigate("${Screen.LeagueSettings.route}/${state.league.ownerId},${state.league.ownerId == authState.user!!.id}") }
+                onNavigate = { navController.navigate("${Screen.LeagueSettings.route}/${state.league.id},${state.league.ownerId == authState.user!!.id}") }
             )
         }
     ) { paddingValues ->
@@ -101,16 +87,9 @@ fun LeagueDetailsScreen(
                 leagueName = state.league.name,
                 ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
                 code = state.league.code,
-                userScores = state.userScores,
-                isLeaveLeagueDialogOpen = state.isLeaveLeagueDialogOpen,
-                onLeaveLeague = { viewModel.onEvent(LeagueDetailsEvent.LeaveLeague) },
-                isDeleteLeagueDialogOpen = state.isDeleteLeagueDialogOpen,
-                onDeleteLeague = { viewModel.onEvent(LeagueDetailsEvent.DeleteLeague) },
-                onDismissLeaveLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseLeaveLeagueDialog) },
-                onDismissDeleteLeagueDialog = { viewModel.onEvent(LeagueDetailsEvent.CloseDeleteLeagueDialog) }
+                userScores = state.userScores
             )
         }
-
     }
 }
 
@@ -121,12 +100,6 @@ private fun LeagueDetailsContent(
     ownerName: String,
     code: String,
     userScores: List<UserScore>,
-    isLeaveLeagueDialogOpen: Boolean,
-    onLeaveLeague: () -> Unit,
-    isDeleteLeagueDialogOpen: Boolean,
-    onDeleteLeague: () -> Unit,
-    onDismissLeaveLeagueDialog: () -> Unit,
-    onDismissDeleteLeagueDialog: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -160,19 +133,6 @@ private fun LeagueDetailsContent(
         // Members table
         Text(text = "Members", fontSize = 20.sp)
         ScoresTable(userScores = userScores)
-    }
-
-    if (isLeaveLeagueDialogOpen) {
-        ConfirmLeaveLeagueDialog(
-            onLeaveLeague = onLeaveLeague,
-            onDismiss = onDismissLeaveLeagueDialog
-        )
-    }
-    if (isDeleteLeagueDialogOpen) {
-        ConfirmDeleteLeagueDialog(
-            onDeleteLeague = onDeleteLeague,
-            onDismiss = onDismissDeleteLeagueDialog
-        )
     }
 }
 
@@ -235,28 +195,11 @@ private fun CopyLeagueCodeButton(clipboardManager: ClipboardManager, code: Strin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(isLeagueOwner: Boolean, onBackArrowClick: () -> Unit, onEvent: (LeagueDetailsEvent) -> Unit, onNavigate: () -> Unit) {
+private fun TopBar(onBackArrowClick: () -> Unit, onNavigate: () -> Unit) {
     TopAppBar(
         title = { Text(text = "Leagues") },
         actions = {
-            if (isLeagueOwner) {
-                IconButton(onClick = { onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = LightGray
-                    )
-                }
-            } else {
-                IconButton(onClick = { onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
-                        contentDescription = null,
-                        tint = LightGray
-                    )
-                }
-            }
-            IconButton(onClick = onNavigate ) {
+            IconButton(onClick = onNavigate) {
                 Icon(
                     imageVector = Icons.Default.Settings,
                     contentDescription = null,
@@ -287,13 +230,7 @@ fun LeagueDetailsPreview() {
             leagueName = "League name",
             ownerName = "owner",
             code = "fn28gD",
-            userScores = emptyList(),
-            isLeaveLeagueDialogOpen = false,
-            onLeaveLeague = {},
-            onDeleteLeague = {},
-            isDeleteLeagueDialogOpen = false,
-            onDismissLeaveLeagueDialog = {},
-            onDismissDeleteLeagueDialog = {}
+            userScores = emptyList()
         )
     }
 }
