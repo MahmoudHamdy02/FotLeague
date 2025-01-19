@@ -2,54 +2,48 @@
 
 Football game inspired by Fantasy Premier League, where players predict match scores, earn points and compete in leaderboards!
 
-## Project structure
+## Project Structure
 
-The project consists of three docker containers, which are organised and run by a docker compose file:
-- Backend: ExpressJS 
-- Database: Postgres
-- Python: Web scraping
+The project consists of several modules:
+- Backend & Database
+- Web scraping
+- Native Android App
 
-## Project initialization
+The backend services are containerized and managed through docker compose. 
+
+## Running
 
 To run this project locally, start by running the docker containers, which will download all the needed dependencies and start all services:
 
-```docker compose up```
-
-Stop the project by running `docker compose down` in another terminal.
-
-Alternatively, you could run this command to be able to Ctrl-C without suspending the containers:
-
 ```docker compose up -d && docker compose logs --follow```
 
+Stop the containers by pressing `Ctrl-C` to stop following the logs, then run:
 
-## Backend 
+```docker compose down```
 
-The backend is built using `Express`, `Typescript` and the `pg` client
 
-To run the backend tests, open `sh` inside the container and run the test command:
+### Further documentation for each module can be found in its respective folder
 
-```
-docker exec -it fotleague-backend-1 sh
-npm run test
-```
+## Container Archeticture
 
-## Database
+### 1. Development:
 
-The database is initialised on startup using the init.sql commands
+`docker-compose.yaml` consists of 4 containers:
+1. Backend
+2. Database
+3. Scraping
+4. Test database
 
-Postgres schema:
-![FotLeague](./images/FotLeague.drawio.png)
+The real database has a volume specified to persist the data, while the test database is an unseeded instance that is used in jest tests.
 
-## Python
+The backend and scraping folders are locally mounted to update the files inside the containers while developing.
 
-The python script scrapes [site] for live match results, and sends the result to the express server. 
+### 2. Production:
 
-This repeats every 5 minutes in an infinite loop. 
+`docker-compose.prod.yaml` consists of 4 containers:
+1. Backend
+2. Database
+3. Scraping
+4. Watchtower
 
-## Native Android App
-
-The app is built with Kotlin using Jetpack Compose, utilizing MVVM archeticture. The used libraries are Room, Retrofit and Dagger-Hilt.
-
-## Website
-
-Todo
+The production variant uses a `watchtower` container to automatically update the running images whenever changes are pushed to the Dockerhub repository.
