@@ -23,7 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fotleague.LocalNavController
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -31,7 +32,10 @@ import com.example.fotleague.ui.theme.FotLeagueTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen() {
+fun StatsScreen(
+    navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry?
+) {
     val seasonList = mapOf(
         Pair("Current season score", "99"),
         Pair("Current global position", "52"),
@@ -44,11 +48,10 @@ fun StatsScreen() {
         Pair("Leagues joined", "12"),
         Pair("Top 3 league finishes", "10")
     )
-    val navController = LocalNavController.current
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController)
+            BottomNavigation(navController, navBackStackEntry)
         },
         topBar = {
             TopAppBar(

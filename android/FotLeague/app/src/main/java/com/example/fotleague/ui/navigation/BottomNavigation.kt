@@ -1,5 +1,6 @@
 package com.example.fotleague.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -8,17 +9,16 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.ui.theme.DarkGray
@@ -33,7 +33,10 @@ data class BottomNavigationItem(
 )
 
 @Composable
-fun BottomNavigation(navController: NavHostController) {
+fun BottomNavigation(
+    navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry?
+) {
 
     val items = listOf(
         BottomNavigationItem(
@@ -68,18 +71,16 @@ fun BottomNavigation(navController: NavHostController) {
         modifier = Modifier.height(120.dp),
         containerColor = DarkGray,
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
+        Log.d("ROUTE", "$currentDestination")
         items.forEach { item ->
-            // TODO: Use nested sealed classes for navigation, check if routes matches any subroute
-            // TODO: to keep highlight while transitioning into nested screen
             val isSelected =
                 currentDestination?.hierarchy?.any {
                     it.route == item.screen.route
                             ||
                             (item.screen.route == Screen.LeaguesScreen.route && it.route?.startsWith(
                                 Screen.LeagueDetails.route
-                            ) ?: false)
+                            ) == true)
                 } == true
             NavigationBarItem(selected = isSelected, label = {
                 Text(

@@ -54,8 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.fotleague.LocalNavController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
@@ -70,9 +68,9 @@ import com.example.fotleague.ui.theme.PrimaryLight
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
-    val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
 
@@ -112,7 +110,7 @@ fun LoginScreen(
                 isRememberMeChecked = state.rememberMe,
                 setIsRememberMeChecked = { viewModel.onEvent(LoginEvent.SetRememberMe(it)) },
                 onLogin = { viewModel.onEvent(LoginEvent.Login) },
-                navController = navController
+                onNavigate = { navController.navigate(it) }
             )
         }
     }
@@ -130,7 +128,7 @@ private fun LoginScreenContent(
     isRememberMeChecked: Boolean,
     setIsRememberMeChecked: (Boolean) -> Unit,
     onLogin: () -> Unit,
-    navController: NavHostController
+    onNavigate: (path: String) -> Unit
 ) {
 
     Column(
@@ -224,7 +222,7 @@ private fun LoginScreenContent(
                 text = "Register now",
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
-                    navController.navigate(Screen.Auth.SignupScreen.route)
+                    onNavigate(Screen.Auth.SignupScreen.route)
                 })
         }
     }
@@ -262,7 +260,7 @@ private fun LoginScreenPreview() {
             isRememberMeChecked = false,
             setIsRememberMeChecked = {},
             onLogin = {},
-            navController = rememberNavController()
+            onNavigate = {}
         )
     }
 }

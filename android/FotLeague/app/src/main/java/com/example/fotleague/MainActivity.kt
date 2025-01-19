@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.fotleague.ui.theme.Background
@@ -29,9 +28,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 Surface(modifier = Modifier.background(Background)) {
-                    CompositionLocalProvider(LocalNavController provides navController) {
-                        Navigation()
-                    }
+                    Navigation(navController)
                 }
             }
         }

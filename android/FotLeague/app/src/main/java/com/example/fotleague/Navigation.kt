@@ -8,12 +8,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.example.fotleague.screens.auth.login.LoginScreen
@@ -44,15 +45,12 @@ sealed class Route(val route: String) {
     data object Auth : Route("auth")
 }
 
-val LocalNavController = compositionLocalOf<NavHostController> {
-    error("No LocalNavController provided")
-}
-
 @Composable
-fun Navigation() {
+fun Navigation(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     NavHost(
-        navController = LocalNavController.current,
+        navController = navController,
         startDestination = Screen.MatchesScreen.route,
         modifier = Modifier.fillMaxSize(),
         enterTransition = { EnterTransition.None },
@@ -62,7 +60,7 @@ fun Navigation() {
     ) {
         // Bottom navigation
         composable(Screen.MatchesScreen.route) {
-            MatchesScreen()
+            MatchesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
         composable(Screen.LeaguesScreen.route,
             exitTransition = {
@@ -77,16 +75,16 @@ fun Navigation() {
                     ExitTransition.None
                 }
             }) {
-            LeaguesScreen()
+            LeaguesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
         composable(Screen.LeaderboardScreen.route) {
-            LeaderboardScreen()
+            LeaderboardScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
         composable(Screen.StatsScreen.route) {
-            StatsScreen()
+            StatsScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
         composable(Screen.MoreScreen.route) {
-            MoreScreen()
+            MoreScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // Nested navigation
@@ -110,7 +108,7 @@ fun Navigation() {
                 )
             }
         ) {
-            LeagueDetailsScreen()
+            LeagueDetailsScreen(navController = navController)
         }
 
         // Auth
@@ -119,10 +117,10 @@ fun Navigation() {
             route = Route.Auth.route
         ) {
             composable(Screen.Auth.LoginScreen.route) {
-                LoginScreen()
+                LoginScreen(navController = navController)
             }
             composable(Screen.Auth.SignupScreen.route) {
-                SignupScreen()
+                SignupScreen(navController = navController)
             }
             composable(Screen.Auth.ForgotPasswordScreen.route) {
 

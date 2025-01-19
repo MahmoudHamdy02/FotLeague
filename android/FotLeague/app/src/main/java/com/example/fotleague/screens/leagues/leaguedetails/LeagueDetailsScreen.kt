@@ -51,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalNavController
+import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.models.UserScore
@@ -67,12 +67,12 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeagueDetailsScreen(
-    viewModel: LeagueDetailsViewModel = hiltViewModel()
+    viewModel: LeagueDetailsViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val state by viewModel.state.collectAsState()
     val authState by viewModel.authState.collectAsState()
 
-    val navController = LocalNavController.current
     val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(state.leagueLeft) {

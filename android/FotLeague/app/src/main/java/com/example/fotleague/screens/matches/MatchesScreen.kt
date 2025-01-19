@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,9 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.fotleague.AuthState
-import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
@@ -58,16 +57,17 @@ import com.example.fotleague.ui.theme.PrimaryLight
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchesScreen(
-    viewModel: MatchesViewModel = hiltViewModel()
+    navController: NavHostController,
+    viewModel: MatchesViewModel = hiltViewModel(),
+    navBackStackEntry: NavBackStackEntry?
 ) {
-    val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
     val authState by viewModel.authState.collectAsState()
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController)
+            BottomNavigation(navController, navBackStackEntry)
         },
         topBar = {
             TopAppBar(
@@ -97,7 +97,8 @@ fun MatchesScreen(
             MatchesContent(
                 state = state,
                 authState = authState,
-                onEvent = { viewModel.onEvent(it) }
+                onEvent = { viewModel.onEvent(it) },
+                onNavigate = { navController.navigate((it)) }
             )
         }
     }
@@ -108,7 +109,8 @@ fun MatchesScreen(
 private fun MatchesContent(
     state: MatchesState,
     authState: AuthState,
-    onEvent: (event: MatchesEvent) -> Unit
+    onEvent: (event: MatchesEvent) -> Unit,
+    onNavigate: (path: String) -> Unit
 ) {
     val pagerState = rememberPagerState {
         38
@@ -163,7 +165,8 @@ private fun MatchesContent(
                     scores = state.scores,
                     isLoggedIn = authState.isLoggedIn,
                     onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
-                    onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) }
+                    onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) },
+                    onNavigate = onNavigate
                 )
             }
         }
@@ -185,6 +188,7 @@ private fun MatchesContent(
                 }
             },
             onDismiss = { onEvent(MatchesEvent.CloseDialog) },
+            onNavigate = onNavigate,
             edit = state.predictions.any { it.matchId == state.selectedMatch.id }
         )
     }
@@ -194,7 +198,6 @@ private fun MatchesContent(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MatchesContentPreview() {
-    CompositionLocalProvider(LocalNavController provides rememberNavController()) {
         FotLeagueTheme {
             MatchesContent(
                 state = MatchesState(
@@ -213,8 +216,8 @@ private fun MatchesContentPreview() {
                     )
                 ),
                 authState = AuthState(),
-                onEvent = {}
+                onEvent = {},
+                onNavigate = {}
             )
         }
-    }
 }

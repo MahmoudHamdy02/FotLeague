@@ -32,7 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalNavController
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.models.UserScore
 import com.example.fotleague.ui.components.ScoresTable
@@ -46,13 +47,14 @@ import com.example.fotleague.ui.theme.LightGray
 @Composable
 fun LeaderboardScreen(
     viewModel: LeaderboardViewModel = hiltViewModel(),
+    navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry?
 ) {
-    val navController = LocalNavController.current
     val state by viewModel.state.collectAsState()
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController)
+            BottomNavigation(navController, navBackStackEntry)
         },
         topBar = {
             TopAppBar(

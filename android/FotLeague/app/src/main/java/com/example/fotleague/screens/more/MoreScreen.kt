@@ -34,7 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalNavController
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.ui.navigation.BottomNavigation
@@ -46,9 +47,10 @@ import com.example.fotleague.ui.theme.LightGray
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    viewModel: MoreViewModel = hiltViewModel()
+    viewModel: MoreViewModel = hiltViewModel(),
+    navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry?
 ) {
-    val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
     val authState by viewModel.authState.collectAsState()
@@ -61,7 +63,7 @@ fun MoreScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavigation(navController)
+            BottomNavigation(navController, navBackStackEntry)
         },
         topBar = {
             TopAppBar(

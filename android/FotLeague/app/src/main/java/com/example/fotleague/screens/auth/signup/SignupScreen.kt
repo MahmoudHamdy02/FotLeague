@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.fotleague.LocalNavController
+import androidx.navigation.NavHostController
 import com.example.fotleague.Screen
 import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
 import com.example.fotleague.ui.theme.Background
@@ -53,9 +53,9 @@ import com.example.fotleague.ui.theme.PrimaryLight
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
-    val navController = LocalNavController.current
 
     val state by viewModel.state.collectAsState()
 

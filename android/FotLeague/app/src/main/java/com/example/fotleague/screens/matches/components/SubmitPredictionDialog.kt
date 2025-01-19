@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.ui.Logos
 import com.example.fotleague.ui.components.picker.Picker
@@ -52,12 +51,11 @@ fun SubmitPredictionDialog(
     isLoggedIn: Boolean,
     onDismiss: () -> Unit,
     onSubmit: () -> Unit,
+    onNavigate: (path: String) -> Unit,
     edit: Boolean
 ) {
     val homeGoals = remember { (0..15).map { it.toString() } }
     val awayGoals = remember { (0..15).map { it.toString() } }
-
-    val navController = LocalNavController.current
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -156,7 +154,7 @@ fun SubmitPredictionDialog(
                 Button(
                     onClick = {
                         if (!isLoggedIn) {
-                            navController.navigate(Route.Auth.route)
+                            onNavigate(Route.Auth.route)
                         } else {
                             onSubmit()
                             onDismiss()
@@ -185,6 +183,7 @@ private fun SubmitPredictionModalPreview() {
             onDismiss = {},
             onSubmit = {},
             isLoggedIn = true,
+            onNavigate = {},
             edit = false
         )
     }

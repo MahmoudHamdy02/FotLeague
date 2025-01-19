@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.fotleague.LocalNavController
 import com.example.fotleague.Route
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
@@ -29,8 +28,8 @@ fun MatchesList(
     isLoggedIn: Boolean,
     onOpenPredictionDialog: () -> Unit,
     onSelectMatch: (match: Match) -> Unit,
+    onNavigate: (path: String) -> Unit
 ) {
-    val navController = LocalNavController.current
 
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -54,7 +53,7 @@ fun MatchesList(
                 ) {
                     if (match.matchStatus != MatchStatus.Played.num && match.matchStatus != MatchStatus.InProgress.num) {
                         if (!isLoggedIn) {
-                            navController.navigate(Route.Auth.route)
+                            onNavigate(Route.Auth.route)
                         } else {
                             onOpenPredictionDialog()
                             onSelectMatch(match)
