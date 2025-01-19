@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -89,7 +90,8 @@ fun LeagueDetailsScreen(
             TopBar(
                 isLeagueOwner = state.league.ownerId == authState.user!!.id,
                 onBackArrowClick = navController::popBackStack,
-                onEvent = { viewModel.onEvent(it) }
+                onEvent = { viewModel.onEvent(it) },
+                onNavigate = { navController.navigate("${Screen.LeagueSettings.route}/${state.league.ownerId},${state.league.ownerId == authState.user!!.id}") }
             )
         }
     ) { paddingValues ->
@@ -233,7 +235,7 @@ private fun CopyLeagueCodeButton(clipboardManager: ClipboardManager, code: Strin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(isLeagueOwner: Boolean, onBackArrowClick: () -> Unit, onEvent: (LeagueDetailsEvent) -> Unit) {
+private fun TopBar(isLeagueOwner: Boolean, onBackArrowClick: () -> Unit, onEvent: (LeagueDetailsEvent) -> Unit, onNavigate: () -> Unit) {
     TopAppBar(
         title = { Text(text = "Leagues") },
         actions = {
@@ -253,6 +255,13 @@ private fun TopBar(isLeagueOwner: Boolean, onBackArrowClick: () -> Unit, onEvent
                         tint = LightGray
                     )
                 }
+            }
+            IconButton(onClick = onNavigate ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = LightGray
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),

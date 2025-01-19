@@ -22,6 +22,7 @@ import com.example.fotleague.screens.auth.signup.SignupScreen
 import com.example.fotleague.screens.leaderboard.LeaderboardScreen
 import com.example.fotleague.screens.leagues.LeaguesScreen
 import com.example.fotleague.screens.leagues.leaguedetails.LeagueDetailsScreen
+import com.example.fotleague.screens.leagues.leaguesettings.LeagueSettingsScreen
 import com.example.fotleague.screens.matches.MatchesScreen
 import com.example.fotleague.screens.more.MoreScreen
 import com.example.fotleague.screens.stats.StatsScreen
@@ -33,6 +34,7 @@ sealed class Screen(val route: String) {
     data object StatsScreen : Screen("stats_screen")
     data object MoreScreen : Screen("more_screen")
     data object LeagueDetails : Screen("league_details")
+    data object LeagueSettings : Screen("league_settings")
 
     sealed class Auth(val route: String) {
         data object LoginScreen : Auth("login_screen")
@@ -66,11 +68,14 @@ fun Navigation() {
         composable(Screen.LeaguesScreen.route,
             exitTransition = {
                 if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
-                    fadeOut(animationSpec = tween(250, easing = EaseOut), 0.5f) + slideOutOfContainer(
+                    fadeOut(
+                        animationSpec = tween(250, easing = EaseOut),
+                        0.5f
+                    ) + slideOutOfContainer(
                         animationSpec = tween(400, easing = EaseOut),
                         towards = AnimatedContentTransitionScope.SlideDirection.Start
                     ) {
-                        it/5
+                        it / 5
                     }
                 } else {
                     ExitTransition.None
@@ -110,6 +115,20 @@ fun Navigation() {
             }
         ) {
             LeagueDetailsScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}",
+            arguments = listOf(
+                navArgument("leagueId") {
+                    type = NavType.IntType
+                },
+                navArgument("isLeagueOwner") {
+                    type = NavType.BoolType
+                }
+            )
+        ) {
+            LeagueSettingsScreen()
         }
 
         // Auth
