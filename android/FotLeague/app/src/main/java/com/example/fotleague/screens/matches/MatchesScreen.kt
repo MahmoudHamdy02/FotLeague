@@ -1,7 +1,6 @@
 package com.example.fotleague.screens.matches
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,11 +53,10 @@ import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchesScreen(
-    navController: NavHostController,
     viewModel: MatchesViewModel = hiltViewModel(),
+    navController: NavHostController,
     navBackStackEntry: NavBackStackEntry?
 ) {
 
@@ -66,32 +64,8 @@ fun MatchesScreen(
     val authState by viewModel.authState.collectAsState()
 
     Scaffold(
-        bottomBar = {
-            BottomNavigation(navController, navBackStackEntry)
-        },
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
-                title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) },
-                actions = {
-                    if (!authState.isLoggedIn) {
-                        Button(
-                            onClick = { navController.navigate(Route.Auth.route)},
-                            contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(16.dp))
-                                .width(72.dp)
-                                .height(36.dp)
-                                .background(
-                                    Brush.linearGradient(listOf(Primary, PrimaryLight))
-                                )) {
-                            Text("Log in", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                        }
-                    }
-                }
-            )
-        }
+        bottomBar = { BottomNavigation(navController, navBackStackEntry) },
+        topBar = { TopBar(authState.isLoggedIn, authState.isLoading) { navController.navigate(it) } }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             MatchesContent(
@@ -104,7 +78,6 @@ fun MatchesScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MatchesContent(
     state: MatchesState,
@@ -179,8 +152,7 @@ private fun MatchesContent(
             homePickerState = state.homePickerState,
             awayPickerState = state.awayPickerState,
             isLoggedIn = authState.isLoggedIn,
-            onSubmit =
-            {
+            onSubmit = {
                 if (state.predictions.any { it.matchId == state.selectedMatch.id }) {
                     onEvent(MatchesEvent.UpdatePrediction)
                 } else {
@@ -194,30 +166,57 @@ private fun MatchesContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: (String) -> Unit) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+        title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) },
+        actions = {
+            if (!isLoggedIn && !isLoading) {
+                Button(
+                    onClick = { onNavigate(Route.Auth.route) },
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .width(72.dp)
+                        .height(36.dp)
+                        .background(
+                            Brush.linearGradient(listOf(Primary, PrimaryLight))
+                        )
+                ) {
+                    Text("Log in", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+    )
+}
+
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun MatchesContentPreview() {
-        FotLeagueTheme {
-            MatchesContent(
-                state = MatchesState(
-                    matches = listOf(
-                        Match(
-                            id = 1,
-                            home = "Liverpool",
-                            away = "",
-                            homeScore = 0,
-                            awayScore = 0,
-                            matchStatus = 1,
-                            datetime = "2024-08-16T19:00:00.000Z",
-                            season = 0,
-                            gameweek = 1
-                        )
+    FotLeagueTheme {
+        MatchesContent(
+            state = MatchesState(
+                matches = listOf(
+                    Match(
+                        id = 1,
+                        home = "Liverpool",
+                        away = "",
+                        homeScore = 0,
+                        awayScore = 0,
+                        matchStatus = 1,
+                        datetime = "2024-08-16T19:00:00.000Z",
+                        season = 0,
+                        gameweek = 1
                     )
-                ),
-                authState = AuthState(),
-                onEvent = {},
-                onNavigate = {}
-            )
-        }
+                )
+            ),
+            authState = AuthState(),
+            onEvent = {},
+            onNavigate = {}
+        )
+    }
 }

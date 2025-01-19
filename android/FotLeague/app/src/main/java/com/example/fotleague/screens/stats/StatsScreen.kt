@@ -30,7 +30,6 @@ import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
     navController: NavHostController,
@@ -50,15 +49,8 @@ fun StatsScreen(
     )
 
     Scaffold(
-        bottomBar = {
-            BottomNavigation(navController, navBackStackEntry)
-        },
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
-                title = { Text(text = "Stats", fontWeight = FontWeight.Medium) }
-            )
-        }
+        bottomBar = { BottomNavigation(navController, navBackStackEntry) },
+        topBar = { TopBar() }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             StatsContent(seasonList, allTimeList, leaguesList)
@@ -118,6 +110,15 @@ private fun StatsItem(text: String, value: String) {
         Text(text = text)
         Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar() {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+        title = { Text(text = "Stats", fontWeight = FontWeight.Medium) }
+    )
 }
 
 @Preview

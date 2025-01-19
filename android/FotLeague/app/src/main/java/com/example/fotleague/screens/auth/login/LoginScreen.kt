@@ -65,7 +65,6 @@ import com.example.fotleague.ui.theme.LightGray
 import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -82,21 +81,7 @@ fun LoginScreen(
 
     Scaffold(
         containerColor = Background,
-        topBar = {
-            TopAppBar(
-                title = { Text("Log in", fontWeight = FontWeight.Medium) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                navigationIcon = {
-                    IconButton(onClick = navController::popBackStack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                }
-            )
-        }
+        topBar = { TopBar(navController::popBackStack) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             LoginScreenContent(
@@ -243,6 +228,24 @@ private fun SocialLoginButton(iconResourceId: Int) {
             tint = Color.Unspecified
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(onBackArrowClick: () -> Unit) {
+    TopAppBar(
+        title = { Text("Log in", fontWeight = FontWeight.Medium) },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+        navigationIcon = {
+            IconButton(onClick = onBackArrowClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        }
+    )
 }
 
 @Preview

@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.fotleague.screens.auth.login.LoginScreen
 import com.example.fotleague.screens.auth.signup.SignupScreen
@@ -46,7 +46,8 @@ sealed class Route(val route: String) {
 }
 
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation() {
+    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     NavHost(

@@ -25,10 +25,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FotLeagueTheme {
-                val navController = rememberNavController()
-
                 Surface(modifier = Modifier.background(Background)) {
-                    Navigation(navController)
+                    Navigation()
                 }
             }
         }

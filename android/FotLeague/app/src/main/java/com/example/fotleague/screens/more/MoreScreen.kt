@@ -44,7 +44,6 @@ import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
     viewModel: MoreViewModel = hiltViewModel(),
@@ -62,15 +61,8 @@ fun MoreScreen(
     }
 
     Scaffold(
-        bottomBar = {
-            BottomNavigation(navController, navBackStackEntry)
-        },
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
-                title = { Text(text = "More", fontWeight = FontWeight.Medium) }
-            )
-        }
+        bottomBar = { BottomNavigation(navController, navBackStackEntry) },
+        topBar = { TopBar() }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             MoreContent(
@@ -137,6 +129,15 @@ private fun RowButton(icon: ImageVector, text: String, onClick: () -> Unit) {
         Icon(imageVector = icon, contentDescription = null, tint = LightGray)
         Text(text = text)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar() {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+        title = { Text(text = "More", fontWeight = FontWeight.Medium) }
+    )
 }
 
 @Preview

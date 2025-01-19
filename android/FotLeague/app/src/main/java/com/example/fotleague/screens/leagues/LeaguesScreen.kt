@@ -68,17 +68,15 @@ fun LeaguesScreen(
         topBar = {
             TopBar(
                 onCreateClick = {
-                    if (!authState.isLoggedIn) {
+                    if (!authState.isLoggedIn)
                         navController.navigate(Route.Auth.route)
-                    } else {
+                    else
                         viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)
-                    }
                 }, onJoinClick = {
-                    if (!authState.isLoggedIn) {
+                    if (!authState.isLoggedIn)
                         navController.navigate(Route.Auth.route)
-                    } else {
+                    else
                         viewModel.onEvent(LeaguesEvent.OpenJoinLeagueDialog)
-                    }
                 })
         }
     ) { paddingValues ->
@@ -167,7 +165,6 @@ fun LeaguesList(leagues: List<League>, onLeagueClick: (leagueId: Int) -> Unit) {
     }
 }
 
-
 @Composable
 fun League(name: String, pos: Int, modifier: Modifier = Modifier) {
     Row(
@@ -220,14 +217,6 @@ private fun TopBar(onCreateClick: () -> Unit, onJoinClick: () -> Unit) {
     )
 }
 
-@Preview
-@Composable
-fun LeaguePreview(modifier: Modifier = Modifier) {
-    FotLeagueTheme {
-        League(name = "League 1 name", pos = 1)
-    }
-}
-
 @Composable
 fun Header() {
     Row(
@@ -237,5 +226,13 @@ fun Header() {
         Spacer(modifier = Modifier.weight(1f))
         Text(text = "Pos.")
         Spacer(modifier = Modifier.width(20.dp))
+    }
+}
+
+@Preview
+@Composable
+fun LeaguePreview() {
+    FotLeagueTheme {
+        League(name = "League 1 name", pos = 1)
     }
 }

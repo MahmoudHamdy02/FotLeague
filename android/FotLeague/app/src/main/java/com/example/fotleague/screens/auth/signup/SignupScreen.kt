@@ -50,7 +50,6 @@ import com.example.fotleague.ui.theme.LightGray
 import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
@@ -67,21 +66,7 @@ fun SignupScreen(
 
     Scaffold(
         containerColor = Background,
-        topBar = {
-            TopAppBar(
-                title = { Text("Sign up", fontWeight = FontWeight.Medium) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                navigationIcon = {
-                    IconButton(onClick = navController::popBackStack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                }
-            )
-        }
+        topBar = { TopBar(navController::popBackStack) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             SignupScreenContent(
@@ -163,6 +148,23 @@ private fun SignupScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(onBackArrowClick: () -> Unit) {
+    TopAppBar(
+        title = { Text("Sign up", fontWeight = FontWeight.Medium) },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+        navigationIcon = {
+            IconButton(onClick = onBackArrowClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        }
+    )
+}
 
 @Preview
 @Composable

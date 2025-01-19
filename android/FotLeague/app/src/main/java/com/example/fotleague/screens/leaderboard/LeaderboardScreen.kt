@@ -43,7 +43,6 @@ import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(
     viewModel: LeaderboardViewModel = hiltViewModel(),
@@ -53,15 +52,8 @@ fun LeaderboardScreen(
     val state by viewModel.state.collectAsState()
 
     Scaffold(
-        bottomBar = {
-            BottomNavigation(navController, navBackStackEntry)
-        },
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
-                title = { Text(text = "Leaderboard", fontWeight = FontWeight.Medium) }
-            )
-        }
+        bottomBar = { BottomNavigation(navController, navBackStackEntry) },
+        topBar = { TopBar() }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             LeaderboardContent(
@@ -144,6 +136,15 @@ private fun LeaderboardContent(
             ScoresTable(userScores = userScores)
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar() {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
+        title = { Text(text = "Leaderboard", fontWeight = FontWeight.Medium) }
+    )
 }
 
 @Preview

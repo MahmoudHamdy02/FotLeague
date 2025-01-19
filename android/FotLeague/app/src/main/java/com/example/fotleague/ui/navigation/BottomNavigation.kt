@@ -1,6 +1,5 @@
 package com.example.fotleague.ui.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -25,7 +24,7 @@ import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.LightGray
 import com.example.fotleague.ui.theme.Primary
 
-data class BottomNavigationItem(
+private data class BottomNavigationItem(
     val title: String,
     val screen: Screen,
     val selectedIcon: ImageVector,
@@ -72,7 +71,7 @@ fun BottomNavigation(
         containerColor = DarkGray,
     ) {
         val currentDestination = navBackStackEntry?.destination
-        Log.d("ROUTE", "$currentDestination")
+
         items.forEach { item ->
             val isSelected =
                 currentDestination?.hierarchy?.any {
