@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
-//    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
@@ -45,9 +44,6 @@ android {
     buildFeatures {
         compose = true
     }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.5.14"
-//    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -96,8 +92,3 @@ dependencies {
     // Datastore
     implementation(libs.androidx.datastore.preferences)
 }
-
-// Allow references to generated code
-//kapt {
-//    correctErrorTypes = true
-//}
