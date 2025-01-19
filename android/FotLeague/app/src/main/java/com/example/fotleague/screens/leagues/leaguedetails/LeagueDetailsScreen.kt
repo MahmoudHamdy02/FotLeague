@@ -86,37 +86,10 @@ fun LeagueDetailsScreen(
     Scaffold(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(NavigationBarDefaults.windowInsets),
         topBar = {
-            TopAppBar(
-                title = { Text(text = "Leagues") },
-                actions = {
-                    if (state.league.ownerId == authState.user!!.id) {
-                        IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = null,
-                                tint = LightGray
-                            )
-                        }
-                    } else {
-                        IconButton(onClick = { viewModel.onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
-                                contentDescription = null,
-                                tint = LightGray
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
-                navigationIcon = {
-                    IconButton(onClick = navController::popBackStack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = LightGray
-                        )
-                    }
-                }
+            TopBar(
+                isLeagueOwner = state.league.ownerId == authState.user!!.id,
+                onBackArrowClick = navController::popBackStack,
+                onEvent = { viewModel.onEvent(it) }
             )
         }
     ) { paddingValues ->
@@ -256,6 +229,43 @@ private fun CopyLeagueCodeButton(clipboardManager: ClipboardManager, code: Strin
             fontWeight = FontWeight.SemiBold,
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(isLeagueOwner: Boolean, onBackArrowClick: () -> Unit, onEvent: (LeagueDetailsEvent) -> Unit) {
+    TopAppBar(
+        title = { Text(text = "Leagues") },
+        actions = {
+            if (isLeagueOwner) {
+                IconButton(onClick = { onEvent(LeagueDetailsEvent.OpenDeleteLeagueDialog) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = LightGray
+                    )
+                }
+            } else {
+                IconButton(onClick = { onEvent(LeagueDetailsEvent.OpenLeaveLeagueDialog) }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.logout_24),
+                        contentDescription = null,
+                        tint = LightGray
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+        navigationIcon = {
+            IconButton(onClick = onBackArrowClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = LightGray
+                )
+            }
+        }
+    )
 }
 
 @Preview
