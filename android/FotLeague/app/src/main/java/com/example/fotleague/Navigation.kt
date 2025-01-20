@@ -102,16 +102,32 @@ fun Navigation() {
                 }
             ),
             enterTransition = {
-                slideIntoContainer(
-                    animationSpec = tween(250, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start
-                )
+                if (this.initialState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
+                    EnterTransition.None
+                } else {
+                    slideIntoContainer(
+                        animationSpec = tween(250, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                }
             },
             exitTransition = {
-                slideOutOfContainer(
-                    animationSpec = tween(250, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.End
-                )
+                if (this.targetState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
+                    fadeOut(
+                        animationSpec = tween(250, easing = EaseOut),
+                        0.5f
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(400, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    ) {
+                        it / 5
+                    }
+                } else {
+                    slideOutOfContainer(
+                        animationSpec = tween(250, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                }
             }
         ) {
             LeagueDetailsScreen(navController = navController)
@@ -126,7 +142,19 @@ fun Navigation() {
                 navArgument("isLeagueOwner") {
                     type = NavType.BoolType
                 }
-            )
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    animationSpec = tween(250, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    animationSpec = tween(250, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }
         ) {
             LeagueSettingsScreen(navController = navController)
         }
