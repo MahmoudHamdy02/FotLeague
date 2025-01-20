@@ -207,7 +207,7 @@ private fun TopBar(onBackArrowClick: () -> Unit, onNavigate: () -> Unit) {
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Background),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
         navigationIcon = {
             IconButton(onClick = onBackArrowClick) {
                 Icon(

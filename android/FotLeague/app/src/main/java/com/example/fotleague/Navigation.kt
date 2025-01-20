@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,39 +62,23 @@ fun Navigation() {
         popEnterTransition = { EnterTransition.None },
         popExitTransition = { ExitTransition.None }
     ) {
-        // Bottom navigation
+        // Matches
         composable(Screen.MatchesScreen.route) {
             MatchesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
+
+        // Leagues
         composable(Screen.LeaguesScreen.route,
             exitTransition = {
                 if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
-                    fadeOut(
-                        animationSpec = tween(250, easing = EaseOut),
-                        0.5f
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(400, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
-                    ) {
-                        it / 5
-                    }
+                    fadeOutAnimation() + partialSlideOutAnimation()
                 } else {
                     ExitTransition.None
                 }
             }) {
             LeaguesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
-        composable(Screen.LeaderboardScreen.route) {
-            LeaderboardScreen(navController = navController, navBackStackEntry = navBackStackEntry)
-        }
-        composable(Screen.StatsScreen.route) {
-            StatsScreen(navController = navController, navBackStackEntry = navBackStackEntry)
-        }
-        composable(Screen.MoreScreen.route) {
-            MoreScreen(navController = navController, navBackStackEntry = navBackStackEntry)
-        }
-
-        // Nested navigation
+        // League details
         composable(
             route = Screen.LeagueDetails.route + "/{leagueId}",
             arguments = listOf(
@@ -105,34 +90,20 @@ fun Navigation() {
                 if (this.initialState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
                     EnterTransition.None
                 } else {
-                    slideIntoContainer(
-                        animationSpec = tween(250, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
-                    )
+                    slideInAnimation(this)
                 }
             },
             exitTransition = {
                 if (this.targetState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
-                    fadeOut(
-                        animationSpec = tween(250, easing = EaseOut),
-                        0.5f
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(400, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
-                    ) {
-                        it / 5
-                    }
+                    fadeOutAnimation() + partialSlideOutAnimation()
                 } else {
-                    slideOutOfContainer(
-                        animationSpec = tween(250, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.End
-                    )
+                    slideOutAnimation(this)
                 }
             }
         ) {
             LeagueDetailsScreen(navController = navController)
         }
-
+        // League settings
         composable(
             route = Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}",
             arguments = listOf(
@@ -144,19 +115,28 @@ fun Navigation() {
                 }
             ),
             enterTransition = {
-                slideIntoContainer(
-                    animationSpec = tween(250, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Start
-                )
+                slideInAnimation(this)
             },
             exitTransition = {
-                slideOutOfContainer(
-                    animationSpec = tween(250, easing = EaseOut),
-                    towards = AnimatedContentTransitionScope.SlideDirection.End
-                )
+                slideOutAnimation(this)
             }
         ) {
             LeagueSettingsScreen(navController = navController)
+        }
+
+        // Leaderboard
+        composable(Screen.LeaderboardScreen.route) {
+            LeaderboardScreen(navController = navController, navBackStackEntry = navBackStackEntry)
+        }
+
+        // Stats
+        composable(Screen.StatsScreen.route) {
+            StatsScreen(navController = navController, navBackStackEntry = navBackStackEntry)
+        }
+
+        // More
+        composable(Screen.MoreScreen.route) {
+            MoreScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // Auth
@@ -175,4 +155,34 @@ fun Navigation() {
             }
         }
     }
+}
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInAnimation(it: AnimatedContentTransitionScope<NavBackStackEntry>): EnterTransition {
+    return it.slideIntoContainer(
+        animationSpec = tween(250, easing = EaseOut),
+        towards = AnimatedContentTransitionScope.SlideDirection.Start
+    )
+}
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutAnimation(it: AnimatedContentTransitionScope<NavBackStackEntry>): ExitTransition {
+    return it.slideOutOfContainer(
+        animationSpec = tween(250, easing = EaseOut),
+        towards = AnimatedContentTransitionScope.SlideDirection.End
+    )
+}
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.partialSlideOutAnimation(): ExitTransition {
+    return slideOutOfContainer(
+        animationSpec = tween(400, easing = EaseOut),
+        towards = AnimatedContentTransitionScope.SlideDirection.Start
+    ) {
+        it / 5
+    }
+}
+
+private fun fadeOutAnimation(): ExitTransition {
+    return fadeOut(
+        animationSpec = tween(250, easing = EaseOut),
+        0.5f
+    )
 }
