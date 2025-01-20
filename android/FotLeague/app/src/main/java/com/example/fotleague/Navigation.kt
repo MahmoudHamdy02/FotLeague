@@ -11,13 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavType
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.fotleague.screens.auth.login.LoginScreen
 import com.example.fotleague.screens.auth.signup.SignupScreen
 import com.example.fotleague.screens.leaderboard.LeaderboardScreen
@@ -27,25 +26,45 @@ import com.example.fotleague.screens.leagues.leaguesettings.LeagueSettingsScreen
 import com.example.fotleague.screens.matches.MatchesScreen
 import com.example.fotleague.screens.more.MoreScreen
 import com.example.fotleague.screens.stats.StatsScreen
+import kotlinx.serialization.Serializable
 
-sealed class Screen(val route: String) {
-    data object MatchesScreen : Screen("matches_screen")
-    data object LeaguesScreen : Screen("leagues_screen")
-    data object LeaderboardScreen : Screen("leaderboard_screen")
-    data object StatsScreen : Screen("stats_screen")
-    data object MoreScreen : Screen("more_screen")
-    data object LeagueDetails : Screen("league_details")
-    data object LeagueSettings : Screen("league_settings")
+sealed class Screen {
+    @Serializable
+    object Matches: Screen()
 
-    sealed class Auth(val route: String) {
-        data object LoginScreen : Auth("login_screen")
-        data object SignupScreen : Auth("signup_screen")
-        data object ForgotPasswordScreen : Auth("forgot_password_screen")
+    @Serializable
+    object Leagues: Screen()
+
+    @Serializable
+    data class LeagueDetails(val leagueId: Int): Screen()
+
+    @Serializable
+    data class LeagueSettings(val leagueId: Int, val isLeagueOwner: Boolean): Screen()
+
+    @Serializable
+    object Leaderboard: Screen()
+
+    @Serializable
+    object Stats: Screen()
+
+    @Serializable
+    object More: Screen()
+
+    @Serializable
+    object AuthGraph
+
+    @Serializable
+    sealed class Auth {
+
+        @Serializable
+        object Login: Auth()
+
+        @Serializable
+        object Signup: Auth()
+
+        @Serializable
+        object ForgotPassword: Auth()
     }
-}
-
-sealed class Route(val route: String) {
-    data object Auth : Route("auth")
 }
 
 @Composable
@@ -55,7 +74,7 @@ fun Navigation() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.MatchesScreen.route,
+        startDestination = Screen.Matches,
         modifier = Modifier.fillMaxSize(),
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },
@@ -63,14 +82,14 @@ fun Navigation() {
         popExitTransition = { ExitTransition.None }
     ) {
         // Matches
-        composable(Screen.MatchesScreen.route) {
+        composable<Screen.Matches> {
             MatchesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // Leagues
-        composable(Screen.LeaguesScreen.route,
+        composable<Screen.Leagues>(
             exitTransition = {
-                if (this.targetState.destination.route == Screen.LeagueDetails.route + "/{leagueId}") {
+                if (this.targetState.destination.hasRoute(Screen.LeagueDetails::class)) {
                     fadeOutAnimation() + partialSlideOutAnimation()
                 } else {
                     ExitTransition.None
@@ -79,93 +98,73 @@ fun Navigation() {
             LeaguesScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
         // League details
-        composable(
-            route = Screen.LeagueDetails.route + "/{leagueId}",
-            arguments = listOf(
-                navArgument("leagueId") {
-                    type = NavType.IntType
-                }
-            ),
+        composable<Screen.LeagueDetails>(
             enterTransition = {
-                if (this.initialState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
+                if (this.initialState.destination.hasRoute(Screen.LeagueSettings::class)) {
                     EnterTransition.None
                 } else {
-                    slideInAnimation(this)
+                    slideInAnimation()
                 }
             },
             exitTransition = {
-                if (this.targetState.destination.route == Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}") {
+                if (this.targetState.destination.hasRoute(Screen.LeagueSettings::class)) {
                     fadeOutAnimation() + partialSlideOutAnimation()
                 } else {
-                    slideOutAnimation(this)
+                    slideOutAnimation()
                 }
             }
         ) {
             LeagueDetailsScreen(navController = navController)
         }
         // League settings
-        composable(
-            route = Screen.LeagueSettings.route + "/{leagueId},{isLeagueOwner}",
-            arguments = listOf(
-                navArgument("leagueId") {
-                    type = NavType.IntType
-                },
-                navArgument("isLeagueOwner") {
-                    type = NavType.BoolType
-                }
-            ),
-            enterTransition = {
-                slideInAnimation(this)
-            },
-            exitTransition = {
-                slideOutAnimation(this)
-            }
+        composable<Screen.LeagueSettings>(
+            enterTransition = { slideInAnimation() },
+            exitTransition = { slideOutAnimation() }
         ) {
             LeagueSettingsScreen(navController = navController)
         }
 
         // Leaderboard
-        composable(Screen.LeaderboardScreen.route) {
+        composable<Screen.Leaderboard> {
             LeaderboardScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // Stats
-        composable(Screen.StatsScreen.route) {
+        composable<Screen.Stats> {
             StatsScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // More
-        composable(Screen.MoreScreen.route) {
+        composable<Screen.More> {
             MoreScreen(navController = navController, navBackStackEntry = navBackStackEntry)
         }
 
         // Auth
-        navigation(
-            startDestination = Screen.Auth.LoginScreen.route,
-            route = Route.Auth.route
+        navigation<Screen.AuthGraph>(
+            startDestination = Screen.Auth.Login
         ) {
-            composable(Screen.Auth.LoginScreen.route) {
+            composable<Screen.Auth.Login> {
                 LoginScreen(navController = navController)
             }
-            composable(Screen.Auth.SignupScreen.route) {
+            composable<Screen.Auth.Signup> {
                 SignupScreen(navController = navController)
             }
-            composable(Screen.Auth.ForgotPasswordScreen.route) {
+            composable<Screen.Auth.ForgotPassword> {
 
             }
         }
     }
 }
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInAnimation(it: AnimatedContentTransitionScope<NavBackStackEntry>): EnterTransition {
-    return it.slideIntoContainer(
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInAnimation(): EnterTransition {
+    return slideIntoContainer(
         animationSpec = tween(250, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.Start
     )
 }
 
-private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutAnimation(it: AnimatedContentTransitionScope<NavBackStackEntry>): ExitTransition {
-    return it.slideOutOfContainer(
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutAnimation(): ExitTransition {
+    return slideOutOfContainer(
         animationSpec = tween(250, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.End
     )

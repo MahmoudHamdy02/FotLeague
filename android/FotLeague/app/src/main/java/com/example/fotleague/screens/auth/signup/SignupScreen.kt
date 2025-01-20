@@ -60,7 +60,7 @@ fun SignupScreen(
 
     LaunchedEffect(state.onSignup) {
         if (state.onSignup) {
-            navController.navigate(Screen.MatchesScreen.route)
+            navController.navigate(Screen.Matches)
         }
     }
 

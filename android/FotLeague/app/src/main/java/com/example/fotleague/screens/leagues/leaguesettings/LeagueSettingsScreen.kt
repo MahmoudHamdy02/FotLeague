@@ -53,8 +53,8 @@ fun LeagueSettingsScreen(
 
     LaunchedEffect(state.leagueLeft) {
         if (state.leagueLeft) {
-            navController.navigate(Screen.LeaguesScreen.route) {
-                popUpTo(Screen.LeaguesScreen.route)
+            navController.navigate(Screen.Leagues) {
+                popUpTo(Screen.Leagues)
             }
         }
     }

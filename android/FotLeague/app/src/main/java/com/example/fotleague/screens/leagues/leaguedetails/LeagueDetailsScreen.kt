@@ -77,7 +77,10 @@ fun LeagueDetailsScreen(
         topBar = {
             TopBar(
                 onBackArrowClick = navController::popBackStack,
-                onNavigate = { navController.navigate("${Screen.LeagueSettings.route}/${state.league.id},${state.league.ownerId == authState.user!!.id}") }
+                onNavigate = { navController.navigate(Screen.LeagueSettings(
+                    state.league.id,
+                    state.league.ownerId == authState.user!!.id
+                )) }
             )
         }
     ) { paddingValues ->

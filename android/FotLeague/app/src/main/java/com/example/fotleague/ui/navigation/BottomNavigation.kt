@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.fotleague.R
@@ -40,27 +40,27 @@ fun BottomNavigation(
     val items = listOf(
         BottomNavigationItem(
             title = "Matches",
-            screen = Screen.MatchesScreen,
+            screen = Screen.Matches,
             selectedIcon = ImageVector.vectorResource(id = R.drawable.sports_32),
             unselectedIcon = ImageVector.vectorResource(id = R.drawable.sports_24)
         ), BottomNavigationItem(
             title = "Leagues",
-            screen = Screen.LeaguesScreen,
+            screen = Screen.Leagues,
             selectedIcon = ImageVector.vectorResource(id = R.drawable.groups_filled_32),
             unselectedIcon = ImageVector.vectorResource(id = R.drawable.groups_24)
         ), BottomNavigationItem(
             title = "Leaderboard",
-            screen = Screen.LeaderboardScreen,
+            screen = Screen.Leaderboard,
             selectedIcon = ImageVector.vectorResource(id = R.drawable.trophy_filled_32),
             unselectedIcon = ImageVector.vectorResource(id = R.drawable.trophy_24)
         ), BottomNavigationItem(
             title = "Stats",
-            screen = Screen.StatsScreen,
+            screen = Screen.Stats,
             selectedIcon = ImageVector.vectorResource(id = R.drawable.leaderboard_filled_32),
             unselectedIcon = ImageVector.vectorResource(id = R.drawable.leaderboard_24)
         ), BottomNavigationItem(
             title = "More",
-            screen = Screen.MoreScreen,
+            screen = Screen.More,
             selectedIcon = ImageVector.vectorResource(id = R.drawable.menu_32),
             unselectedIcon = ImageVector.vectorResource(id = R.drawable.menu_24)
         )
@@ -73,14 +73,10 @@ fun BottomNavigation(
         val currentDestination = navBackStackEntry?.destination
 
         items.forEach { item ->
-            val isSelected =
-                currentDestination?.hierarchy?.any {
-                    it.route == item.screen.route
-                            ||
-                            (item.screen.route == Screen.LeaguesScreen.route && it.route?.startsWith(
-                                Screen.LeagueDetails.route
-                            ) == true)
-                } == true
+            val isSelected = currentDestination?.hasRoute(item.screen::class) == true
+                    ||
+                    item.screen == Screen.Leagues && currentDestination?.hasRoute(Screen.LeagueDetails::class) == true
+
             NavigationBarItem(selected = isSelected, label = {
                 Text(
                     text = item.title,
@@ -89,7 +85,7 @@ fun BottomNavigation(
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             }, onClick = {
-                navController.navigate(item.screen.route) {
+                navController.navigate(item.screen) {
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }

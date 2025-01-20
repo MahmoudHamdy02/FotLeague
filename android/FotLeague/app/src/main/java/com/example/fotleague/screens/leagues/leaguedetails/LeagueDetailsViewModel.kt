@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.example.fotleague.AuthStatus
+import com.example.fotleague.Screen
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.League
 import com.example.fotleague.models.UserScore
@@ -29,17 +31,15 @@ class LeagueDetailsViewModel @Inject constructor(
 
     val authState = authStatus.getAuthState()
 
-    private val leagueId = savedStateHandle.get<Int>("leagueId")
+    private val args = savedStateHandle.toRoute<Screen.LeagueDetails>()
 
     init {
-        if (leagueId != null) {
             viewModelScope.launch {
                 authState.collect {
                     if (it.isLoggedIn) {
-                        getLeague(leagueId)
+                        getLeague(args.leagueId)
                     }
                 }
-            }
         }
     }
 

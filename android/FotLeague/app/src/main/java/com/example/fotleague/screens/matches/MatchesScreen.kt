@@ -40,7 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.example.fotleague.AuthState
-import com.example.fotleague.Route
+import com.example.fotleague.Screen
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
@@ -65,14 +65,14 @@ fun MatchesScreen(
 
     Scaffold(
         bottomBar = { BottomNavigation(navController, navBackStackEntry) },
-        topBar = { TopBar(authState.isLoggedIn, authState.isLoading) { navController.navigate(it) } }
+        topBar = { TopBar(authState.isLoggedIn, authState.isLoading) { navController.navigate(Screen.AuthGraph) } }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             MatchesContent(
                 state = state,
                 authState = authState,
                 onEvent = { viewModel.onEvent(it) },
-                onNavigate = { navController.navigate((it)) }
+                onNavigateToAuth = { navController.navigate(Screen.AuthGraph) }
             )
         }
     }
@@ -83,7 +83,7 @@ private fun MatchesContent(
     state: MatchesState,
     authState: AuthState,
     onEvent: (event: MatchesEvent) -> Unit,
-    onNavigate: (path: String) -> Unit
+    onNavigateToAuth: () -> Unit
 ) {
     val pagerState = rememberPagerState {
         38
@@ -139,7 +139,7 @@ private fun MatchesContent(
                     isLoggedIn = authState.isLoggedIn,
                     onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
                     onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) },
-                    onNavigate = onNavigate
+                    onNavigateToAuth = onNavigateToAuth
                 )
             }
         }
@@ -160,7 +160,7 @@ private fun MatchesContent(
                 }
             },
             onDismiss = { onEvent(MatchesEvent.CloseDialog) },
-            onNavigate = onNavigate,
+            onNavigateToAuth = onNavigateToAuth,
             edit = state.predictions.any { it.matchId == state.selectedMatch.id }
         )
     }
@@ -168,14 +168,14 @@ private fun MatchesContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: (String) -> Unit) {
+private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkGray),
         title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) },
         actions = {
             if (!isLoggedIn && !isLoading) {
                 Button(
-                    onClick = { onNavigate(Route.Auth.route) },
+                    onClick = onNavigate,
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
@@ -216,7 +216,7 @@ private fun MatchesContentPreview() {
             ),
             authState = AuthState(),
             onEvent = {},
-            onNavigate = {}
+            onNavigateToAuth = {}
         )
     }
 }

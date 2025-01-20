@@ -40,7 +40,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.example.fotleague.R
-import com.example.fotleague.Route
 import com.example.fotleague.Screen
 import com.example.fotleague.models.League
 import com.example.fotleague.screens.leagues.components.CreateLeagueDialog
@@ -69,12 +68,12 @@ fun LeaguesScreen(
             TopBar(
                 onCreateClick = {
                     if (!authState.isLoggedIn)
-                        navController.navigate(Route.Auth.route)
+                        navController.navigate(Screen.AuthGraph)
                     else
                         viewModel.onEvent(LeaguesEvent.OpenCreateLeagueDialog)
                 }, onJoinClick = {
                     if (!authState.isLoggedIn)
-                        navController.navigate(Route.Auth.route)
+                        navController.navigate(Screen.AuthGraph)
                     else
                         viewModel.onEvent(LeaguesEvent.OpenJoinLeagueDialog)
                 })
@@ -83,7 +82,7 @@ fun LeaguesScreen(
         Box(modifier = Modifier.padding(paddingValues)) {
             LeaguesContent(
                 leagues = state.leagues,
-                onLeagueClick = { navController.navigate(Screen.LeagueDetails.route + "/$it") },
+                onLeagueClick = { navController.navigate(Screen.LeagueDetails(it)) },
                 isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
                 onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
                 code = state.joinLeagueDialogCode,

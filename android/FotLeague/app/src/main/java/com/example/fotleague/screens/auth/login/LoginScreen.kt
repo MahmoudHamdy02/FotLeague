@@ -75,7 +75,7 @@ fun LoginScreen(
 
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) {
-            navController.popBackStack(Screen.MatchesScreen.route, false)
+            navController.popBackStack(Screen.Matches, false)
         }
     }
 
@@ -95,7 +95,7 @@ fun LoginScreen(
                 isRememberMeChecked = state.rememberMe,
                 setIsRememberMeChecked = { viewModel.onEvent(LoginEvent.SetRememberMe(it)) },
                 onLogin = { viewModel.onEvent(LoginEvent.Login) },
-                onNavigate = { navController.navigate(it) }
+                onNavigateToSignUp = { navController.navigate(Screen.Auth.Signup) }
             )
         }
     }
@@ -113,7 +113,7 @@ private fun LoginScreenContent(
     isRememberMeChecked: Boolean,
     setIsRememberMeChecked: (Boolean) -> Unit,
     onLogin: () -> Unit,
-    onNavigate: (path: String) -> Unit
+    onNavigateToSignUp: () -> Unit
 ) {
 
     Column(
@@ -207,7 +207,7 @@ private fun LoginScreenContent(
                 text = "Register now",
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable {
-                    onNavigate(Screen.Auth.SignupScreen.route)
+                    onNavigateToSignUp()
                 })
         }
     }
@@ -263,7 +263,7 @@ private fun LoginScreenPreview() {
             isRememberMeChecked = false,
             setIsRememberMeChecked = {},
             onLogin = {},
-            onNavigate = {}
+            onNavigateToSignUp = {}
         )
     }
 }

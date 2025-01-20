@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.example.fotleague.Screen
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,10 +21,9 @@ class LeagueSettingsViewModel @Inject constructor(
     private val api: FotLeagueApi,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val leagueId = savedStateHandle.get<Int>("leagueId")
-    private val isLeagueOwner = savedStateHandle.get<Boolean>("isLeagueOwner")
+    private val args = savedStateHandle.toRoute<Screen.LeagueSettings>()
 
-    private val _state = MutableStateFlow(LeagueSettingsState(isLeagueOwner == true))
+    private val _state = MutableStateFlow(LeagueSettingsState(args.isLeagueOwner == true))
     val state: StateFlow<LeagueSettingsState> = _state.asStateFlow()
 
     fun onEvent(event: LeagueSettingsEvent) {
@@ -30,36 +31,53 @@ class LeagueSettingsViewModel @Inject constructor(
             LeagueSettingsEvent.LeaveLeague -> {
                 viewModelScope.launch { leaveLeague() }
             }
+
             LeagueSettingsEvent.DeleteLeague -> {
                 viewModelScope.launch { deleteLeague() }
             }
-            LeagueSettingsEvent.CloseLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = false) }
-            LeagueSettingsEvent.OpenLeaveLeagueDialog -> _state.update { it.copy(isLeaveLeagueDialogOpen = true) }
-            LeagueSettingsEvent.CloseDeleteLeagueDialog -> _state.update { it.copy(isDeleteLeagueDialogOpen = false) }
-            LeagueSettingsEvent.OpenDeleteLeagueDialog -> _state.update { it.copy(isDeleteLeagueDialogOpen = true) }
+
+            LeagueSettingsEvent.CloseLeaveLeagueDialog -> _state.update {
+                it.copy(
+                    isLeaveLeagueDialogOpen = false
+                )
+            }
+
+            LeagueSettingsEvent.OpenLeaveLeagueDialog -> _state.update {
+                it.copy(
+                    isLeaveLeagueDialogOpen = true
+                )
+            }
+
+            LeagueSettingsEvent.CloseDeleteLeagueDialog -> _state.update {
+                it.copy(
+                    isDeleteLeagueDialogOpen = false
+                )
+            }
+
+            LeagueSettingsEvent.OpenDeleteLeagueDialog -> _state.update {
+                it.copy(
+                    isDeleteLeagueDialogOpen = true
+                )
+            }
         }
     }
 
     private suspend fun leaveLeague() {
-        if (leagueId != null) {
-            val leagueDetailsResponse = api.leaveLeague(LeaveLeagueRequest(leagueId))
-            val leagueDetailsBody = leagueDetailsResponse.body()
-            if (leagueDetailsResponse.isSuccessful && leagueDetailsBody != null) {
-                _state.update { state ->
-                    state.copy(leagueLeft = true)
-                }
+        val leagueDetailsResponse = api.leaveLeague(LeaveLeagueRequest(args.leagueId))
+        val leagueDetailsBody = leagueDetailsResponse.body()
+        if (leagueDetailsResponse.isSuccessful && leagueDetailsBody != null) {
+            _state.update { state ->
+                state.copy(leagueLeft = true)
             }
         }
     }
 
     private suspend fun deleteLeague() {
-        if (leagueId != null) {
-            val leagueDetailsResponse = api.deleteLeague(leagueId)
-            Log.d("DELETE", leagueDetailsResponse.toString())
-            if (leagueDetailsResponse.isSuccessful) {
-                _state.update { state ->
-                    state.copy(leagueLeft = true)
-                }
+        val leagueDetailsResponse = api.deleteLeague(args.leagueId)
+        Log.d("DELETE", leagueDetailsResponse.toString())
+        if (leagueDetailsResponse.isSuccessful) {
+            _state.update { state ->
+                state.copy(leagueLeft = true)
             }
         }
     }
