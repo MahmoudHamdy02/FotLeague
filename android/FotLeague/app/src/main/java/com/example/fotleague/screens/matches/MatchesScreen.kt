@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -30,9 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +38,7 @@ import com.example.fotleague.AuthState
 import com.example.fotleague.Screen
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
+import com.example.fotleague.screens.auth.components.PrimaryButton
 import com.example.fotleague.screens.matches.components.GameweeksRow
 import com.example.fotleague.screens.matches.components.MatchesList
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
@@ -51,8 +46,6 @@ import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
-import com.example.fotleague.ui.theme.Primary
-import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
 fun MatchesScreen(
@@ -66,7 +59,12 @@ fun MatchesScreen(
 
     Scaffold(
         bottomBar = { BottomNavigation(navController, navBackStackEntry) },
-        topBar = { TopBar(authState.isLoggedIn, authState.isLoading) { navController.navigate(Screen.AuthGraph) } }
+        topBar = {
+            TopBar(
+                authState.isLoggedIn,
+                authState.isLoading
+            ) { navController.navigate(Screen.AuthGraph) }
+        }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             MatchesContent(
@@ -175,17 +173,12 @@ private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: () -> Un
         title = { Text(text = "FotLeague", fontWeight = FontWeight.Bold) },
         actions = {
             if (!isLoggedIn && !isLoading) {
-                Button(
+                PrimaryButton(
                     onClick = onNavigate,
                     contentPadding = PaddingValues(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
                         .width(72.dp)
                         .height(36.dp)
-                        .background(
-                            Brush.linearGradient(listOf(Primary, PrimaryLight))
-                        )
                 ) {
                     Text("Log in", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 }

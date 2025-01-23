@@ -1,7 +1,8 @@
 package com.example.fotleague.screens.auth.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -18,15 +19,22 @@ import com.example.fotleague.ui.theme.Primary
 import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
-fun PrimaryButton(onClick: () -> Unit, isDisabled: Boolean, text: @Composable () -> Unit) {
+fun PrimaryButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isDisabled: Boolean = false,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    text: @Composable () -> Unit
+) {
     Button(
         onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        contentPadding = contentPadding,
         enabled = !isDisabled,
-        modifier = Modifier
-            .width(280.dp)
-            .height(40.dp)
+        modifier = modifier
             .clip(RoundedCornerShape(12.dp))
+            .width(280.dp)
+            .heightIn(40.dp)
             .background(
                 if (isDisabled)
                     Brush.linearGradient(listOf(Gray, LightGray))
