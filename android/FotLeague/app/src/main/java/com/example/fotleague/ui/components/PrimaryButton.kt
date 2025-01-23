@@ -1,4 +1,4 @@
-package com.example.fotleague.screens.auth.components
+package com.example.fotleague.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues

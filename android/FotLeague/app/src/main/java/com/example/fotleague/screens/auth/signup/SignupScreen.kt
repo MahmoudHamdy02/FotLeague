@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.fotleague.Screen
-import com.example.fotleague.screens.auth.components.PrimaryButton
+import com.example.fotleague.ui.components.PrimaryButton
 import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray

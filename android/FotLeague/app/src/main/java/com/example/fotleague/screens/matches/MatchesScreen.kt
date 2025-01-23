@@ -38,10 +38,10 @@ import com.example.fotleague.AuthState
 import com.example.fotleague.Screen
 import com.example.fotleague.models.Match
 import com.example.fotleague.models.MatchStatus
-import com.example.fotleague.screens.auth.components.PrimaryButton
 import com.example.fotleague.screens.matches.components.GameweeksRow
 import com.example.fotleague.screens.matches.components.MatchesList
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
+import com.example.fotleague.ui.components.PrimaryButton
 import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -209,7 +209,7 @@ private fun MatchesContentPreview() {
                     )
                 )
             ),
-            authState = AuthState(),
+            authState = AuthState(isLoading = false),
             onEvent = {},
             onNavigateToAuth = {}
         )
