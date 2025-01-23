@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -179,7 +180,7 @@ private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: () -> Un
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .width(72.dp)
                         .height(36.dp)
                         .background(
@@ -188,6 +189,7 @@ private fun TopBar(isLoggedIn: Boolean, isLoading: Boolean, onNavigate: () -> Un
                 ) {
                     Text("Log in", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                 }
+                Spacer(Modifier.width(8.dp))
             }
         }
     )
