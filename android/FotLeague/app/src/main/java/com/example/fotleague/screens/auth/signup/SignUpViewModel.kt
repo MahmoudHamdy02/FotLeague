@@ -35,6 +35,7 @@ class SignUpViewModel @Inject constructor(
 
     private fun signUp() {
         viewModelScope.launch {
+            _state.update { state -> state.copy(isLoading = true) }
             val response = api.signUp(
                 SignUpRequest(
                     _state.value.email,
@@ -61,7 +62,7 @@ class SignUpViewModel @Inject constructor(
                 )
                 authStatus.loginTrigger.value = true
                 authStatus.loginTrigger.value = false
-                _state.update { state -> state.copy(onSignup = true) }
+                _state.update { state -> state.copy(onSignup = true, isLoading = false) }
             }
         }
     }
@@ -71,7 +72,8 @@ data class SignUpState(
     val email: String = "",
     val password: String = "",
     val username: String = "",
-    val onSignup: Boolean = false
+    val onSignup: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 sealed interface SignUpEvent {

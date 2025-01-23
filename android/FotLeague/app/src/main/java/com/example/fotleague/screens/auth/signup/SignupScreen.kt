@@ -5,15 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,8 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,13 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.fotleague.Screen
+import com.example.fotleague.screens.auth.components.PrimaryButton
 import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
-import com.example.fotleague.ui.theme.Primary
-import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
 fun SignupScreen(
@@ -71,6 +63,7 @@ fun SignupScreen(
         Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             SignupScreenContent(
                 topPadding = paddingValues.calculateTopPadding(),
+                isLoading = state.isLoading,
                 username = state.username,
                 setUsername = { viewModel.onEvent(SignUpEvent.SetUsername(it)) },
                 email = state.email,
@@ -87,6 +80,7 @@ fun SignupScreen(
 @Composable
 private fun SignupScreenContent(
     topPadding: Dp,
+    isLoading: Boolean,
     username: String,
     email: String,
     setEmail: (String) -> Unit,
@@ -132,18 +126,11 @@ private fun SignupScreenContent(
             )
         }
 
-        Button(
-            onClick = { onSignUpClick() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            modifier = Modifier
-                .width(280.dp)
-                .height(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    Brush.linearGradient(listOf(Primary, PrimaryLight))
-                )
+        PrimaryButton(
+            onClick = onSignUpClick,
+            isDisabled = isLoading
         ) {
-            Text(text = "Create account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = if (!isLoading) "Create account" else "Signing up...", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -172,6 +159,7 @@ private fun SignupScreenPreview() {
     FotLeagueTheme {
         SignupScreenContent(
             topPadding = (0).dp,
+            isLoading = false,
             username = "",
             setUsername = {},
             email = "",

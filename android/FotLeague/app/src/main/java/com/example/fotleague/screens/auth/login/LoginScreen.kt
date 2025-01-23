@@ -38,8 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -56,14 +54,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.fotleague.R
 import com.example.fotleague.Screen
+import com.example.fotleague.screens.auth.components.PrimaryButton
 import com.example.fotleague.screens.auth.components.drawTopAndBottomCurves
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.Gray
 import com.example.fotleague.ui.theme.LightGray
-import com.example.fotleague.ui.theme.Primary
-import com.example.fotleague.ui.theme.PrimaryLight
 
 @Composable
 fun LoginScreen(
@@ -86,6 +83,7 @@ fun LoginScreen(
         Box(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             LoginScreenContent(
                 topPadding = paddingValues.calculateTopPadding(),
+                isLoading = state.isLoading,
                 email = state.email,
                 setEmail = { viewModel.onEvent(LoginEvent.SetEmail(it)) },
                 password = state.password,
@@ -104,6 +102,7 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenContent(
     topPadding: Dp,
+    isLoading: Boolean,
     email: String,
     setEmail: (String) -> Unit,
     password: String,
@@ -163,18 +162,11 @@ private fun LoginScreenContent(
             }
         }
 
-        Button(
-            onClick = { onLogin() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            modifier = Modifier
-                .width(280.dp)
-                .height(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    Brush.linearGradient(listOf(Primary, PrimaryLight))
-                )
+        PrimaryButton(
+            onClick = onLogin,
+            isDisabled = isLoading
         ) {
-            Text(text = "Log in", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = if (!isLoading) "Log in" else "Logging in...", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -253,7 +245,8 @@ private fun TopBar(onBackArrowClick: () -> Unit) {
 private fun LoginScreenPreview() {
     FotLeagueTheme {
         LoginScreenContent(
-            topPadding = (1).dp,
+            topPadding = (0).dp,
+            isLoading = false,
             email = "",
             setEmail = {},
             password = "",

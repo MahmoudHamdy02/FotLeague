@@ -35,6 +35,7 @@ class LoginViewModel @Inject constructor(
 
     private fun login() {
         viewModelScope.launch {
+            _state.update { state -> state.copy(isLoading = true) }
             val response = api.login(
                 LoginRequest(
                     _state.value.email,
@@ -52,7 +53,7 @@ class LoginViewModel @Inject constructor(
             )
             authStatus.loginTrigger.value = true
             authStatus.loginTrigger.value = false
-            _state.update { state -> state.copy(isLoggedIn = true) }
+            _state.update { state -> state.copy(isLoggedIn = true, isLoading = false) }
         }
     }
 }
@@ -62,7 +63,8 @@ data class LoginState(
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val rememberMe: Boolean = false,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 sealed interface LoginEvent {
