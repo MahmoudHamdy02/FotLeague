@@ -71,8 +71,9 @@ export const getMatchesBySeason = async (req: Request, res: Response) => {
 };
 
 // TODO: Could probably use some better error handling
+// TODO: find better way to validate, liveTime is nullable
 export const updateMatch = async (req: Request, res: Response) => {
-    const { matchId, status, homeScore, awayScore, datetime } = req.body;
+    const { matchId, status, homeScore, awayScore, datetime, liveTime } = req.body;
     if (!validate([
         matchId,
         status,
@@ -88,7 +89,7 @@ export const updateMatch = async (req: Request, res: Response) => {
     ], res)) return;
 
     try {
-        const updatedMatch = await matchService.updateMatch(matchId, status, homeScore, awayScore, datetime);
+        const updatedMatch = await matchService.updateMatch(matchId, status, homeScore, awayScore, datetime, liveTime);
 
         if (status !== MatchStatus.Played)
             return res.status(200).json(updatedMatch);

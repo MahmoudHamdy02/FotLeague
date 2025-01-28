@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS matches(
     away_score INT NULL,
     season INT NOT NULL,
     datetime TIMESTAMP NOT NULL,
-    gameweek INT NOT NULL
+    gameweek INT NOT NULL,
+    live_time TEXT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS predictions(

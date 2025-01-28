@@ -8,4 +8,5 @@ export type Match = {
     datetime: string,
     season: number,
     gameweek: number
+    live_time: string | null
 }

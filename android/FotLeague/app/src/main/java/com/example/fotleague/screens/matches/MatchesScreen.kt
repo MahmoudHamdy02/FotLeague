@@ -205,7 +205,8 @@ private fun MatchesContentPreview() {
                         matchStatus = 1,
                         datetime = "2024-08-16T19:00:00.000Z",
                         season = 0,
-                        gameweek = 1
+                        gameweek = 1,
+                        liveTime = "90'"
                     )
                 )
             ),

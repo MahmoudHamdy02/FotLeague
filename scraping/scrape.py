@@ -17,6 +17,8 @@ def initialize(matches, season):
             status = 3
         elif match["status"]["cancelled"]:
             status = 4
+
+        live_time = match["liveTime"]["short"] if "liveTime" in match else None
         
         matchesJSON.append({
             "gameweek": match["round"],
@@ -26,7 +28,8 @@ def initialize(matches, season):
             "home_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[0].strip(),
             "away_score": 0 if "scoreStr" not in match["status"] else match["status"]["scoreStr"].split("-")[1].strip(),
             "datetime": match["status"]["utcTime"],
-            "match_status": status
+            "match_status": status,
+            "live_time": live_time
         })
     # Send to backend
     print(requests.post(f"http://backend:3000/matches/init", json={"matches": matchesJSON}))
@@ -85,6 +88,8 @@ while True:
         else:
             status = 1
 
+        live_time = updatedMatch["liveTime"]["short"] if "liveTime" in updatedMatch else None
+
         # Get game score if it has started
         if status == 2 or status == 3 and updatedMatch["status"]["scoreStr"]:
             home_score = int(updatedMatch["status"]["scoreStr"].split("-")[0].strip())
@@ -100,8 +105,9 @@ while True:
         except ValueError:
             updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format_ms)
         matchDateTime = datetime.strptime(match["datetime"], db_date_format)
+
         if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"]:
             print("updating id:", match["id"])
-            requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"]})
+            requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"], "live_time": live_time})
 
     sleep(timeout)

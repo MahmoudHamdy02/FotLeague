@@ -50,6 +50,7 @@ class MatchesViewModel @Inject constructor(
             getScores()
             getMatches()
         } catch (e: Exception) {
+            Log.d("ERROR", e.toString())
             _state.update { state ->
                 state.copy(
                     error = if (e is ConnectException) "Failed to connect to server" else "An error occurred",
@@ -164,7 +165,7 @@ data class MatchesState(
     val scores: List<Score> = emptyList(),
     val predictions: List<Prediction> = emptyList(),
     val predictionDialogOpen: Boolean = false,
-    val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0)
+    val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0, null)
 )
 
 sealed interface MatchesEvent {

@@ -16,5 +16,7 @@ data class Match(
     val matchStatus: Int,
     val datetime: String,
     val season: Int,
-    val gameweek: Int
+    val gameweek: Int,
+    @SerialName("live_time")
+    val liveTime: String?
 )
