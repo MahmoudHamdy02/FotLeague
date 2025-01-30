@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -77,6 +78,7 @@ fun MatchesScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MatchesContent(
     state: MatchesState,
@@ -124,22 +126,23 @@ private fun MatchesContent(
                 )
             }
         } else {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) { index ->
-                MatchesList(
-                    index = index,
-                    matches = state.matches,
-                    predictions = state.predictions,
-                    scores = state.scores,
-                    isLoggedIn = authState.isLoggedIn,
-                    onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
-                    onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) },
-                    onNavigateToAuth = onNavigateToAuth
-                )
+            PullToRefreshBox(isRefreshing = state.isRefreshing, onRefresh = { onEvent(MatchesEvent.Refresh) }) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) { index ->
+                    MatchesList(
+                        index = index,
+                        matches = state.matches,
+                        predictions = state.predictions,
+                        scores = state.scores,
+                        isLoggedIn = authState.isLoggedIn,
+                        onOpenPredictionDialog = { onEvent(MatchesEvent.OpenDialog) },
+                        onSelectMatch = { onEvent(MatchesEvent.SelectMatch(it)) },
+                        onNavigateToAuth = onNavigateToAuth
+                    )
+                }
             }
         }
     }

@@ -33,6 +33,7 @@ class MatchesViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             Log.d("FETCH", "INITIALIZED")
+            _state.update { state -> state.copy(isLoading = true) }
             fetchData()
         }
         viewModelScope.launch {
@@ -44,7 +45,6 @@ class MatchesViewModel @Inject constructor(
     }
 
     private suspend fun fetchData() {
-        _state.update { state -> state.copy(isLoading = true) }
         try {
             getPredictions()
             getScores()
@@ -85,6 +85,11 @@ class MatchesViewModel @Inject constructor(
             is MatchesEvent.SelectMatch -> _state.update { state -> state.copy(selectedMatch = event.match) }
             is MatchesEvent.SubmitPrediction -> submitPrediction()
             MatchesEvent.UpdatePrediction -> updatePrediction()
+            MatchesEvent.Refresh -> viewModelScope.launch {
+                _state.update { state -> state.copy(isRefreshing = true) }
+                fetchData()
+                _state.update { state -> state.copy(isRefreshing = false) }
+            }
         }
     }
 
@@ -165,7 +170,8 @@ data class MatchesState(
     val scores: List<Score> = emptyList(),
     val predictions: List<Prediction> = emptyList(),
     val predictionDialogOpen: Boolean = false,
-    val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0, null)
+    val selectedMatch: Match = Match(0, "", "", 0, 0, 0, "", 0, 0, null),
+    val isRefreshing: Boolean = false
 )
 
 sealed interface MatchesEvent {
@@ -174,4 +180,5 @@ sealed interface MatchesEvent {
     data class SelectMatch(val match: Match) : MatchesEvent
     data object SubmitPrediction : MatchesEvent
     data object UpdatePrediction : MatchesEvent
+    data object Refresh : MatchesEvent
 }
