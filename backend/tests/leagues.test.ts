@@ -4,6 +4,7 @@ import request from "supertest";
 import { pool } from "../db";
 import { resetDB } from "./utils";
 
+// TODO: Organize magic numbers and strings into variables
 
 beforeAll(async () => {
     await resetDB();
@@ -14,7 +15,8 @@ afterAll(async () => {
 });
 
 describe("League System", () => {
-    let cookie: string;
+    let cookie1: string;
+    let cookie2: string;
 
     const newUser = {
         email: "test@gmail.com",
@@ -35,14 +37,18 @@ describe("League System", () => {
     let newLeagueId: number;
 
     beforeAll(async () => {
-        const res = await request(app).post("/auth/signup")
+        const res1 = await request(app).post("/auth/signup")
                 .send(newUser);
-        cookie = res.headers["set-cookie"][0];
+        cookie1 = res1.headers["set-cookie"][0];
+
+        const res2 = await request(app).post("/auth/signup")
+                .send(newUser2);
+        cookie2 = res2.headers["set-cookie"][0];
     });
 
     it("joins new user into the global league", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie);
+                .set("Cookie", cookie1);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(1);
         expect(res.body[0]).toEqual({
@@ -56,7 +62,7 @@ describe("League System", () => {
     it("creates a new league", async () => {
         const res = await request(app).post("/leagues/")
                 .send(newLeague)
-                .set("Cookie", cookie);
+                .set("Cookie", cookie1);
         expect(res.statusCode).toEqual(201);
         expect(typeof res.body.id).toEqual("number");
         expect(typeof res.body.code).toEqual("string");
@@ -67,21 +73,17 @@ describe("League System", () => {
     });
 
     it("joins a new league", async () => {
-        const res = await request(app).post("/auth/signup")
-                .send(newUser2);
-        cookie = res.headers["set-cookie"][0];
-
-        const res2 = await request(app).post("/leagues/join")
+        const res = await request(app).post("/leagues/join")
                 .send({code: newLeagueCode})
-                .set("Cookie", cookie);
-        expect(res2.statusCode).toEqual(201);
-        expect(res2.body.league_id).toEqual(newLeagueId);
-        expect(res2.body.user_id).toEqual(res.body.id);
+                .set("Cookie", cookie2);
+        expect(res.statusCode).toEqual(201);
+        expect(res.body.league_id).toEqual(newLeagueId);
+        expect(res.body.user_id).toEqual(3);
     });
 
     it("returns the two user leagues", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie);
+                .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(2);
         expect(res.body[0]).toEqual({
@@ -101,7 +103,7 @@ describe("League System", () => {
     it("throws an error when joining same league twice", async () => {
         const res = await request(app).post("/leagues/join")
                 .send({code: newLeagueCode})
-                .set("Cookie", cookie);
+                .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("User already in league");
     });
@@ -113,7 +115,7 @@ describe("League System", () => {
             : "111111";
         const res = await request(app).post("/leagues/join")
                 .send({code: wrongCode})
-                .set("Cookie", cookie);
+                .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("No league found");
     });
