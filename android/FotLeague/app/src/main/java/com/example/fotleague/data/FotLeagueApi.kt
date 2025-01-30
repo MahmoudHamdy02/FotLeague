@@ -13,6 +13,7 @@ import com.example.fotleague.models.network.request.CreateLeagueRequest
 import com.example.fotleague.models.network.request.JoinLeagueRequest
 import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import com.example.fotleague.models.network.request.LoginRequest
+import com.example.fotleague.models.network.request.RenameLeagueRequest
 import com.example.fotleague.models.network.request.SignUpRequest
 import com.example.fotleague.models.network.response.GetLeagueDetailsResponse
 import com.example.fotleague.models.network.response.LogoutResponse
@@ -66,6 +67,9 @@ interface FotLeagueApi {
 
     @POST("/leagues/join")
     suspend fun joinLeague(@Body body: JoinLeagueRequest): Response<Unit>
+
+    @POST("/leagues/rename")
+    suspend fun renameLeague(@Body body: RenameLeagueRequest): Response<League>
 
     @POST("/leagues/leave")
     suspend fun leaveLeague(@Body body: LeaveLeagueRequest): Response<LeagueUser>

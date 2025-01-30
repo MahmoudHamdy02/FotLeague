@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.example.fotleague.Screen
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.network.request.LeaveLeagueRequest
+import com.example.fotleague.models.network.request.RenameLeagueRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +27,30 @@ class LeagueSettingsViewModel @Inject constructor(
     private val _state = MutableStateFlow(LeagueSettingsState(args.isLeagueOwner == true))
     val state: StateFlow<LeagueSettingsState> = _state.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            getLeagueDetailsAndUpdateName()
+        }
+    }
+
     fun onEvent(event: LeagueSettingsEvent) {
         when (event) {
+            LeagueSettingsEvent.OpenRenameLeagueDialog -> _state.update {
+                it.copy(isRenameLeagueDialogOpen = true)
+            }
+
+            LeagueSettingsEvent.CloseRenameLeagueDialog -> _state.update {
+                it.copy(isRenameLeagueDialogOpen = false)
+            }
+
+            is LeagueSettingsEvent.SetRenamedLeagueName -> _state.update {
+                it.copy(renamedLeagueName = event.name)
+            }
+
+            LeagueSettingsEvent.RenameLeague -> {
+                viewModelScope.launch { renameLeague() }
+            }
+
             LeagueSettingsEvent.LeaveLeague -> {
                 viewModelScope.launch { leaveLeague() }
             }
@@ -62,6 +85,27 @@ class LeagueSettingsViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getLeagueDetailsAndUpdateName() {
+        val leagueDetailsResponse = api.getLeagueDetails(args.leagueId)
+        val leagueDetailsBody = leagueDetailsResponse.body()
+        if (leagueDetailsResponse.isSuccessful && leagueDetailsBody != null) {
+            _state.update { state ->
+                state.copy(renamedLeagueName = leagueDetailsBody.league.name)
+            }
+        }
+    }
+
+    private suspend fun renameLeague() {
+        val leagueDetailsResponse =
+            api.renameLeague(RenameLeagueRequest(args.leagueId, _state.value.renamedLeagueName))
+        val leagueDetailsBody = leagueDetailsResponse.body()
+        if (leagueDetailsResponse.isSuccessful && leagueDetailsBody != null) {
+            _state.update { state ->
+                state.copy(leagueLeft = true)
+            }
+        }
+    }
+
     private suspend fun leaveLeague() {
         val leagueDetailsResponse = api.leaveLeague(LeaveLeagueRequest(args.leagueId))
         val leagueDetailsBody = leagueDetailsResponse.body()
@@ -85,12 +129,18 @@ class LeagueSettingsViewModel @Inject constructor(
 
 data class LeagueSettingsState(
     val isLeagueOwner: Boolean,
+    val renamedLeagueName: String = "",
+    val isRenameLeagueDialogOpen: Boolean = false,
     val leagueLeft: Boolean = false,
     val isLeaveLeagueDialogOpen: Boolean = false,
     val isDeleteLeagueDialogOpen: Boolean = false
 )
 
 sealed interface LeagueSettingsEvent {
+    data object OpenRenameLeagueDialog : LeagueSettingsEvent
+    data object CloseRenameLeagueDialog : LeagueSettingsEvent
+    data class SetRenamedLeagueName(val name: String) : LeagueSettingsEvent
+    data object RenameLeague : LeagueSettingsEvent
     data object LeaveLeague : LeagueSettingsEvent
     data object DeleteLeague : LeagueSettingsEvent
     data object OpenLeaveLeagueDialog : LeagueSettingsEvent

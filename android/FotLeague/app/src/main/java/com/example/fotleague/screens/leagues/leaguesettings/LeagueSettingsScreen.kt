@@ -39,6 +39,7 @@ import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.screens.leagues.components.ConfirmDeleteLeagueDialog
 import com.example.fotleague.screens.leagues.components.ConfirmLeaveLeagueDialog
+import com.example.fotleague.screens.leagues.components.RenameLeagueDialog
 import com.example.fotleague.ui.components.RowButton
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
@@ -89,7 +90,7 @@ private fun LeagueSettingsContent(
         RowButton(
             icon = Icons.Default.Edit,
             text = "Rename league",
-            onClick = {}
+            onClick = { onEvent(LeagueSettingsEvent.OpenRenameLeagueDialog) }
         )
         HorizontalDivider()
         RowButton(
@@ -111,6 +112,15 @@ private fun LeagueSettingsContent(
                 onClick = { onEvent(LeagueSettingsEvent.OpenLeaveLeagueDialog) }
             )
         }
+    }
+
+    if (state.isRenameLeagueDialogOpen) {
+        RenameLeagueDialog(
+            name = state.renamedLeagueName,
+            setName = { onEvent(LeagueSettingsEvent.SetRenamedLeagueName(it)) },
+            onRenameClick = { onEvent(LeagueSettingsEvent.RenameLeague) },
+            onDismiss = { onEvent(LeagueSettingsEvent.CloseRenameLeagueDialog) }
+        )
     }
 
     if (state.isLeaveLeagueDialogOpen) {
