@@ -100,6 +100,37 @@ describe("League System", () => {
         });
     });
 
+    it("renames a league", async () => {
+        const res = await request(app).post("/leagues/rename")
+                .send({leagueId: newLeagueId, name: "Renamed Test League"})
+                .set("Cookie", cookie1);
+        expect(typeof res.body.id).toEqual("number");
+        expect(typeof res.body.code).toEqual("string");
+        expect(res.body.id).toEqual(newLeagueId);
+        expect(res.body.code.length).toEqual(6);
+        expect(res.body.code).toEqual(newLeagueCode);
+        expect(res.body.name).toEqual("Renamed Test League");
+    });
+
+    it("updates renamed league to other members", async () => {
+        const res = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie2);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(2);
+        expect(res.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
+        expect(res.body[1]).toEqual({
+            id: newLeagueId,
+            name: "Renamed Test League",
+            owner_id: 2,
+            code: newLeagueCode
+        });
+    });
+
     it("throws an error when joining same league twice", async () => {
         const res = await request(app).post("/leagues/join")
                 .send({code: newLeagueCode})

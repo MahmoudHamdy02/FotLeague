@@ -107,6 +107,26 @@ export const getLeagueDetailsById = async (req: Request, res: Response) => {
     }
 };
 
+export const renameLeague = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { leagueId, name } = req.body;
+    if (!validate([leagueId, name], ["number", "string"], res)) return;
+
+    try {
+        const league = await leagueService.getLeagueById(leagueId);
+
+        if (!league) return res.status(400).json({error: "No league found"});
+
+        if (league.owner_id !== userId) return res.status(400).json({error: "Can't rename league: unauthorized"});
+
+        const renamedLeague = await leagueService.renameLeague(leagueId, name);
+
+        res.status(200).json(renamedLeague);
+    } catch (error) {
+        return res.status(400).json({error: "Error renaming league"});
+    }
+};
+
 export const leaveLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { leagueId } = req.body;
