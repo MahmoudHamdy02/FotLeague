@@ -88,7 +88,7 @@ while True:
         else:
             status = 1
 
-        live_time = updatedMatch["liveTime"]["short"] if "liveTime" in updatedMatch else None
+        live_time = updatedMatch["status"]["liveTime"]["short"] if "liveTime" in updatedMatch["status"] else None
 
         # Get game score if it has started
         if status == 2 or status == 3 and updatedMatch["status"]["scoreStr"]:
@@ -106,8 +106,8 @@ while True:
             updatedMatchDatetime = datetime.strptime(updatedMatch["status"]["utcTime"], fotmob_date_format_ms)
         matchDateTime = datetime.strptime(match["datetime"], db_date_format)
 
-        if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"]:
+        if status != match["match_status"] or home_score != match["home_score"] or updatedMatchDatetime != matchDateTime or away_score != match["away_score"] or match["live_time"] != live_time:
             print("updating id:", match["id"])
-            requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"], "live_time": live_time})
+            requests.post(f"{backend}/matches/update", json={"matchId": match["id"], "status": status, "homeScore": home_score, "awayScore": away_score, "datetime": updatedMatch["status"]["utcTime"], "liveTime": live_time})
 
     sleep(timeout)
