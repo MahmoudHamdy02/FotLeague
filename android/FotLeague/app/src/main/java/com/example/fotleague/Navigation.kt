@@ -143,10 +143,44 @@ fun Navigation() {
         navigation<Screen.AuthGraph>(
             startDestination = Screen.Auth.Login
         ) {
-            composable<Screen.Auth.Login> {
+            composable<Screen.Auth.Login>(
+                enterTransition = {
+                    if (this.initialState.destination.hasRoute(Screen.Auth.Signup::class)) {
+                        slideIntoContainer(
+                            animationSpec = tween(500),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    } else {
+                        EnterTransition.None
+                    }
+                },
+                exitTransition = {
+                    if (this.targetState.destination.hasRoute(Screen.Auth.Signup::class)) {
+                        slideOutOfContainer(
+                            animationSpec = tween(500),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    } else {
+                        ExitTransition.None
+                    }
+                }
+            ) {
                 LoginScreen(navController = navController)
             }
-            composable<Screen.Auth.Signup> {
+            composable<Screen.Auth.Signup>(
+                enterTransition = {
+                    slideIntoContainer(
+                        animationSpec = tween(500),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        animationSpec = tween(500),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                }
+            ) {
                 SignupScreen(navController = navController)
             }
             composable<Screen.Auth.ForgotPassword> {
@@ -158,14 +192,14 @@ fun Navigation() {
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInAnimation(): EnterTransition {
     return slideIntoContainer(
-        animationSpec = tween(250, easing = EaseOut),
+        animationSpec = tween(1000, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.Start
     )
 }
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutAnimation(): ExitTransition {
     return slideOutOfContainer(
-        animationSpec = tween(250, easing = EaseOut),
+        animationSpec = tween(1000, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.End
     )
 }
