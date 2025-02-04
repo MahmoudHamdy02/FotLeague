@@ -14,6 +14,8 @@ leagueRouter.get("/user/leagues", requireAuth, leagueController.getUserLeagues);
 
 leagueRouter.post("/rename", requireAuth, leagueController.renameLeague);
 
+leagueRouter.post("/generate", requireAuth, leagueController.generateNewLeagueCode);
+
 leagueRouter.post("/leave", requireAuth, leagueController.leaveLeague);
 
 leagueRouter.delete("/:id", requireAuth, leagueController.deleteLeague);

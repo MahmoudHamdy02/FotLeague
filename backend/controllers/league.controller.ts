@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { leagueService } from "../services/league.service";
 import { validate } from "./utils";
+import { LeagueDto } from "../types/LeagueDto";
 
 // Utils
 
@@ -25,16 +26,15 @@ const generateLeagueCode = (length: number): string => {
  * @returns true if the code is valid
  */
 const checkValidCode = async (code: string): Promise<boolean> => {
-    const league = await leagueService.getLeagueByCode(code);
+    const league = await leagueService.getLeagueCodeByCode(code);
     return league === null;
 };
 
-// Route handlers
-export const createLeague = async (req: Request, res: Response) => {
-    const userId = req.authUser.id;
-    const { name } = req.body;
-    if (!validate([name], ["string"], res)) return;
-
+/**
+ * Returns a new league code that is guaranteed to be unused
+ * @returns new unique code
+ */
+const getNewLeagueCode = async (): Promise<string> => {
     // Generate random code
     let code = generateLeagueCode(6);
     let isValid = await checkValidCode(code);
@@ -45,9 +45,28 @@ export const createLeague = async (req: Request, res: Response) => {
         isValid = await checkValidCode(code);
     }
 
+    return code;
+};
+
+// Route handlers
+export const createLeague = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { name } = req.body;
+    if (!validate([name], ["string"], res)) return;
+
+    const code = await getNewLeagueCode();
+
     try {
-        const league = await leagueService.createLeague(name, userId, code);
-        return res.status(201).json(league);
+        const leagueCode = await leagueService.createLeagueCode(code);
+        const league = await leagueService.createLeague(name, userId, leagueCode.id);
+
+        const leagueDto: LeagueDto = {
+            id: league.id,
+            name: league.name,
+            owner_id: league.owner_id,
+            code: leagueCode.code
+        };
+        return res.status(201).json(leagueDto);
     } catch (e) {
         console.log(e);
         return res.status(400).json({error: "Error creating league"});
@@ -81,7 +100,7 @@ export const getUserLeagues = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
 
     try {
-        const leagues = await leagueService.getUserLeagues(userId);
+        const leagues: LeagueDto[] = await leagueService.getUserLeagues(userId);
 
         return res.status(200).json(leagues);
     } catch (error) {
@@ -127,6 +146,36 @@ export const renameLeague = async (req: Request, res: Response) => {
     }
 };
 
+export const generateNewLeagueCode = async (req: Request, res: Response) => {
+    const userId = req.authUser.id;
+    const { leagueId } = req.body;
+    if (!validate([leagueId], ["number"], res)) return;
+
+    try {
+        const league = await leagueService.getLeagueById(leagueId);
+
+        if (!league) return res.status(400).json({error: "No league found"});
+
+        if (league.owner_id !== userId) return res.status(400).json({error: "Can't generate new code: Unauthorized"});
+
+        const code = await getNewLeagueCode();
+
+        const leagueCode = await leagueService.createLeagueCode(code);
+
+        const updatedLeague = await leagueService.updateLeagueCode(league.id, leagueCode.id);
+
+        const leagueDto: LeagueDto = {
+            id: updatedLeague.id,
+            name: updatedLeague.name,
+            owner_id: updatedLeague.owner_id,
+            code: leagueCode.code
+        };
+        return res.status(200).json(leagueDto);
+    } catch (error) {
+        return res.status(400).json({error: "Error generating new league code"});
+    }
+};
+
 export const leaveLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { leagueId } = req.body;
@@ -152,17 +201,25 @@ export const deleteLeague = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     try {
-        console.log(userId, id);
         const leagueId = parseInt(id);
         const league = await leagueService.getLeagueById(leagueId);
-
         if (!league) return res.status(400).json({error: "No league found"});
+
+        const leagueCode = await leagueService.getLeagueCodeById(league.code_id);
+        if (!leagueCode) return res.status(400).json({error: "No league code found"});
 
         if (userId !== league.owner_id) return res.status(401).json({error: "League can only be deleted by its owner"});
 
         const deletedLeague = await leagueService.deleteLeague(leagueId);
 
-        res.status(200).json(deletedLeague);
+        const deletedLeagueDto: LeagueDto = {
+            id: deletedLeague.id,
+            name: deletedLeague.name,
+            owner_id: deletedLeague.owner_id,
+            code: leagueCode.code
+        };
+
+        res.status(200).json(deletedLeagueDto);
     } catch (error) {
         return res.status(400).json({error: "Error deleting league"});
     }

@@ -34,6 +34,7 @@ describe("League System", () => {
         name: "Test League"
     };
     let newLeagueCode: string;
+    let regeneratedLeagueCode: string;
     let newLeagueId: number;
 
     beforeAll(async () => {
@@ -149,5 +150,76 @@ describe("League System", () => {
                 .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("No league found");
+    });
+
+    it("generates a new league code", async () => {
+        const res = await request(app).post("/leagues/generate")
+                .send({leagueId: newLeagueId})
+                .set("Cookie", cookie1);
+        expect(typeof res.body.id).toEqual("number");
+        expect(typeof res.body.name).toEqual("string");
+        expect(typeof res.body.owner_id).toEqual("number");
+        expect(typeof res.body.code).toEqual("string");
+        expect(res.body.id).toEqual(newLeagueId);
+        expect(res.body.code.length).toEqual(6);
+        expect(res.body.code).not.toEqual(newLeagueCode);
+        expect(res.body.name).toEqual("Renamed Test League");
+        regeneratedLeagueCode = res.body.code;
+    });
+
+    it("updates league code for other members", async () => {
+        const res = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie2);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(2);
+        expect(res.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
+        expect(res.body[1]).toEqual({
+            id: newLeagueId,
+            name: "Renamed Test League",
+            owner_id: 2,
+            code: regeneratedLeagueCode
+        });
+    });
+
+    it("deletes a league", async () => {
+        const res = await request(app).delete(`/leagues/${newLeagueId}`)
+                .set("Cookie", cookie1);
+        expect(typeof res.body.id).toEqual("number");
+        expect(typeof res.body.name).toEqual("string");
+        expect(typeof res.body.owner_id).toEqual("number");
+        expect(typeof res.body.code).toEqual("string");
+        expect(res.body.id).toEqual(newLeagueId);
+        expect(res.body.code.length).toEqual(6);
+        expect(res.body.code).toEqual(regeneratedLeagueCode);
+        expect(res.body.name).toEqual("Renamed Test League");
+
+        const res2 = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie1);
+        expect(res2.statusCode).toEqual(200);
+        expect(res2.body.length).toEqual(1);
+        expect(res2.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
+    });
+
+    it("deletes a league for other members", async () => {
+        const res = await request(app).get("/leagues/user/leagues")
+                .set("Cookie", cookie2);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(1);
+        expect(res.body[0]).toEqual({
+            id: 1,
+            name: "global",
+            owner_id: 1,
+            code: "000000"
+        });
     });
 });

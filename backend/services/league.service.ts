@@ -1,14 +1,21 @@
 import { pool } from "../db";
 import { League } from "../types/League";
+import { LeagueCode } from "../types/LeagueCode";
+import { LeagueDto } from "../types/LeagueDto";
 import { LeagueUser } from "../types/LeagueUser";
 import { UserScore } from "../types/UserScore";
 
-export const createLeague = async (name: string, ownerId: number, code: string): Promise<League> => {
+export const createLeagueCode = async (code: string): Promise<LeagueCode> => {
+    const data = await pool.query<LeagueCode>("INSERT INTO league_codes(code) VALUES ($1) RETURNING *;", [code]);
+    return data.rows[0];
+};
+
+export const createLeague = async (name: string, ownerId: number, codeId: number): Promise<League> => {
     const client = await pool.connect();
     try {
         await client.query("BEGIN");
         // Create new league
-        const league = await pool.query<League>("INSERT INTO leagues(name, owner_id, code) VALUES ($1, $2, $3) RETURNING *;", [name, ownerId, code]);
+        const league = await pool.query<League>("INSERT INTO leagues(name, owner_id, code_id) VALUES ($1, $2, $3) RETURNING *;", [name, ownerId, codeId]);
         // Automatically insert user into their league
         await pool.query("INSERT INTO leagues_users(league_id, user_id) VALUES ($1, $2);", [league.rows[0].id, ownerId]);
 
@@ -22,8 +29,22 @@ export const createLeague = async (name: string, ownerId: number, code: string):
     }
 };
 
+export const getLeagueCodeById = async (id: number): Promise<LeagueCode | null> => {
+    const data = await pool.query<LeagueCode>("SELECT * FROM league_codes WHERE id = $1 LIMIT 1;", [id]);
+    return data.rowCount === 1
+        ? data.rows[0]
+        : null;
+};
+
+export const getLeagueCodeByCode = async (code: string): Promise<LeagueCode | null> => {
+    const data = await pool.query<LeagueCode>("SELECT * FROM league_codes WHERE code = $1 LIMIT 1;", [code]);
+    return data.rowCount === 1
+        ? data.rows[0]
+        : null;
+};
+
 export const getLeagueByCode = async (code: string): Promise<League | null> => {
-    const data = await pool.query<League>("SELECT * FROM leagues WHERE code = $1 LIMIT 1;", [code]);
+    const data = await pool.query<League>("SELECT leagues.* FROM leagues JOIN league_codes ON leagues.code_id = league_codes.id WHERE league_codes.code = $1 LIMIT 1;", [code]);
     return data.rowCount === 1
         ? data.rows[0]
         : null;
@@ -51,13 +72,18 @@ export const getLeagueUsersWithScores = async (leagueId: number): Promise<UserSc
     return users.rows;
 };
 
-export const getUserLeagues = async (userId: number): Promise<League[]> => {
-    const leagues = await pool.query<League>("SELECT L.* FROM leagues_users AS LU JOIN leagues AS L ON LU.league_id = L.id WHERE LU.user_id = $1", [userId]);
+export const getUserLeagues = async (userId: number): Promise<LeagueDto[]> => {
+    const leagues = await pool.query<LeagueDto>("SELECT L.id, L.name, L.owner_id, LC.code FROM leagues_users AS LU JOIN leagues AS L ON LU.league_id = L.id JOIN league_codes AS LC ON L.code_id = LC.id WHERE LU.user_id = $1", [userId]);
     return leagues.rows;
 };
 
-export const renameLeague = async (leagueId: number, name: string): Promise<League> => {
-    const league = await pool.query<League>("UPDATE leagues SET name = $1 WHERE id = $2 RETURNING *;", [name, leagueId]);
+export const renameLeague = async (leagueId: number, name: string): Promise<LeagueDto> => {
+    const league = await pool.query<LeagueDto>("WITH updated_league AS (UPDATE leagues SET name = $1 WHERE id = $2 RETURNING *) SELECT L.id, L.name, L.owner_id, LC.code FROM updated_league AS L JOIN league_codes AS LC ON L.code_id = LC.id;", [name, leagueId]);
+    return league.rows[0];
+};
+
+export const updateLeagueCode = async (leagueId: number, codeId: number): Promise<League> => {
+    const league = await pool.query<League>("UPDATE leagues SET code_id = $1 WHERE id = $2 RETURNING *;", [codeId, leagueId]);
     return league.rows[0];
 };
 
