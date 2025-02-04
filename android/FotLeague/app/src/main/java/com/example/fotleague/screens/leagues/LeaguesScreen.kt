@@ -24,6 +24,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,7 +52,9 @@ import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
+import com.example.fotleague.ui.theme.Primary
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaguesScreen(
     viewModel: LeaguesViewModel = hiltViewModel(),
@@ -80,21 +85,36 @@ fun LeaguesScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            LeaguesContent(
-                leagues = state.leagues,
-                onLeagueClick = { navController.navigate(Screen.LeagueDetails(it)) },
-                isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
-                onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
-                code = state.joinLeagueDialogCode,
-                setCode = { viewModel.onEvent(LeaguesEvent.SetJoinLeagueDialogCode(it)) },
-                onJoinClick = { viewModel.onEvent(LeaguesEvent.JoinLeague) },
-                isCreateLeagueDialogOpen = state.isCreateLeagueDialogOpen,
-                onDismissCreateLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseCreateLeagueDialog) },
-                name = state.createLeagueDialogName,
-                setName = { viewModel.onEvent(LeaguesEvent.SetCreateLeagueDialogName(it)) },
-                onCreateClick = { viewModel.onEvent(LeaguesEvent.CreateLeague) },
-                isLoggedIn = authState.isLoggedIn
-            )
+            val pullState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.onEvent(LeaguesEvent.Refresh) },
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        state = pullState,
+                        isRefreshing = state.isRefreshing,
+                        color = Primary
+                    )
+                }
+            ) {
+                LeaguesContent(
+                    leagues = state.leagues,
+                    onLeagueClick = { navController.navigate(Screen.LeagueDetails(it)) },
+                    isJoinLeagueDialogOpen = state.isJoinLeagueDialogOpen,
+                    onDismissJoinLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseJoinLeagueDialog) },
+                    code = state.joinLeagueDialogCode,
+                    setCode = { viewModel.onEvent(LeaguesEvent.SetJoinLeagueDialogCode(it)) },
+                    onJoinClick = { viewModel.onEvent(LeaguesEvent.JoinLeague) },
+                    isCreateLeagueDialogOpen = state.isCreateLeagueDialogOpen,
+                    onDismissCreateLeagueDialog = { viewModel.onEvent(LeaguesEvent.CloseCreateLeagueDialog) },
+                    name = state.createLeagueDialogName,
+                    setName = { viewModel.onEvent(LeaguesEvent.SetCreateLeagueDialogName(it)) },
+                    onCreateClick = { viewModel.onEvent(LeaguesEvent.CreateLeague) },
+                    isLoggedIn = authState.isLoggedIn
+                )
+            }
         }
     }
 }
@@ -150,6 +170,7 @@ fun LeaguesContent(
 @Composable
 fun LeaguesList(leagues: List<League>, onLeagueClick: (leagueId: Int) -> Unit) {
     LazyColumn(
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {

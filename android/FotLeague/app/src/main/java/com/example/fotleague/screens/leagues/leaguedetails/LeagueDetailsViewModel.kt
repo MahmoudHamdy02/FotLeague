@@ -43,6 +43,18 @@ class LeagueDetailsViewModel @Inject constructor(
         }
     }
 
+    fun onEvent(event: LeaguesDetailsEvent) {
+        when (event) {
+            LeaguesDetailsEvent.Refresh -> {
+                viewModelScope.launch {
+                    _state.update { state -> state.copy(isRefreshing = true) }
+                    getLeague(args.leagueId)
+                    _state.update { state -> state.copy(isRefreshing = false) }
+                }
+            }
+        }
+    }
+
     private suspend fun getLeague(leagueId: Int) {
         val leagueDetailsResponse = api.getLeagueDetails(leagueId)
         val leagueDetailsBody = leagueDetailsResponse.body()
@@ -61,4 +73,9 @@ class LeagueDetailsViewModel @Inject constructor(
 data class LeagueDetailsState(
     val league: League = League(0, "", 0, ""),
     val userScores: List<UserScore> = emptyList(),
+    val isRefreshing: Boolean = false
 )
+
+sealed interface LeaguesDetailsEvent {
+    data object Refresh : LeaguesDetailsEvent
+}

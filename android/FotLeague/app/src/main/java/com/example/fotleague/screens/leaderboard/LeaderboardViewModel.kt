@@ -63,6 +63,12 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi) :
                     getScores(event.num)
                 }
             }
+
+            LeaderboardEvent.Refresh -> {
+                viewModelScope.launch {
+                    getScores(_state.value.numOfScores)
+                }
+            }
         }
     }
 }
@@ -72,11 +78,13 @@ data class LeaderboardState(
     val error: String? = null,
     val scores: List<UserScore> = emptyList(),
     val isNumOfScoresDropdownExpanded: Boolean = false,
-    val numOfScores: Int = 10
+    val numOfScores: Int = 10,
+    val isRefreshing: Boolean = false
 )
 
 sealed interface LeaderboardEvent {
     data object ExpandNumOfScoresDropdown : LeaderboardEvent
     data object DismissNumOfScoresDropdown : LeaderboardEvent
     data class SelectNumOfScores(val num: Int) : LeaderboardEvent
+    data object Refresh : LeaderboardEvent
 }

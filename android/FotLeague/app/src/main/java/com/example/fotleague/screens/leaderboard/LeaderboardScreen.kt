@@ -20,6 +20,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,7 +45,9 @@ import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
+import com.example.fotleague.ui.theme.Primary
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(
     viewModel: LeaderboardViewModel = hiltViewModel(),
@@ -56,16 +61,31 @@ fun LeaderboardScreen(
         topBar = { TopBar() }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            LeaderboardContent(
-                error = state.error,
-                isLoading = state.isLoading,
-                numOfScores = state.numOfScores,
-                userScores = state.scores,
-                isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
-                onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown) },
-                onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown) },
-                onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it)) }
-            )
+            val pullState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.onEvent(LeaderboardEvent.Refresh) },
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        state = pullState,
+                        isRefreshing = state.isRefreshing,
+                        color = Primary
+                    )
+                }
+            ) {
+                LeaderboardContent(
+                    error = state.error,
+                    isLoading = state.isLoading,
+                    numOfScores = state.numOfScores,
+                    userScores = state.scores,
+                    isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
+                    onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown) },
+                    onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown) },
+                    onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it)) }
+                )
+            }
         }
     }
 }

@@ -106,6 +106,14 @@ class LeaguesViewModel @Inject constructor(
                     }
                 }
             }
+
+            LeaguesEvent.Refresh -> {
+                viewModelScope.launch {
+                    _state.update { state -> state.copy(isRefreshing = true) }
+                    getLeagues()
+                    _state.update { state -> state.copy(isRefreshing = false) }
+                }
+            }
         }
     }
 
@@ -131,7 +139,9 @@ data class LeaguesState(
     val joinLeagueDialogCode: String = "",
 
     val isCreateLeagueDialogOpen: Boolean = false,
-    val createLeagueDialogName: String = ""
+    val createLeagueDialogName: String = "",
+
+    val isRefreshing: Boolean = false
 )
 
 sealed interface LeaguesEvent {
@@ -144,4 +154,6 @@ sealed interface LeaguesEvent {
     data object CloseCreateLeagueDialog : LeaguesEvent
     data class SetCreateLeagueDialogName(val name: String) : LeaguesEvent
     data object CreateLeague : LeaguesEvent
+
+    data object Refresh : LeaguesEvent
 }

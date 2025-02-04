@@ -22,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +49,7 @@ import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
+import com.example.fotleague.ui.theme.Primary
 
 @Composable
 fun MatchesScreen(
@@ -126,7 +129,20 @@ private fun MatchesContent(
                 )
             }
         } else {
-            PullToRefreshBox(isRefreshing = state.isRefreshing, onRefresh = { onEvent(MatchesEvent.Refresh) }) {
+            val pullState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(MatchesEvent.Refresh) },
+                indicator = {
+                  PullToRefreshDefaults.Indicator(
+                      modifier = Modifier.align(Alignment.TopCenter),
+                      state = pullState,
+                      isRefreshing = state.isRefreshing,
+                      color = Primary
+                  )
+                }
+            ) {
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier

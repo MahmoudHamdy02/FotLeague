@@ -32,6 +32,9 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,8 +64,10 @@ import com.example.fotleague.ui.theme.Background
 import com.example.fotleague.ui.theme.DarkGray
 import com.example.fotleague.ui.theme.FotLeagueTheme
 import com.example.fotleague.ui.theme.LightGray
+import com.example.fotleague.ui.theme.Primary
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeagueDetailsScreen(
     viewModel: LeagueDetailsViewModel = hiltViewModel(),
@@ -85,13 +91,28 @@ fun LeagueDetailsScreen(
         }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            LeagueDetailsContent(
-                clipboardManager = clipboardManager,
-                leagueName = state.league.name,
-                ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
-                code = state.league.code,
-                userScores = state.userScores
-            )
+            val pullState = rememberPullToRefreshState()
+            PullToRefreshBox(
+                state = pullState,
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.onEvent(LeaguesDetailsEvent.Refresh) },
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        state = pullState,
+                        isRefreshing = state.isRefreshing,
+                        color = Primary
+                    )
+                }
+            ) {
+                LeagueDetailsContent(
+                    clipboardManager = clipboardManager,
+                    leagueName = state.league.name,
+                    ownerName = state.userScores.find { it.id == state.league.ownerId }?.name ?: "",
+                    code = state.league.code,
+                    userScores = state.userScores
+                )
+            }
         }
     }
 }
