@@ -192,14 +192,14 @@ fun Navigation() {
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideInAnimation(): EnterTransition {
     return slideIntoContainer(
-        animationSpec = tween(1000, easing = EaseOut),
+        animationSpec = tween(250, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.Start
     )
 }
 
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.slideOutAnimation(): ExitTransition {
     return slideOutOfContainer(
-        animationSpec = tween(1000, easing = EaseOut),
+        animationSpec = tween(250, easing = EaseOut),
         towards = AnimatedContentTransitionScope.SlideDirection.End
     )
 }
