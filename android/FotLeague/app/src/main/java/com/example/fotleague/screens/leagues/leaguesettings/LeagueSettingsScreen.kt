@@ -39,6 +39,7 @@ import com.example.fotleague.R
 import com.example.fotleague.Screen
 import com.example.fotleague.screens.leagues.components.ConfirmDeleteLeagueDialog
 import com.example.fotleague.screens.leagues.components.ConfirmLeaveLeagueDialog
+import com.example.fotleague.screens.leagues.components.GenerateNewLeagueCodeDialog
 import com.example.fotleague.screens.leagues.components.RenameLeagueDialog
 import com.example.fotleague.ui.components.RowButton
 import com.example.fotleague.ui.theme.Background
@@ -96,7 +97,7 @@ private fun LeagueSettingsContent(
         RowButton(
             icon = Icons.Default.Replay,
             text = "Generate new code",
-            onClick = {}
+            onClick = { onEvent(LeagueSettingsEvent.OpenGenerateNewLeagueCodeDialog) }
         )
         HorizontalDivider()
         if (state.isLeagueOwner) {
@@ -133,6 +134,13 @@ private fun LeagueSettingsContent(
         ConfirmDeleteLeagueDialog(
             onDeleteLeague = { onEvent(LeagueSettingsEvent.DeleteLeague) },
             onDismiss = { onEvent(LeagueSettingsEvent.CloseDeleteLeagueDialog) }
+        )
+    }
+
+    if (state.isGenerateNewLeagueCodeDialogOpen) {
+        GenerateNewLeagueCodeDialog(
+            onGenerateCode = { onEvent(LeagueSettingsEvent.GenerateNewCode) },
+            onDismiss = { onEvent(LeagueSettingsEvent.CloseGenerateNewLeagueCodeDialog) }
         )
     }
 }

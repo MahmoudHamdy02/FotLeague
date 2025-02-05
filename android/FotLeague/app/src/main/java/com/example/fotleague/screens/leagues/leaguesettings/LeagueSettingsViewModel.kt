@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.example.fotleague.Screen
 import com.example.fotleague.data.FotLeagueApi
+import com.example.fotleague.models.network.request.GenerateNewLeagueCodeRequest
 import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import com.example.fotleague.models.network.request.RenameLeagueRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,14 @@ class LeagueSettingsViewModel @Inject constructor(
 
     fun onEvent(event: LeagueSettingsEvent) {
         when (event) {
+            LeagueSettingsEvent.OpenGenerateNewLeagueCodeDialog -> _state.update {
+                it.copy(isGenerateNewLeagueCodeDialogOpen = true)
+            }
+
+            LeagueSettingsEvent.CloseGenerateNewLeagueCodeDialog -> _state.update {
+                it.copy(isGenerateNewLeagueCodeDialogOpen = false)
+            }
+
             LeagueSettingsEvent.OpenRenameLeagueDialog -> _state.update {
                 it.copy(isRenameLeagueDialogOpen = true)
             }
@@ -49,6 +58,10 @@ class LeagueSettingsViewModel @Inject constructor(
 
             LeagueSettingsEvent.RenameLeague -> {
                 viewModelScope.launch { renameLeague() }
+            }
+
+            LeagueSettingsEvent.GenerateNewCode -> {
+                viewModelScope.launch { generateNewCode() }
             }
 
             LeagueSettingsEvent.LeaveLeague -> {
@@ -106,6 +119,17 @@ class LeagueSettingsViewModel @Inject constructor(
         }
     }
 
+    private suspend fun generateNewCode() {
+        val leagueDetailsResponse = api.generateNewLeagueCode(GenerateNewLeagueCodeRequest(args.leagueId))
+        val leagueDetailsBody = leagueDetailsResponse.body()
+        Log.d("GENERATE", leagueDetailsBody.toString())
+        if (leagueDetailsResponse.isSuccessful && leagueDetailsBody != null) {
+            _state.update { state ->
+                state.copy(leagueLeft = true)
+            }
+        }
+    }
+
     private suspend fun leaveLeague() {
         val leagueDetailsResponse = api.leaveLeague(LeaveLeagueRequest(args.leagueId))
         val leagueDetailsBody = leagueDetailsResponse.body()
@@ -133,7 +157,8 @@ data class LeagueSettingsState(
     val isRenameLeagueDialogOpen: Boolean = false,
     val leagueLeft: Boolean = false,
     val isLeaveLeagueDialogOpen: Boolean = false,
-    val isDeleteLeagueDialogOpen: Boolean = false
+    val isDeleteLeagueDialogOpen: Boolean = false,
+    val isGenerateNewLeagueCodeDialogOpen: Boolean = false
 )
 
 sealed interface LeagueSettingsEvent {
@@ -143,8 +168,11 @@ sealed interface LeagueSettingsEvent {
     data object RenameLeague : LeagueSettingsEvent
     data object LeaveLeague : LeagueSettingsEvent
     data object DeleteLeague : LeagueSettingsEvent
+    data object GenerateNewCode: LeagueSettingsEvent
     data object OpenLeaveLeagueDialog : LeagueSettingsEvent
     data object CloseLeaveLeagueDialog : LeagueSettingsEvent
     data object OpenDeleteLeagueDialog : LeagueSettingsEvent
     data object CloseDeleteLeagueDialog : LeagueSettingsEvent
+    data object OpenGenerateNewLeagueCodeDialog : LeagueSettingsEvent
+    data object CloseGenerateNewLeagueCodeDialog : LeagueSettingsEvent
 }

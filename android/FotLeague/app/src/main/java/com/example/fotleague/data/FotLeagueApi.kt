@@ -10,6 +10,7 @@ import com.example.fotleague.models.User
 import com.example.fotleague.models.UserScore
 import com.example.fotleague.models.network.request.AddOrEditPredictionRequest
 import com.example.fotleague.models.network.request.CreateLeagueRequest
+import com.example.fotleague.models.network.request.GenerateNewLeagueCodeRequest
 import com.example.fotleague.models.network.request.JoinLeagueRequest
 import com.example.fotleague.models.network.request.LeaveLeagueRequest
 import com.example.fotleague.models.network.request.LoginRequest
@@ -70,6 +71,9 @@ interface FotLeagueApi {
 
     @POST("/leagues/rename")
     suspend fun renameLeague(@Body body: RenameLeagueRequest): Response<League>
+
+    @POST("/leagues/generate")
+    suspend fun generateNewLeagueCode(@Body body: GenerateNewLeagueCodeRequest): Response<League>
 
     @POST("/leagues/leave")
     suspend fun leaveLeague(@Body body: LeaveLeagueRequest): Response<LeagueUser>
