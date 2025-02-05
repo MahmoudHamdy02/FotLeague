@@ -203,23 +203,14 @@ export const deleteLeague = async (req: Request, res: Response) => {
     try {
         const leagueId = parseInt(id);
         const league = await leagueService.getLeagueById(leagueId);
-        if (!league) return res.status(400).json({error: "No league found"});
 
-        const leagueCode = await leagueService.getLeagueCodeById(league.code_id);
-        if (!leagueCode) return res.status(400).json({error: "No league code found"});
+        if (!league) return res.status(400).json({error: "No league found"});
 
         if (userId !== league.owner_id) return res.status(401).json({error: "League can only be deleted by its owner"});
 
-        const deletedLeague = await leagueService.deleteLeague(leagueId);
+        await leagueService.deleteLeague(leagueId);
 
-        const deletedLeagueDto: LeagueDto = {
-            id: deletedLeague.id,
-            name: deletedLeague.name,
-            owner_id: deletedLeague.owner_id,
-            code: leagueCode.code
-        };
-
-        res.status(200).json(deletedLeagueDto);
+        res.status(200).json(league);
     } catch (error) {
         return res.status(400).json({error: "Error deleting league"});
     }

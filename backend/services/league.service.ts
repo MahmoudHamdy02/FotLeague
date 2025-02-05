@@ -50,8 +50,8 @@ export const getLeagueByCode = async (code: string): Promise<League | null> => {
         : null;
 };
 
-export const getLeagueById = async (id: number): Promise<League | null> => {
-    const data = await pool.query<League>("SELECT * FROM leagues WHERE id = $1;", [id]);
+export const getLeagueById = async (id: number): Promise<LeagueDto | null> => {
+    const data = await pool.query<LeagueDto>("SELECT L.id, L.name, L.owner_id, LC.code FROM leagues AS L JOIN league_codes AS LC ON L.code_id = LC.id WHERE L.id = $1;", [id]);
     return data.rowCount === 1
         ? data.rows[0]
         : null;
