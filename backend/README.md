@@ -2,16 +2,21 @@
 
 The backend is built using `Express`, `Typescript` and the `pg` client.
 
-## Main Components/Layers
-- `app.ts`: Initializes libraries, database connection and authentication
+## Layers
 - **Routes**: Specify available API routes and their HTTP methods
 - **Middleware**: Enforces authentication for protected routes
 - **Controllers**: Contain business logic and implementations
 - **Services**: Handle database querying and SQL commands
+
+### Other Components
+- **`app.ts`**: Initializes libraries, database connection and authentication
 - **Strategies**: `Passport` implementations for authentication methods
+- **Tests**: Jest integration tests 
 
 
 ## Tests
+
+Tests are run on the test database container when running the development (default) compose file.
 
 To run the `jest` tests, open `sh` inside the container and run the test command:
 
