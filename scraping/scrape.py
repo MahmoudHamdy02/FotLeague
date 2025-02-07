@@ -46,15 +46,19 @@ db_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 # Infinite loop that runs every 5/15 minutes
 while True:
-    # Get token from fotmob website
-    x_fm_req = requests.get('http://46.101.91.154:6006/')
-    token = x_fm_req.json()
-    print(f"{datetime.now()} Getting FotMob data")
-    fotmob = requests.get(url, headers=token)
+    try:
+        # Get token from fotmob website
+        x_fm_req = requests.get('http://46.101.91.154:6006/')
+        token = x_fm_req.json()
+        print(f"{datetime.now()} Getting FotMob data")
+        fotmob = requests.get(url, headers=token)
+    except requests.exceptions.ConnectionError:
+        print(f"{datetime.now()} Couldn't connect")
+        sleep(timeout)
+        continue
     data = json.loads(fotmob.text)
 
     # Ping more frequently if there is an ongoing match
-    # TODO: hasOngoingMatch sometimes returns True even though it should be False
     timeout = 60 * 5 if data["matches"]["hasOngoingMatch"] else 60 * 15
 
     updatedMatches = data["matches"]["allMatches"]
