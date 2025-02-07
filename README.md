@@ -2,6 +2,8 @@
 
 Football game inspired by Fantasy Premier League, where players predict match scores, earn points and compete in leaderboards!
 
+Details on how the app works can be found in [app.md](app.md)
+
 ## Project Structure
 
 The project consists of several modules:

@@ -2,6 +2,8 @@
 
 This Python module regularly scrapes the FotMob website to get live match results, and send the updated data to the backend server.
 
+FBRef and football-data.org were other possible sources for the football data, however FotMob was the simplest and didn't require a lot of data processing.
+
 The `scrape.py` file consists of two main parts:
 
 ### 1. `initialize()`
