@@ -64,31 +64,40 @@ describe("Score System", () => {
 
         // TODO: Refactor into one query?
         // Test setup: 5 matches, 1 exact prediction, 3 correct results, one wrong prediction
+        // Each match is in a separate gameweek
         await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Everton', $1, $2, $3, $4, 2024, 1);", [
             match1.homeScore,
             match1.awayScore,
             match1.status,
             match1.datetime
         ]);
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man City', $1, $2, $3, $4, 2024, 1);", [
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man City', $1, $2, $3, $4, 2024, 2);", [
             match2.homeScore,
             match2.awayScore,
             match2.status,
             match2.datetime
         ]);
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man United', $1, $2, $3, $4, 2024, 1);", [
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Man United', $1, $2, $3, $4, 2024, 3);", [
             match3.homeScore,
             match3.awayScore,
             match3.status,
             match3.datetime
         ]);
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Chelsea', $1, $2, $3, $4, 2024, 1);", [
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Chelsea', $1, $2, $3, $4, 2024, 4);", [
             match4.homeScore,
             match4.awayScore,
             match4.status,
             match4.datetime
         ]);
-        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Arsenal', $1, $2, $3, $4, 2024, 1);", [
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Arsenal', $1, $2, $3, $4, 2024, 5);", [
+            match5.homeScore,
+            match5.awayScore,
+            match5.status,
+            match5.datetime
+        ]);
+
+        // Extra match with no predictions: user should still get 0 gameweek score
+        await pool.query("INSERT INTO matches (home, away, home_score, away_score, match_status, datetime, season, gameweek) VALUES ('Liverpool', 'Arsenal', $1, $2, $3, $4, 2024, 6);", [
             match5.homeScore,
             match5.awayScore,
             match5.status,
@@ -298,5 +307,25 @@ describe("Score System", () => {
         expect(res.statusCode).toEqual(200);
         expect(typeof res.body.score).toEqual("number");
         expect(res.body.score).toEqual(6);
+    });
+
+    it("returns correct gameweek scores", async () => {
+        const res = await request(app).get("/scores/user/gameweeks")
+                .set("Cookie", cookie);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(38);
+        expect(res.body[0].score).toEqual(3);
+        expect(res.body[1].score).toEqual(1);
+        expect(res.body[2].score).toEqual(1);
+        expect(res.body[3].score).toEqual(1);
+        expect(res.body[4].score).toEqual(0);
+        // Gameweeks with no prediction/score return 0
+        for (let i=5; i<38; i++) {
+            expect(res.body[i].score).toEqual(0);
+        }
+        for (let i=0; i<38; i++) {
+            expect(res.body[i].gameweek).toEqual(i+1);
+            expect(res.body[i].user_id).toEqual(user_id);
+        }
     });
 });

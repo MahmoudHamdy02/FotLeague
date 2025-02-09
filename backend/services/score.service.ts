@@ -1,5 +1,6 @@
 import { pool } from "../db";
 import { Score } from "../types/Score";
+import { UserGameweekScore } from "../types/UserGameweekScore";
 import { UserScore } from "../types/UserScore";
 
 export const getTotalUserScoreBySeason = async (userId: number, season: number): Promise<number> => {
@@ -24,6 +25,20 @@ export const getTopGlobalUsersBySeason = async (num: number, season: number): Pr
         ORDER BY score DESC
         LIMIT $2;
     `, [season, num]
+    );
+    return data.rows;
+};
+
+export const getUserGameweekScores = async (userId: number, season: number): Promise<UserGameweekScore[]> => {
+    const data = await pool.query<UserGameweekScore>(
+        `
+        SELECT user_id, gameweek, CAST(SUM(score) AS INTEGER) as score
+        FROM matches LEFT JOIN scores
+        ON scores.match_id = matches.id
+        WHERE scores.user_id = $1 AND matches.season = $2
+        GROUP BY scores.user_id, matches.gameweek
+        ORDER BY matches.gameweek
+    `, [userId, season]
     );
     return data.rows;
 };

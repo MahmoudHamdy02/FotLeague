@@ -6,6 +6,8 @@ export const scoreRouter = Router();
 
 scoreRouter.get("/user", requireAuth, scoreController.getUserScores);
 
+scoreRouter.get("/user/gameweeks", requireAuth, scoreController.getUserGameweekScores);
+
 scoreRouter.get("/user/:season", requireAuth, scoreController.getUserScoresBySeason);
 
 scoreRouter.get("/user/total/:season", requireAuth, scoreController.getTotalUserScoreBySeason);
