@@ -1,6 +1,6 @@
 import { pool } from "../db";
 import { Score } from "../types/Score";
-import { UserGameweekScore } from "../types/UserGameweekScore";
+import { GameweekScore } from "../types/GameweekScore";
 import { UserScore } from "../types/UserScore";
 
 export const getTotalUserScoreBySeason = async (userId: number, season: number): Promise<number> => {
@@ -29,22 +29,22 @@ export const getTopGlobalUsersBySeason = async (num: number, season: number): Pr
     return data.rows;
 };
 
-export const getUserGameweekScores = async (userId: number, season: number): Promise<UserGameweekScore[]> => {
-    const data = await pool.query<UserGameweekScore>(
-        "SELECT user_id, gameweek, CAST(score AS INTEGER) FROM user_gameweek_scores WHERE user_id = $1 AND season = $2", [userId, season]
+export const getUserGameweekScores = async (userId: number, season: number): Promise<GameweekScore[]> => {
+    const data = await pool.query<GameweekScore>(
+        "SELECT gameweek, CAST(score AS INTEGER) FROM user_gameweek_scores WHERE user_id = $1 AND season = $2", [userId, season]
     );
     return data.rows;
 };
 
-export const getHighestGameweekScores = async (season: number): Promise<{gameweek: number, score: number}[]> => {
-    const data = await pool.query<{gameweek: number, score: number}>(
+export const getHighestGameweekScores = async (season: number): Promise<GameweekScore[]> => {
+    const data = await pool.query<GameweekScore>(
         "SELECT gameweek, CAST(MAX(score) AS INTEGER) AS score FROM user_gameweek_scores WHERE season = $1 GROUP BY gameweek ORDER BY gameweek", [season]
     );
     return data.rows;
 };
 
-export const getAverageGameweekScores = async (season: number): Promise<{gameweek: number, score: number}[]> => {
-    const data = await pool.query<{gameweek: number, score: number}>(
+export const getAverageGameweekScores = async (season: number): Promise<GameweekScore[]> => {
+    const data = await pool.query<GameweekScore>(
         "SELECT gameweek, CAST(AVG(score) AS FLOAT) AS score FROM user_gameweek_scores WHERE season = $1 GROUP BY gameweek ORDER BY gameweek", [season]
     );
     return data.rows;
