@@ -1,5 +1,6 @@
 package com.example.fotleague.data
 
+import com.example.fotleague.models.GameweekScore
 import com.example.fotleague.models.League
 import com.example.fotleague.models.LeagueUser
 import com.example.fotleague.models.Match
@@ -52,6 +53,15 @@ interface FotLeagueApi {
 
     @GET("/scores/user")
     suspend fun getUserScores(): Response<List<Score>>
+
+    @GET("/scores/user/gameweeks")
+    suspend fun getUserGameweekScores(): Response<List<GameweekScore>>
+
+    @GET("/scores/highest")
+    suspend fun getHighestGameweekScores(): Response<List<GameweekScore>>
+
+    @GET("/scores/average")
+    suspend fun getAverageGameweekScores(): Response<List<GameweekScore>>
 
     @GET("/scores/global")
     suspend fun getGlobalScores(@Query("num") num: Int): Response<List<UserScore>>

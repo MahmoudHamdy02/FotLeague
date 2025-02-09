@@ -21,6 +21,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -92,6 +93,13 @@ fun LeaderboardScreen(
                     numOfScores = state.numOfScores,
                     userScores = state.scores,
                     isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
+                    selectedGameweek = state.selectedGameweek,
+                    currentGameweek = state.currentGameweek,
+                    averageScore = if (state.isScoreLoading) null else state.averageGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
+                    highestScore = if (state.isScoreLoading) null else state.highestGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
+                    userScore = if (state.isScoreLoading) null else state.userGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
+                    onNextGameweek = { viewModel.onEvent(LeaderboardEvent.SelectNextGameweek) },
+                    onPreviousGameweek = { viewModel.onEvent(LeaderboardEvent.SelectPreviousGameweek) },
                     onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown) },
                     onExpandNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.ExpandNumOfScoresDropdown) },
                     onSelectNumOfScores = { viewModel.onEvent(LeaderboardEvent.SelectNumOfScores(it)) }
@@ -108,6 +116,13 @@ private fun LeaderboardContent(
     numOfScores: Int,
     userScores: List<UserScore>,
     isNumOfScoresDropdownExpanded: Boolean,
+    selectedGameweek: Int,
+    currentGameweek: Int,
+    averageScore: Int?,
+    highestScore: Int?,
+    userScore: Int?,
+    onNextGameweek: () -> Unit,
+    onPreviousGameweek: () -> Unit,
     onDismissNumOfScoresDropdown: () -> Unit,
     onExpandNumOfScoresDropdown: () -> Unit,
     onSelectNumOfScores: (num: Int) -> Unit
@@ -118,7 +133,15 @@ private fun LeaderboardContent(
             .background(color = Background)
             .padding(horizontal = 16.dp, vertical = 24.dp),
     ) {
-        GameweekScores(23)
+        GameweekScores(
+            selectedGameweek,
+            currentGameweek,
+            averageScore,
+            highestScore,
+            userScore,
+            onNextGameweek,
+            onPreviousGameweek
+        )
         Spacer(Modifier.height(24.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -181,7 +204,15 @@ private fun TopBar() {
 }
 
 @Composable
-private fun GameweekScores(gameweek: Int) {
+private fun GameweekScores(
+    selectedGameweek: Int,
+    currentGameweek: Int,
+    averageScore: Int?,
+    highestScore: Int?,
+    userScore: Int?,
+    onNextGameweek: () -> Unit,
+    onPreviousGameweek: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -200,17 +231,22 @@ private fun GameweekScores(gameweek: Int) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.ChevronLeft,
-                tint = Primary,
-                contentDescription = "Previous gameweek"
-            )
-            Text(text = "Gameweek $gameweek", fontWeight = FontWeight.Medium)
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                tint = Primary,
-                contentDescription = "Previous gameweek"
-            )
+            IconButton(onClick = onPreviousGameweek, enabled = selectedGameweek != 1) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    tint = if (selectedGameweek != 1) Primary else Gray,
+                    contentDescription = "Previous gameweek"
+                )
+            }
+            Text(text = "Gameweek $selectedGameweek", fontWeight = FontWeight.Medium)
+            IconButton(onClick = onNextGameweek, enabled = selectedGameweek < currentGameweek) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    tint = if (selectedGameweek < currentGameweek) Primary else Gray,
+                    contentDescription = "Previous gameweek"
+                )
+            }
+
         }
         // Scores
         Row(
@@ -223,11 +259,16 @@ private fun GameweekScores(gameweek: Int) {
             ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ScoreCard("Average", 36)
+            ScoreCard("Average", averageScore)
             VerticalDivider(modifier = Modifier.height(50.dp), color = Color(0xFF555555))
-            ScoreCard("Your Score", 39, 2, Brush.verticalGradient(listOf(Primary, PrimaryDark)))
+            ScoreCard(
+                "Your Score",
+                userScore,
+                2,
+                Brush.verticalGradient(listOf(Primary, PrimaryDark))
+            )
             VerticalDivider(modifier = Modifier.height(50.dp), color = Color(0xFF555555))
-            ScoreCard("Highest", 44)
+            ScoreCard("Highest", highestScore)
         }
     }
 }
@@ -235,7 +276,7 @@ private fun GameweekScores(gameweek: Int) {
 @Composable
 private fun ScoreCard(
     topText: String,
-    score: Int,
+    score: Int?,
     borderWidth: Int = 1,
     brush: Brush = Brush.verticalGradient(listOf(Gray, DarkGray))
 ) {
@@ -248,7 +289,7 @@ private fun ScoreCard(
                 .border(borderWidth.dp, brush, RoundedCornerShape(8.dp))
                 .padding(8.dp)
         ) {
-            Text(text = score.toString(), fontWeight = FontWeight.Medium, fontSize = 36.sp)
+            Text(text = "${score ?: ""}", fontWeight = FontWeight.Medium, fontSize = 36.sp)
         }
     }
 }
@@ -263,9 +304,16 @@ private fun LeaderboardContentPreview() {
             numOfScores = 10,
             userScores = emptyList(),
             isNumOfScoresDropdownExpanded = false,
+            selectedGameweek = 1,
+            currentGameweek = 1,
+            averageScore = 10,
+            highestScore = 10,
+            userScore = 10,
             onDismissNumOfScoresDropdown = {},
             onExpandNumOfScoresDropdown = {},
-            onSelectNumOfScores = {}
+            onSelectNumOfScores = {},
+            onNextGameweek = {},
+            onPreviousGameweek = {}
         )
     }
 }
