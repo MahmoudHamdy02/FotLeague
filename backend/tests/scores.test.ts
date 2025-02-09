@@ -345,20 +345,12 @@ describe("Score System", () => {
         const res = await request(app).get("/scores/user/gameweeks")
                 .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
-        expect(res.body.length).toEqual(38);
+        expect(res.body.length).toEqual(5);
         expect(res.body[0].score).toEqual(3);
         expect(res.body[1].score).toEqual(1);
         expect(res.body[2].score).toEqual(1);
         expect(res.body[3].score).toEqual(1);
         expect(res.body[4].score).toEqual(0);
-        // Gameweeks with no prediction/score return 0
-        for (let i=5; i<38; i++) {
-            expect(res.body[i].score).toEqual(0);
-        }
-        for (let i=0; i<38; i++) {
-            expect(res.body[i].gameweek).toEqual(i+1);
-            expect(res.body[i].user_id).toEqual(user_id);
-        }
     });
 
     // Sanity check before testing average/max scores

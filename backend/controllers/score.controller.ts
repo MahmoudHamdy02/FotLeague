@@ -50,17 +50,6 @@ export const getUserGameweekScores = async (req: Request, res: Response) => {
 
         const scores = await scoreService.getUserGameweekScores(userId, season);
 
-        let gameweeks = [...Array(39).keys()];
-        gameweeks = gameweeks.filter(gw => gw !== 0);
-
-        scores.forEach(s => {
-            gameweeks = gameweeks.filter(gw => s.gameweek !== gw);
-        });
-
-        for (let i=0; i<gameweeks.length; i++) {
-            scores.push({user_id: userId, gameweek: gameweeks[i], score: 0});
-        }
-
         return res.status(200).json(scores);
     } catch (error) {
         return res.status(400).json({error: "Error getting user gameweek scores"});
