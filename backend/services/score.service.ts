@@ -31,14 +31,21 @@ export const getTopGlobalUsersBySeason = async (num: number, season: number): Pr
 
 export const getUserGameweekScores = async (userId: number, season: number): Promise<UserGameweekScore[]> => {
     const data = await pool.query<UserGameweekScore>(
-        `
-        SELECT user_id, gameweek, CAST(SUM(score) AS INTEGER) as score
-        FROM matches LEFT JOIN scores
-        ON scores.match_id = matches.id
-        WHERE scores.user_id = $1 AND matches.season = $2
-        GROUP BY scores.user_id, matches.gameweek
-        ORDER BY matches.gameweek
-    `, [userId, season]
+        "SELECT user_id, gameweek, CAST(score AS INTEGER) FROM user_gameweek_scores WHERE user_id = $1 AND season = $2", [userId, season]
+    );
+    return data.rows;
+};
+
+export const getHighestGameweekScores = async (season: number): Promise<{gameweek: number, score: number}[]> => {
+    const data = await pool.query<{gameweek: number, score: number}>(
+        "SELECT gameweek, CAST(MAX(score) AS INTEGER) AS score FROM user_gameweek_scores WHERE season = $1 GROUP BY gameweek ORDER BY gameweek", [season]
+    );
+    return data.rows;
+};
+
+export const getAverageGameweekScores = async (season: number): Promise<{gameweek: number, score: number}[]> => {
+    const data = await pool.query<{gameweek: number, score: number}>(
+        "SELECT gameweek, CAST(AVG(score) AS FLOAT) AS score FROM user_gameweek_scores WHERE season = $1 GROUP BY gameweek ORDER BY gameweek", [season]
     );
     return data.rows;
 };

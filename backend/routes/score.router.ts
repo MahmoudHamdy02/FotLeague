@@ -14,3 +14,7 @@ scoreRouter.get("/user/total/:season", requireAuth, scoreController.getTotalUser
 
 // TODO: Needs tests
 scoreRouter.get("/global", scoreController.getTopGlobalUsers);
+
+scoreRouter.get("/highest", scoreController.getHighestGameweekScores);
+
+scoreRouter.get("/average", scoreController.getAverageGameweekScores);

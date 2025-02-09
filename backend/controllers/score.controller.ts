@@ -67,6 +67,32 @@ export const getUserGameweekScores = async (req: Request, res: Response) => {
     }
 };
 
+// Returns highest score in each gameweek
+// Score is null if no score rows are found
+export const getHighestGameweekScores = async (req: Request, res: Response) => {
+    try {
+        const season = await matchService.getCurrentSeason();
+
+        const scores = await scoreService.getHighestGameweekScores(season);
+
+        return res.status(200).json(scores);
+    } catch (error) {
+        return res.status(400).json({error: "Error getting highest gameweek scores"});
+    }
+};
+
+export const getAverageGameweekScores = async (req: Request, res: Response) => {
+    try {
+        const season = await matchService.getCurrentSeason();
+
+        const scores = await scoreService.getAverageGameweekScores(season);
+
+        return res.status(200).json(scores);
+    } catch (error) {
+        return res.status(400).json({error: "Error getting average gameweek scores"});
+    }
+};
+
 export const getTopGlobalUsers = async (req: Request, res: Response) => {
     const num = parseInt((req.query.num ?? "10").toString());
 

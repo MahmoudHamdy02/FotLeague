@@ -63,6 +63,13 @@ CREATE TABLE IF NOT EXISTS scores(
     PRIMARY KEY (user_id, match_id)
 );
 
+CREATE VIEW user_gameweek_scores AS
+SELECT user_id, gameweek, SUM(score) AS score, season
+        FROM matches LEFT JOIN scores
+        ON scores.match_id = matches.id
+        GROUP BY user_id, gameweek, season
+        ORDER BY gameweek;
+
 -- Insert data
 INSERT INTO match_status(match_status) VALUES('upcoming'), ('in progress'), ('played'), ('aborted');
 

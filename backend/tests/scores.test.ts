@@ -16,13 +16,22 @@ afterAll(async () => {
 // TODO: Needs more test, possibly move matches to json files
 describe("Score System", () => {
     let cookie: string;
+    let cookie2: string;
 
     const newUser = {
         email: "test@gmail.com",
         password: "test123",
         name: "testuser"
     };
+    // Second user predicts all matches correctly
+    // Used for average/max score test
+    const newUser2 = {
+        email: "test2@gmail.com",
+        password: "test123",
+        name: "testuser2"
+    };
     let user_id: number;
+    let user_id2: number;
 
     const match1 = {
         homeScore: 3,
@@ -54,12 +63,23 @@ describe("Score System", () => {
         status: 2,
         datetime: "2024-12-14 18:00:00"
     };
+    const matches = [
+        match1,
+        match2,
+        match3,
+        match4,
+        match5
+    ];
 
     beforeAll(async () => {
         const res = await request(app).post("/auth/signup")
                 .send(newUser);
+        const res2 = await request(app).post("/auth/signup")
+                .send(newUser2);
         user_id = res.body.id;
         cookie = res.headers["set-cookie"][0];
+        user_id2 = res2.body.id;
+        cookie2 = res2.headers["set-cookie"][0];
 
 
         // TODO: Refactor into one query?
@@ -149,6 +169,18 @@ describe("Score System", () => {
                     away: 0
                 })
                 .set("Cookie", cookie);
+
+        // Second user correctly predicts all matches
+        for (let i=0; i<5; i++) {
+            await request(app).post("/predictions/")
+                    .send({
+                        user_id: user_id2,
+                        matchId: i+1,
+                        home: matches[i].homeScore,
+                        away: matches[i].awayScore
+                    })
+                    .set("Cookie", cookie2);
+        }
     });
 
     it("returns empty score list for new users", async () => {
@@ -327,5 +359,42 @@ describe("Score System", () => {
             expect(res.body[i].gameweek).toEqual(i+1);
             expect(res.body[i].user_id).toEqual(user_id);
         }
+    });
+
+    // Sanity check before testing average/max scores
+    it("returns correct user 2 scores", async () => {
+        const res = await request(app).get("/scores/user/total/2024")
+                .set("Cookie", cookie2);
+        expect(res.statusCode).toEqual(200);
+        expect(typeof res.body.score).toEqual("number");
+        expect(res.body.score).toEqual(15);
+    });
+
+    it("returns correct highest gameweek scores", async () => {
+        const res = await request(app).get("/scores/highest");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(6);
+        expect(typeof res.body[0].gameweek).toEqual("number");
+        expect(typeof res.body[0].score).toEqual("number");
+        expect(res.body[0].score).toEqual(3);
+        expect(res.body[1].score).toEqual(3);
+        expect(res.body[2].score).toEqual(3);
+        expect(res.body[3].score).toEqual(3);
+        expect(res.body[4].score).toEqual(3);
+        expect(res.body[5].score).toEqual(null);
+    });
+
+    it("returns correct average gameweek scores", async () => {
+        const res = await request(app).get("/scores/average");
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.length).toEqual(6);
+        expect(typeof res.body[0].gameweek).toEqual("number");
+        expect(typeof res.body[0].score).toEqual("number");
+        expect(res.body[0].score).toEqual(3); // 3, 3
+        expect(res.body[1].score).toEqual(2); // 3, 1
+        expect(res.body[2].score).toEqual(2); // 3, 1
+        expect(res.body[3].score).toEqual(2); // 3, 1
+        expect(res.body[4].score).toEqual(1.5); // 3, 0
+        expect(res.body[5].score).toEqual(null);
     });
 });
