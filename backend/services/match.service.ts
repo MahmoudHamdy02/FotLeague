@@ -2,6 +2,10 @@ import { pool } from "../db";
 import { MatchStatus } from "../enums/MatchStatus";
 import { Match } from "../types/Match";
 
+export const getCurrentGameweek = async (): Promise<number> => {
+    const data = await pool.query("SELECT MAX(gameweek) FROM matches WHERE match_status = 3");
+    return data.rows[0].max;
+};
 
 export const getMatchDetails = async (matchId: number): Promise<Match> => {
     const data = await pool.query<Match>("SELECT * FROM matches WHERE id = $1", [matchId]);

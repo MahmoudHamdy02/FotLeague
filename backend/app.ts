@@ -9,6 +9,7 @@ import { leagueRouter } from "./routes/league.router";
 import { matchRouter } from "./routes/match.router";
 import { predictionRouter } from "./routes/prediction.router";
 import { scoreRouter } from "./routes/score.router";
+import { statusRouter } from "./routes/status.router";
 dotenv.config({path: "../.env"});
 
 const app = express();
@@ -45,5 +46,6 @@ app.use("/leagues/", leagueRouter);
 app.use("/matches/", matchRouter);
 app.use("/predictions/", predictionRouter);
 app.use("/scores/", scoreRouter);
+app.use("/current/", statusRouter);
 
 export default app;

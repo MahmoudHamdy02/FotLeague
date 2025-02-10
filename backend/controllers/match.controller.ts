@@ -46,6 +46,17 @@ export const getCurrentSeason = async (req: Request, res: Response) => {
     }
 };
 
+// TODO: Tests
+export const getCurrentGameweek = async (req: Request, res: Response) => {
+    try {
+        const gameweek = await matchService.getCurrentGameweek();
+
+        res.status(200).json(gameweek);
+    } catch (error) {
+        res.status(400).json({error: "Error getting current gameweek"});
+    }
+};
+
 export const initializeMatches = async (req: Request, res: Response) => {
     const { matches } = req.body;
     if (!validate([matches], ["array"], res)) return;
