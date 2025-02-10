@@ -64,11 +64,11 @@ while True:
     updatedMatches = data["matches"]["allMatches"]
     season = data["details"]["latestSeason"]
 
-    currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
+    currentSeason = requests.get(f"{backend}/current/season").json()["currentSeason"]
     if currentSeason is None:
         initialize(updatedMatches, season)
 
-    currentSeason = requests.get(f"{backend}/matches/season/current").json()["currentSeason"]
+    currentSeason = requests.get(f"{backend}/current/season").json()["currentSeason"]
     matches = requests.get(f"{backend}/matches/{currentSeason}").json()
 
     # Get corresponding updated matches for each database match
