@@ -48,7 +48,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.example.fotleague.R
-import com.example.fotleague.models.UserScore
 import com.example.fotleague.ui.components.ScoresTable
 import com.example.fotleague.ui.navigation.BottomNavigation
 import com.example.fotleague.ui.theme.Background
@@ -66,7 +65,8 @@ fun LeaderboardScreen(
     navController: NavHostController,
     navBackStackEntry: NavBackStackEntry?
 ) {
-    val state by viewModel.state.collectAsState()
+    val gameweekScoresState by viewModel.gameweekScoresState.collectAsState()
+    val scoresTableState by viewModel.scoresTableState.collectAsState()
 
     Scaffold(
         bottomBar = { BottomNavigation(navController, navBackStackEntry) },
@@ -76,28 +76,20 @@ fun LeaderboardScreen(
             val pullState = rememberPullToRefreshState()
             PullToRefreshBox(
                 state = pullState,
-                isRefreshing = state.isRefreshing,
+                isRefreshing = scoresTableState.isRefreshing,
                 onRefresh = { viewModel.onEvent(LeaderboardEvent.Refresh) },
                 indicator = {
                     PullToRefreshDefaults.Indicator(
                         modifier = Modifier.align(Alignment.TopCenter),
                         state = pullState,
-                        isRefreshing = state.isRefreshing,
+                        isRefreshing = scoresTableState.isRefreshing,
                         color = Primary
                     )
                 }
             ) {
                 LeaderboardContent(
-                    error = state.error,
-                    isLoading = state.isLoading,
-                    numOfScores = state.numOfScores,
-                    userScores = state.scores,
-                    isNumOfScoresDropdownExpanded = state.isNumOfScoresDropdownExpanded,
-                    selectedGameweek = state.selectedGameweek,
-                    currentGameweek = state.currentGameweek,
-                    averageScore = if (state.isScoreLoading) null else state.averageGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
-                    highestScore = if (state.isScoreLoading) null else state.highestGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
-                    userScore = if (state.isScoreLoading) null else state.userGameweekScores.filter { it.gameweek == state.selectedGameweek }[0].score,
+                    scoresTableState = scoresTableState,
+                    gameweekScoresState = gameweekScoresState,
                     onNextGameweek = { viewModel.onEvent(LeaderboardEvent.SelectNextGameweek) },
                     onPreviousGameweek = { viewModel.onEvent(LeaderboardEvent.SelectPreviousGameweek) },
                     onDismissNumOfScoresDropdown = { viewModel.onEvent(LeaderboardEvent.DismissNumOfScoresDropdown) },
@@ -111,16 +103,8 @@ fun LeaderboardScreen(
 
 @Composable
 private fun LeaderboardContent(
-    error: String?,
-    isLoading: Boolean,
-    numOfScores: Int,
-    userScores: List<UserScore>,
-    isNumOfScoresDropdownExpanded: Boolean,
-    selectedGameweek: Int,
-    currentGameweek: Int,
-    averageScore: Int?,
-    highestScore: Int?,
-    userScore: Int?,
+    gameweekScoresState: GameweekScoresState,
+    scoresTableState: ScoresTableState,
     onNextGameweek: () -> Unit,
     onPreviousGameweek: () -> Unit,
     onDismissNumOfScoresDropdown: () -> Unit,
@@ -134,63 +118,17 @@ private fun LeaderboardContent(
             .padding(horizontal = 16.dp, vertical = 24.dp),
     ) {
         GameweekScores(
-            selectedGameweek,
-            currentGameweek,
-            averageScore,
-            highestScore,
-            userScore,
+            gameweekScoresState,
             onNextGameweek,
             onPreviousGameweek
         )
         Spacer(Modifier.height(24.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Global Scores", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = "Top")
-            Spacer(modifier = Modifier.width(8.dp))
-            Row(
-                modifier = Modifier
-                    .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
-                    .clickable { onExpandNumOfScoresDropdown() }
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = numOfScores.toString(),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.arrow_down_24),
-                    contentDescription = "Copy",
-                    tint = LightGray
-                )
-                DropdownMenu(
-                    expanded = isNumOfScoresDropdownExpanded,
-                    onDismissRequest = onDismissNumOfScoresDropdown,
-                    modifier = Modifier.background(Background)
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "10") },
-                        onClick = { onSelectNumOfScores(10) })
-                    DropdownMenuItem(
-                        text = { Text(text = "20") },
-                        onClick = { onSelectNumOfScores(20) })
-                    DropdownMenuItem(
-                        text = { Text(text = "50") },
-                        onClick = { onSelectNumOfScores(50) })
-                }
-            }
-        }
-        if (error != null) {
-            Text(text = error)
-        } else if (isLoading) {
-            Text(text = "Loading...")
-        } else {
-            ScoresTable(userScores = userScores)
-        }
+        LeaderboardTable(
+            scoresTableState,
+            onDismissNumOfScoresDropdown,
+            onExpandNumOfScoresDropdown,
+            onSelectNumOfScores
+        )
     }
 }
 
@@ -205,11 +143,7 @@ private fun TopBar() {
 
 @Composable
 private fun GameweekScores(
-    selectedGameweek: Int,
-    currentGameweek: Int,
-    averageScore: Int?,
-    highestScore: Int?,
-    userScore: Int?,
+    state: GameweekScoresState,
     onNextGameweek: () -> Unit,
     onPreviousGameweek: () -> Unit
 ) {
@@ -231,18 +165,18 @@ private fun GameweekScores(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onPreviousGameweek, enabled = selectedGameweek != 1) {
+            IconButton(onClick = onPreviousGameweek, enabled = state.isPrevGameweekButtonEnabled) {
                 Icon(
                     imageVector = Icons.Default.ChevronLeft,
-                    tint = if (selectedGameweek != 1) Primary else Gray,
+                    tint = if (state.isPrevGameweekButtonEnabled) Primary else Gray,
                     contentDescription = "Previous gameweek"
                 )
             }
-            Text(text = "Gameweek $selectedGameweek", fontWeight = FontWeight.Medium)
-            IconButton(onClick = onNextGameweek, enabled = selectedGameweek < currentGameweek) {
+            Text(text = "Gameweek ${state.selectedGameweek}", fontWeight = FontWeight.Medium)
+            IconButton(onClick = onNextGameweek, enabled = state.isNextGameweekButtonEnabled) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    tint = if (selectedGameweek < currentGameweek) Primary else Gray,
+                    tint = if (state.isNextGameweekButtonEnabled) Primary else Gray,
                     contentDescription = "Previous gameweek"
                 )
             }
@@ -259,16 +193,16 @@ private fun GameweekScores(
             ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ScoreCard("Average", averageScore)
+            ScoreCard("Average", state.averageScore, fontSize = 30)
             VerticalDivider(modifier = Modifier.height(50.dp), color = Color(0xFF555555))
             ScoreCard(
-                "Your Score",
-                userScore,
-                2,
-                Brush.verticalGradient(listOf(Primary, PrimaryDark))
+                topText = "Your Score",
+                score = state.userScore,
+                borderWidth = 2,
+                brush = Brush.verticalGradient(listOf(Primary, PrimaryDark))
             )
             VerticalDivider(modifier = Modifier.height(50.dp), color = Color(0xFF555555))
-            ScoreCard("Highest", highestScore)
+            ScoreCard("Highest", state.highestScore, fontSize = 30)
         }
     }
 }
@@ -278,7 +212,8 @@ private fun ScoreCard(
     topText: String,
     score: Int?,
     borderWidth: Int = 1,
-    brush: Brush = Brush.verticalGradient(listOf(Gray, DarkGray))
+    brush: Brush = Brush.verticalGradient(listOf(Gray, DarkGray)),
+    fontSize: Int = 36
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -289,8 +224,65 @@ private fun ScoreCard(
                 .border(borderWidth.dp, brush, RoundedCornerShape(8.dp))
                 .padding(8.dp)
         ) {
-            Text(text = "${score ?: ""}", fontWeight = FontWeight.Medium, fontSize = 36.sp)
+            Text(text = "${score ?: "-"}", fontWeight = FontWeight.Medium, fontSize = fontSize.sp)
         }
+    }
+}
+
+@Composable
+private fun LeaderboardTable(
+    state: ScoresTableState,
+    onDismissNumOfScoresDropdown: () -> Unit,
+    onExpandNumOfScoresDropdown: () -> Unit,
+    onSelectNumOfScores: (num: Int) -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = "Global Scores", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "Top")
+        Spacer(modifier = Modifier.width(8.dp))
+        Row(
+            modifier = Modifier
+                .border(1.dp, DarkGray, RoundedCornerShape(4.dp))
+                .clickable { onExpandNumOfScoresDropdown() }
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        ) {
+            Text(
+                text = "${state.numOfScores}",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.arrow_down_24),
+                contentDescription = "Copy",
+                tint = LightGray
+            )
+            DropdownMenu(
+                expanded = state.isNumOfScoresDropdownExpanded,
+                onDismissRequest = onDismissNumOfScoresDropdown,
+                modifier = Modifier.background(Background)
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = "10") },
+                    onClick = { onSelectNumOfScores(10) })
+                DropdownMenuItem(
+                    text = { Text(text = "20") },
+                    onClick = { onSelectNumOfScores(20) })
+                DropdownMenuItem(
+                    text = { Text(text = "50") },
+                    onClick = { onSelectNumOfScores(50) })
+            }
+        }
+    }
+    if (state.error != null) {
+        Text(text = state.error)
+    } else if (state.isLoading) {
+        Text(text = "Loading...")
+    } else {
+        ScoresTable(userScores = state.scores)
     }
 }
 
@@ -299,16 +291,8 @@ private fun ScoreCard(
 private fun LeaderboardContentPreview() {
     FotLeagueTheme {
         LeaderboardContent(
-            error = null,
-            isLoading = false,
-            numOfScores = 10,
-            userScores = emptyList(),
-            isNumOfScoresDropdownExpanded = false,
-            selectedGameweek = 1,
-            currentGameweek = 1,
-            averageScore = 10,
-            highestScore = 10,
-            userScore = 10,
+            scoresTableState = ScoresTableState(),
+            gameweekScoresState = GameweekScoresState(),
             onDismissNumOfScoresDropdown = {},
             onExpandNumOfScoresDropdown = {},
             onSelectNumOfScores = {},

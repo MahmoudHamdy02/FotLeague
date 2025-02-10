@@ -40,6 +40,9 @@ interface FotLeagueApi {
     @GET("/matches/{season}")
     suspend fun getMatches(@Path("season") season: Int): Response<List<Match>>
 
+    @GET("/current/gameweek")
+    suspend fun getCurrentGameweek(): Response<Int>
+
 
     @GET("/predictions/")
     suspend fun getPredictions(): Response<List<Prediction>>

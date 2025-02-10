@@ -3,6 +3,7 @@ package com.example.fotleague.screens.leaderboard
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fotleague.AuthStatus
 import com.example.fotleague.data.FotLeagueApi
 import com.example.fotleague.models.GameweekScore
 import com.example.fotleague.models.UserScore
@@ -15,82 +16,151 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi) :
+class LeaderboardViewModel @Inject constructor(
+    private val api: FotLeagueApi,
+    val authStatus: AuthStatus
+) :
     ViewModel() {
 
-    private val _state = MutableStateFlow(LeaderboardState())
-    val state: StateFlow<LeaderboardState> = _state.asStateFlow()
+    private val _gameweekScoresState = MutableStateFlow(GameweekScoresState())
+    val gameweekScoresState: StateFlow<GameweekScoresState> = _gameweekScoresState.asStateFlow()
+
+    private val _scoresTableState = MutableStateFlow(ScoresTableState())
+    val scoresTableState: StateFlow<ScoresTableState> = _scoresTableState.asStateFlow()
+
+    val authState = authStatus.getAuthState()
+
+    var userScores: List<GameweekScore> = emptyList()
+    var highestScores: List<GameweekScore> = emptyList()
+    var averageScores: List<GameweekScore> = emptyList()
+    var currentGameweek: Int = 1
 
     init {
         viewModelScope.launch {
-            getUserScores()
-            getAverageScores()
-            getHighestScores()
-            getScores(_state.value.numOfScores)
+            getCurrentGameweek()
+            _gameweekScoresState.update { it.copy(selectedGameweek = currentGameweek) }
+            getGameweekScores()
+            getGlobalScores(_scoresTableState.value.numOfScores)
+            authState.collect {
+                if (it.isLoggedIn)
+                    getUserScores()
+            }
         }
     }
 
     fun onEvent(event: LeaderboardEvent) {
         when (event) {
-            LeaderboardEvent.DismissNumOfScoresDropdown -> _state.update {
+            LeaderboardEvent.DismissNumOfScoresDropdown -> _scoresTableState.update {
                 it.copy(isNumOfScoresDropdownExpanded = false)
             }
 
-            LeaderboardEvent.ExpandNumOfScoresDropdown -> _state.update {
+            LeaderboardEvent.ExpandNumOfScoresDropdown -> _scoresTableState.update {
                 it.copy(isNumOfScoresDropdownExpanded = true)
             }
 
             is LeaderboardEvent.SelectNumOfScores -> {
-                _state.update {
+                _scoresTableState.update {
                     it.copy(
                         numOfScores = event.num,
                         isNumOfScoresDropdownExpanded = false
                     )
                 }
                 viewModelScope.launch {
-                    getScores(event.num)
+                    _scoresTableState.update { it.copy(isLoading = true) }
+                    getGlobalScores(event.num)
                 }
             }
 
             LeaderboardEvent.Refresh -> {
                 viewModelScope.launch {
+                    _scoresTableState.update { state -> state.copy(isRefreshing = true) }
+                    getGlobalScores(_scoresTableState.value.numOfScores)
+                    getCurrentGameweek()
                     getUserScores()
-                    getAverageScores()
-                    getHighestScores()
-                    getScores(_state.value.numOfScores)
+                    getGameweekScores()
+                    _scoresTableState.update { state -> state.copy(isRefreshing = false) }
                 }
             }
 
             LeaderboardEvent.SelectNextGameweek -> {
-                _state.update {
-                    it.copy(
-                        selectedGameweek = if (it.selectedGameweek < it.currentGameweek) it.selectedGameweek + 1 else it.selectedGameweek
+                _gameweekScoresState.update {state ->
+                    state.copy(
+                        selectedGameweek = if (state.selectedGameweek < currentGameweek) state.selectedGameweek + 1 else state.selectedGameweek,
+                        averageScore = averageScores.find { it.gameweek == state.selectedGameweek+1 }?.score,
+                        highestScore = highestScores.find { it.gameweek == state.selectedGameweek+1 }?.score,
+                        userScore = userScores.find { it.gameweek == state.selectedGameweek+1 }?.score,
+                        isNextGameweekButtonEnabled = state.selectedGameweek+1 != currentGameweek,
+                        isPrevGameweekButtonEnabled = true
                     )
                 }
             }
 
             LeaderboardEvent.SelectPreviousGameweek -> {
-                _state.update {
-                    it.copy(
-                        selectedGameweek = if (it.selectedGameweek > 1) it.selectedGameweek - 1 else 1
+                _gameweekScoresState.update { state ->
+                    state.copy(
+                        selectedGameweek = if (state.selectedGameweek > 1) state.selectedGameweek - 1 else 1,
+                        averageScore = averageScores.find { it.gameweek == state.selectedGameweek-1 }?.score,
+                        highestScore = highestScores.find { it.gameweek == state.selectedGameweek-1 }?.score,
+                        userScore = userScores.find { it.gameweek == state.selectedGameweek-1 }?.score,
+                        isPrevGameweekButtonEnabled = state.selectedGameweek-1 > 1,
+                        isNextGameweekButtonEnabled = true,
                     )
                 }
             }
         }
     }
 
-    private suspend fun getScores(numOfScores: Int) {
-        try {
-            val scoresResponse = api.getGlobalScores(numOfScores)
-            val scoresBody = scoresResponse.body()
-            if (scoresResponse.isSuccessful && scoresBody != null) {
-                _state.update { state -> state.copy(scores = scoresBody) }
-            }
-        } catch (e: Exception) {
-            _state.update { state ->
+    private suspend fun getCurrentGameweek() {
+        val gameweekResponse = api.getCurrentGameweek()
+        val gameweekBody = gameweekResponse.body()
+        if (gameweekResponse.isSuccessful && gameweekBody != null) {
+            currentGameweek = gameweekBody
+        }
+    }
+
+    private suspend fun getGlobalScores(numOfScores: Int) {
+        val scoresResponse = api.getGlobalScores(numOfScores)
+        val scoresBody = scoresResponse.body()
+        Log.d("SCORE", scoresBody?.get(0)?.score.toString())
+        if (scoresResponse.isSuccessful && scoresBody != null) {
+            _scoresTableState.update { state ->
                 state.copy(
-                    error = "Failed to connect to server",
+                    scores = scoresBody,
                     isLoading = false
+                )
+            }
+        } else {
+            _scoresTableState.update { state ->
+                state.copy(
+                    isLoading = false,
+                    error = "An error occurred"
+                )
+            }
+        }
+    }
+
+    private suspend fun getGameweekScores() {
+        val maxScoresResponse = api.getHighestGameweekScores()
+        val maxScoresBody = maxScoresResponse.body()
+        val avgScoresResponse = api.getAverageGameweekScores()
+        val avgScoresBody = avgScoresResponse.body()
+
+        if (maxScoresResponse.isSuccessful && maxScoresBody != null &&
+            avgScoresResponse.isSuccessful && avgScoresBody != null) {
+            averageScores = avgScoresBody
+            highestScores = maxScoresBody
+            _gameweekScoresState.update { state ->
+                state.copy(
+                    averageScore = averageScores.find { it.gameweek == state.selectedGameweek }?.score,
+                    highestScore = highestScores.find { it.gameweek == state.selectedGameweek }?.score,
+                    isPrevGameweekButtonEnabled = currentGameweek != 1,
+                    isLoading = false
+                )
+            }
+        } else {
+            _gameweekScoresState.update { state ->
+                state.copy(
+                    error = "An error occurred"
                 )
             }
         }
@@ -100,48 +170,29 @@ class LeaderboardViewModel @Inject constructor(private val api: FotLeagueApi) :
         val scoresResponse = api.getUserGameweekScores()
         val scoresBody = scoresResponse.body()
         if (scoresResponse.isSuccessful && scoresBody != null) {
-            Log.d("USR", scoresBody.size.toString())
-            _state.update { state -> state.copy(userGameweekScores = scoresBody) }
-        }
-    }
-
-    private suspend fun getHighestScores() {
-        val scoresResponse = api.getHighestGameweekScores()
-        val scoresBody = scoresResponse.body()
-        if (scoresResponse.isSuccessful && scoresBody != null) {
-            Log.d("MAX", scoresBody.size.toString())
-            val gw = scoresBody.filter { it.score != null }.size
-            _state.update { state ->
-                state.copy(
-                    highestGameweekScores = scoresBody,
-                    currentGameweek = gw,
-                    selectedGameweek = gw,
-                    isScoreLoading = false
-                )
-            }
-        }
-    }
-
-    private suspend fun getAverageScores() {
-        val scoresResponse = api.getAverageGameweekScores()
-        val scoresBody = scoresResponse.body()
-        if (scoresResponse.isSuccessful && scoresBody != null) {
-            Log.d("AVG", scoresBody.size.toString())
-            _state.update { state -> state.copy(averageGameweekScores = scoresBody) }
+            userScores = scoresBody
+            _gameweekScoresState.update { state -> state.copy(
+                userScore = userScores.find { it.gameweek == state.selectedGameweek }?.score
+            ) }
         }
     }
 }
 
-data class LeaderboardState(
+data class GameweekScoresState(
+    val isLoading: Boolean = true,
+    val error: String? = null,
+    val userScore: Int? = null,
+    val highestScore: Int? = null,
+    val averageScore: Int? = null,
+    val selectedGameweek: Int = 1,
+    val isPrevGameweekButtonEnabled: Boolean = false,
+    val isNextGameweekButtonEnabled: Boolean = false,
+)
+
+data class ScoresTableState(
     val isLoading: Boolean = false,
-    val isScoreLoading: Boolean = true,
     val error: String? = null,
     val scores: List<UserScore> = emptyList(),
-    val userGameweekScores: List<GameweekScore> = emptyList(),
-    val highestGameweekScores: List<GameweekScore> = emptyList(),
-    val averageGameweekScores: List<GameweekScore> = emptyList(),
-    val selectedGameweek: Int = 1,
-    val currentGameweek: Int = 1,
     val isNumOfScoresDropdownExpanded: Boolean = false,
     val numOfScores: Int = 10,
     val isRefreshing: Boolean = false
