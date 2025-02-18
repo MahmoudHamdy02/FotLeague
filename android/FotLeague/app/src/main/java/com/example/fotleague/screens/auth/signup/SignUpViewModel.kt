@@ -30,6 +30,7 @@ class SignUpViewModel @Inject constructor(
             is SignUpEvent.SetEmail -> _state.update { state -> state.copy(email = event.email) }
             is SignUpEvent.SetPassword -> _state.update { state -> state.copy(password = event.password) }
             is SignUpEvent.SetUsername -> _state.update { state -> state.copy(username = event.username) }
+            SignUpEvent.TogglePasswordVisibility -> _state.update { state -> state.copy(isPasswordVisible = !state.isPasswordVisible) }
         }
     }
 
@@ -71,6 +72,7 @@ class SignUpViewModel @Inject constructor(
 data class SignUpState(
     val email: String = "",
     val password: String = "",
+    val isPasswordVisible: Boolean = false,
     val username: String = "",
     val onSignup: Boolean = false,
     val isLoading: Boolean = false
@@ -80,5 +82,6 @@ sealed interface SignUpEvent {
     data class SetUsername(val username: String) : SignUpEvent
     data class SetEmail(val email: String) : SignUpEvent
     data class SetPassword(val password: String) : SignUpEvent
+    data object TogglePasswordVisibility : SignUpEvent
     data object SignUp : SignUpEvent
 }

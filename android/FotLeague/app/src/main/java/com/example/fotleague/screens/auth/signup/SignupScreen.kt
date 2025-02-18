@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -69,6 +72,8 @@ fun SignupScreen(
                 email = state.email,
                 setEmail = { viewModel.onEvent(SignUpEvent.SetEmail(it)) },
                 password = state.password,
+                isPasswordVisible = state.isPasswordVisible,
+                togglePasswordVisibility = { viewModel.onEvent(SignUpEvent.TogglePasswordVisibility) },
                 setPassword = { viewModel.onEvent(SignUpEvent.SetPassword(it)) },
                 onSignUpClick = { viewModel.onEvent(SignUpEvent.SignUp) }
             )
@@ -85,6 +90,8 @@ private fun SignupScreenContent(
     email: String,
     setEmail: (String) -> Unit,
     password: String,
+    isPasswordVisible: Boolean,
+    togglePasswordVisibility: () -> Unit,
     setPassword: (String) -> Unit,
     setUsername: (String) -> Unit,
     onSignUpClick: () -> Unit
@@ -121,8 +128,19 @@ private fun SignupScreenContent(
                 onValueChange = { setPassword(it) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = DarkGray),
                 label = { Text(text = "Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    val image = if (isPasswordVisible)
+                        Icons.Filled.Visibility
+                    else Icons.Filled.VisibilityOff
+
+                    val description = if (isPasswordVisible) "Hide password" else "Show password"
+
+                    IconButton(onClick = togglePasswordVisibility) {
+                        Icon(imageVector = image, description)
+                    }
+                }
             )
         }
 
@@ -166,7 +184,9 @@ private fun SignupScreenPreview() {
             setEmail = {},
             password = "",
             setPassword = {},
-            onSignUpClick = {}
+            onSignUpClick = {},
+            isPasswordVisible = false,
+            togglePasswordVisibility = {}
         )
     }
 }
