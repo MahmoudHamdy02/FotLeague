@@ -46,6 +46,7 @@ class MatchesViewModel @Inject constructor(
 
     private suspend fun fetchData() {
         try {
+            getCurrentGameweek()
             getPredictions()
             getScores()
             getMatches()
@@ -134,6 +135,18 @@ class MatchesViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getCurrentGameweek() {
+        val gameweek = api.getCurrentGameweek()
+        val gameweekBody = gameweek.body()
+        if (gameweek.isSuccessful && gameweekBody != null) {
+            _state.update { state ->
+                state.copy(
+                    currentGameweek = gameweekBody,
+                )
+            }
+        }
+    }
+
     private fun submitPrediction() {
         viewModelScope.launch {
             api.addPrediction(
@@ -164,6 +177,7 @@ class MatchesViewModel @Inject constructor(
 data class MatchesState(
     val error: String? = null,
     val isLoading: Boolean = false,
+    val currentGameweek: Int = 1,
     val homePickerState: PickerState = PickerState(),
     val awayPickerState: PickerState = PickerState(),
     val matches: List<Match> = emptyList(),

@@ -40,7 +40,6 @@ import androidx.navigation.NavHostController
 import com.example.fotleague.AuthState
 import com.example.fotleague.Screen
 import com.example.fotleague.models.Match
-import com.example.fotleague.models.MatchStatus
 import com.example.fotleague.screens.matches.components.GameweeksRow
 import com.example.fotleague.screens.matches.components.MatchesList
 import com.example.fotleague.screens.matches.components.SubmitPredictionDialog
@@ -92,13 +91,8 @@ private fun MatchesContent(
     val pagerState = rememberPagerState {
         38
     }
-    LaunchedEffect(state.isLoading) {
-        if (!state.isLoading && state.error == null) {
-            val gameweek =
-                state.matches.filter { it.matchStatus == MatchStatus.Played.num || it.matchStatus == MatchStatus.InProgress.num }
-                    .maxByOrNull { it.datetime }!!.gameweek
-            pagerState.animateScrollToPage(gameweek - 1)
-        }
+    LaunchedEffect(state.currentGameweek) {
+            pagerState.animateScrollToPage(state.currentGameweek)
     }
 
     Column(
