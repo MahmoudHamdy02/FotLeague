@@ -47,8 +47,8 @@ jobs:
             docker pull mahmoudhamdy02/fotleague-backend:latest
             docker pull mahmoudhamdy02/fotleague-scraping:latest
 
-            docker compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yml down
-            docker compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yml up -d
+            docker compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yaml down
+            docker compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yaml up -d
 
             docker image prune -f
 
