@@ -1,6 +1,6 @@
 services:
   backend:
-    image: mahmoudhamdy02/fotleague:backend
+    image: mahmoudhamdy02/fotleague-backend:latest
     expose:
       - 3000
     environment:
@@ -35,7 +35,7 @@ services:
       timeout: 30s
       retries: 15
   python:
-    image: mahmoudhamdy02/fotleague:scraping
+    image: mahmoudhamdy02/fotleague-scraping:latest
     environment:
       - PYTHONUNBUFFERED=1
       - PORT=${PORT}
