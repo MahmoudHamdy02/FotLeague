@@ -2,7 +2,7 @@
 
 Football game inspired by Fantasy Premier League, where players predict match scores, earn points and compete in leaderboards!
 
-Details on how the app works can be found in [app.md](app.md)
+Details on how the app works can be found in the [Android Repository](https://github.com/MahmoudHamdy02/FotLeague-Android)
 
 ## Project Structure
 
