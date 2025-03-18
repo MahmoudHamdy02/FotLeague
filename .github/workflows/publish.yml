@@ -37,3 +37,18 @@ jobs:
           push: true
           tags: mahmoudhamdy02/fotleague-scraping:latest
 
+      - name: Deploy on VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            docker pull mahmoudhamdy02/fotleague-backend:latest
+            docker pull mahmoudhamdy02/fotleague-scraping:latest
+
+            docker-compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yml down
+            docker-compose -f /home/${{ secrets.VPS_USER }}/FotLeague/FotLeague-Backend/docker-compose.prod.yml up -d
+
+            docker image prune -f
+
