@@ -1,11 +1,10 @@
-name: Build and Push Docker Images
+name: Build and Deploy Docker Images to VPS
 on:
   push:
     branches:
       - deploy
 jobs:
   deploy:
-    name: build && push image to docker hub
     runs-on: ubuntu-latest
     
     steps:
@@ -27,8 +26,7 @@ jobs:
           context: ./backend
           file: backend/Dockerfile
           push: true
-          tags: mahmoudhamdy02/fotleague:backend
-          platforms: linux/amd64,linux/arm/v6
+          tags: mahmoudhamdy02/fotleague-backend:latest
 
       - name: build and push scraping
         id: build-push-scraping
@@ -37,6 +35,5 @@ jobs:
           context: ./scraping
           file: scraping/Dockerfile
           push: true
-          tags: mahmoudhamdy02/fotleague:scraping
-          platforms: linux/amd64,linux/arm/v6
+          tags: mahmoudhamdy02/fotleague-scraping:latest
 
