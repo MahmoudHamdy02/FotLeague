@@ -4,7 +4,6 @@ import { MatchStatus } from "../enums/MatchStatus";
 import { Score } from "../types/Score";
 import { predictionService } from "../services/prediction.service";
 import { scoreService } from "../services/score.service";
-import { validate } from "./utils";
 
 /**
  * Calculates the score based on a prediction and the actual match result
@@ -59,8 +58,6 @@ export const getCurrentGameweek = async (req: Request, res: Response) => {
 
 export const initializeMatches = async (req: Request, res: Response) => {
     const { matches } = req.body;
-    if (!validate([matches], ["array"], res)) return;
-
 
     try {
         const _matches = await matchService.insertMatches(matches);
@@ -85,19 +82,6 @@ export const getMatchesBySeason = async (req: Request, res: Response) => {
 // TODO: find better way to validate, liveTime is nullable
 export const updateMatch = async (req: Request, res: Response) => {
     const { matchId, status, homeScore, awayScore, datetime, liveTime } = req.body;
-    if (!validate([
-        matchId,
-        status,
-        homeScore,
-        awayScore,
-        datetime
-    ], [
-        "number",
-        "number",
-        "number",
-        "number",
-        "string"
-    ], res)) return;
 
     try {
         const updatedMatch = await matchService.updateMatch(matchId, status, homeScore, awayScore, datetime, liveTime);
