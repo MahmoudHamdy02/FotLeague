@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { predictionService } from "../services/prediction.service";
-import { validate } from "./utils";
 import { matchService } from "../services/match.service";
 
 export const getUserPredictionsForCurrentSeason = async (req: Request, res: Response) => {
@@ -30,7 +29,6 @@ export const getUserPredictionsBySeason = async (req: Request, res: Response) =>
 export const addPrediction = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { matchId, home, away } = req.body;
-    if (!validate([matchId, home, away], ["number", "number", "number"], res)) return;
 
     try {
         const prediction = await predictionService.addPrediction(userId, matchId, home, away);
@@ -43,7 +41,6 @@ export const addPrediction = async (req: Request, res: Response) => {
 export const updatePrediction = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { matchId, home, away } = req.body;
-    if (!validate([matchId, home, away], ["number", "number", "number"], res)) return;
 
     try {
         const prediction = await predictionService.editPredictionScores(userId, matchId, home, away);
