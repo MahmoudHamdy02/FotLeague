@@ -6,7 +6,6 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
     if (errors.isEmpty()) {
         return next();
     }
-    console.log(req.body);
 
     const errorMsgs = errors.array().map(error => {
         if (error.type == "field")
