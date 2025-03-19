@@ -39,17 +39,17 @@ describe("League System", () => {
 
     beforeAll(async () => {
         const res1 = await request(app).post("/auth/signup")
-                .send(newUser);
+            .send(newUser);
         cookie1 = res1.headers["set-cookie"][0];
 
         const res2 = await request(app).post("/auth/signup")
-                .send(newUser2);
+            .send(newUser2);
         cookie2 = res2.headers["set-cookie"][0];
     });
 
     it("joins new user into the global league", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie1);
+            .set("Cookie", cookie1);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(1);
         expect(res.body[0]).toEqual({
@@ -62,8 +62,8 @@ describe("League System", () => {
 
     it("creates a new league", async () => {
         const res = await request(app).post("/leagues/")
-                .send(newLeague)
-                .set("Cookie", cookie1);
+            .send(newLeague)
+            .set("Cookie", cookie1);
         expect(res.statusCode).toEqual(201);
         expect(typeof res.body.id).toEqual("number");
         expect(typeof res.body.code).toEqual("string");
@@ -75,8 +75,8 @@ describe("League System", () => {
 
     it("joins a new league", async () => {
         const res = await request(app).post("/leagues/join")
-                .send({code: newLeagueCode})
-                .set("Cookie", cookie2);
+            .send({code: newLeagueCode})
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(201);
         expect(res.body.league_id).toEqual(newLeagueId);
         expect(res.body.user_id).toEqual(3);
@@ -84,7 +84,7 @@ describe("League System", () => {
 
     it("returns the two user leagues", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie2);
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(2);
         expect(res.body[0]).toEqual({
@@ -103,8 +103,8 @@ describe("League System", () => {
 
     it("renames a league", async () => {
         const res = await request(app).post("/leagues/rename")
-                .send({leagueId: newLeagueId, name: "Renamed Test League"})
-                .set("Cookie", cookie1);
+            .send({leagueId: newLeagueId, name: "Renamed Test League"})
+            .set("Cookie", cookie1);
         expect(typeof res.body.id).toEqual("number");
         expect(typeof res.body.code).toEqual("string");
         expect(res.body.id).toEqual(newLeagueId);
@@ -115,7 +115,7 @@ describe("League System", () => {
 
     it("updates renamed league to other members", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie2);
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(2);
         expect(res.body[0]).toEqual({
@@ -134,8 +134,8 @@ describe("League System", () => {
 
     it("throws an error when joining same league twice", async () => {
         const res = await request(app).post("/leagues/join")
-                .send({code: newLeagueCode})
-                .set("Cookie", cookie2);
+            .send({code: newLeagueCode})
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("User already in league");
     });
@@ -146,16 +146,16 @@ describe("League System", () => {
             ? "222222"
             : "111111";
         const res = await request(app).post("/leagues/join")
-                .send({code: wrongCode})
-                .set("Cookie", cookie2);
+            .send({code: wrongCode})
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("No league found");
     });
 
     it("generates a new league code", async () => {
         const res = await request(app).post("/leagues/generate")
-                .send({leagueId: newLeagueId})
-                .set("Cookie", cookie1);
+            .send({leagueId: newLeagueId})
+            .set("Cookie", cookie1);
         expect(typeof res.body.id).toEqual("number");
         expect(typeof res.body.name).toEqual("string");
         expect(typeof res.body.owner_id).toEqual("number");
@@ -169,7 +169,7 @@ describe("League System", () => {
 
     it("updates league code for other members", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie2);
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(2);
         expect(res.body[0]).toEqual({
@@ -188,7 +188,7 @@ describe("League System", () => {
 
     it("deletes a league", async () => {
         const res = await request(app).delete(`/leagues/${newLeagueId}`)
-                .set("Cookie", cookie1);
+            .set("Cookie", cookie1);
         expect(typeof res.body.id).toEqual("number");
         expect(typeof res.body.name).toEqual("string");
         expect(typeof res.body.owner_id).toEqual("number");
@@ -199,7 +199,7 @@ describe("League System", () => {
         expect(res.body.name).toEqual("Renamed Test League");
 
         const res2 = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie1);
+            .set("Cookie", cookie1);
         expect(res2.statusCode).toEqual(200);
         expect(res2.body.length).toEqual(1);
         expect(res2.body[0]).toEqual({
@@ -212,7 +212,7 @@ describe("League System", () => {
 
     it("deletes a league for other members", async () => {
         const res = await request(app).get("/leagues/user/leagues")
-                .set("Cookie", cookie2);
+            .set("Cookie", cookie2);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(1);
         expect(res.body[0]).toEqual({

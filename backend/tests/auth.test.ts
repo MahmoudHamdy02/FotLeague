@@ -31,7 +31,7 @@ describe("Auth System", () => {
 
     it("creates a new user", async () => {
         const res = await request(app).post("/auth/signup")
-                .send(newUser);
+            .send(newUser);
         expect(res.statusCode).toEqual(201);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -43,7 +43,7 @@ describe("Auth System", () => {
 
     it("auto logins user after signup", async () => {
         const res = await request(app).get("/auth/status")
-                .set("Cookie", cookie);
+            .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -54,7 +54,7 @@ describe("Auth System", () => {
 
     it("logs out user", async () => {
         const res = await request(app).post("/auth/logout")
-                .set("Cookie", cookie);
+            .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
         expect(res.body.message).toEqual("Logged out");
     });
@@ -67,20 +67,20 @@ describe("Auth System", () => {
 
     it("throws an error when signing up using existing email", async () => {
         const res = await request(app).post("/auth/signup")
-                .send(newUser);
+            .send(newUser);
         expect(res.statusCode).toEqual(400);
         expect(res.body.error).toEqual("Error creating user");
     });
 
     it("throws an error when logging in using wrong credentials", async () => {
         const res = await request(app).post("/auth/login")
-                .send({email: newUser.email, password: "test12"});
+            .send({email: newUser.email, password: "test12"});
         expect(res.statusCode).toEqual(401);
     });
 
     it("logs in user", async () => {
         const res = await request(app).post("/auth/login")
-                .send({email: newUser.email, password: newUser.password, rememberMe: false});
+            .send({email: newUser.email, password: newUser.password, rememberMe: false});
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -91,7 +91,7 @@ describe("Auth System", () => {
 
     it("allows access to protected routes after login", async () => {
         const res = await request(app).get("/auth/status")
-                .set("Cookie", cookie);
+            .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -112,7 +112,7 @@ describe("Reset password", () => {
 
     it("creates a new user", async () => {
         const res = await request(app).post("/auth/signup")
-                .send(newUser);
+            .send(newUser);
         expect(res.statusCode).toEqual(201);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -124,7 +124,7 @@ describe("Reset password", () => {
 
     it("auto logins user after signup", async () => {
         const res = await request(app).get("/auth/status")
-                .set("Cookie", cookie);
+            .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -135,11 +135,11 @@ describe("Reset password", () => {
 
     it("resets user password", async () => {
         const res = await request(app).post("/auth/reset")
-                .set("Cookie", cookie)
-                .send({
-                    oldPassword: newUser.password,
-                    newPassword: newUser.password + "4"
-                });
+            .set("Cookie", cookie)
+            .send({
+                oldPassword: newUser.password,
+                newPassword: newUser.password + "4"
+            });
         expect(res.statusCode).toEqual(200);
     });
 
@@ -151,7 +151,7 @@ describe("Reset password", () => {
 
     it("logs in user with new password", async () => {
         const res = await request(app).post("/auth/login")
-                .send({email: newUser.email, password: newUser.password + "4", rememberMe: false});
+            .send({email: newUser.email, password: newUser.password + "4", rememberMe: false});
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
@@ -162,7 +162,7 @@ describe("Reset password", () => {
 
     it("allows access to protected routes after login", async () => {
         const res = await request(app).get("/auth/status")
-                .set("Cookie", cookie);
+            .set("Cookie", cookie);
         expect(res.statusCode).toEqual(200);
         expect(res.body.email).toEqual(newUser.email);
         expect(res.body.name).toEqual(newUser.name);
