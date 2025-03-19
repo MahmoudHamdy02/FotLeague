@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { leagueService } from "../services/league.service";
-import { validate } from "./utils";
 import { LeagueDto } from "../types/LeagueDto";
 
 // Utils
@@ -52,7 +51,6 @@ const getNewLeagueCode = async (): Promise<string> => {
 export const createLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { name } = req.body;
-    if (!validate([name], ["string"], res)) return;
 
     const code = await getNewLeagueCode();
 
@@ -76,7 +74,6 @@ export const createLeague = async (req: Request, res: Response) => {
 export const joinLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { code } = req.body;
-    if (!validate([code], ["string"], res)) return;
 
     try {
         const league = await leagueService.getLeagueByCode(code);
@@ -129,7 +126,6 @@ export const getLeagueDetailsById = async (req: Request, res: Response) => {
 export const renameLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { leagueId, name } = req.body;
-    if (!validate([leagueId, name], ["number", "string"], res)) return;
 
     try {
         const league = await leagueService.getLeagueById(leagueId);
@@ -149,7 +145,6 @@ export const renameLeague = async (req: Request, res: Response) => {
 export const generateNewLeagueCode = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { leagueId } = req.body;
-    if (!validate([leagueId], ["number"], res)) return;
 
     try {
         const league = await leagueService.getLeagueById(leagueId);
@@ -179,7 +174,6 @@ export const generateNewLeagueCode = async (req: Request, res: Response) => {
 export const leaveLeague = async (req: Request, res: Response) => {
     const userId = req.authUser.id;
     const { leagueId } = req.body;
-    if (!validate([leagueId], ["number"], res)) return;
 
     try {
         const league = await leagueService.getLeagueById(leagueId);

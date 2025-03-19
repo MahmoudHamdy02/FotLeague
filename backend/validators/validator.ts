@@ -1,5 +1,10 @@
 import { param } from "express-validator";
 
+export const id = [
+    param("id")
+        .isInt()
+];
+
 export const season = [
     param("season")
         .isString()
