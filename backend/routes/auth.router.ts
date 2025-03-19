@@ -6,13 +6,8 @@ import { authController } from "../controllers/auth.controller";
 
 export const authRouter = Router();
 
-// TODO: Admin routes/functionality: no. of registered/logged in users, no. of created leagues?
-// TODO: Google OAuth (& twitter/facebook?)
-// TODO: Forgot password
-
 authRouter.get("/status", requireAuth, authController.authStatus);
 
-// TODO: Setup error handling for passport login
 authRouter.post("/login/", passport.authenticate("local"), authController.login);
 
 authRouter.post("/signup/", authController.signup);

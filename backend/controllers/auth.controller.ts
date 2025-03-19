@@ -26,7 +26,6 @@ export const signup = async (req: Request, res: Response) => {
     const { email, password, name } = req.body;
     if (!validate([email, password, name], ["string", "string", "string"], res)) return;
 
-    // TODO: Send back specific errors
     try {
         const user = await userService.createUser(email, password, name, UserRole.User);
 
