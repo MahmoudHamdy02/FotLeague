@@ -74,7 +74,7 @@ describe("Auth System", () => {
 
     it("throws an error when logging in using wrong credentials", async () => {
         const res = await request(app).post("/auth/login")
-            .send({email: newUser.email, password: "test12"});
+            .send({email: newUser.email, password: "test12", rememberMe: false});
         expect(res.statusCode).toEqual(401);
     });
 
