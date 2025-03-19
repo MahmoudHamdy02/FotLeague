@@ -1,11 +1,5 @@
 /* eslint-disable array-bracket-newline */
-import { body, param } from "express-validator";
-
-export const getUserPredictionsBySeason = [
-    param("season")
-        .isString()
-        .isLength({min: 4, max: 4})
-];
+import { body } from "express-validator";
 
 export const addPrediction = [
     body("matchId")

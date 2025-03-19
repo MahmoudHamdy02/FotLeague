@@ -10,10 +10,10 @@ export const authRouter = Router();
 
 authRouter.get("/status", requireAuth, authController.authStatus);
 
-authRouter.post("/login/", authValidator.login, passport.authenticate("local"), authController.login);
+authRouter.post("/login/", authValidator.login, validate, passport.authenticate("local"), authController.login);
 
 authRouter.post("/signup/", authValidator.signup, validate, authController.signup);
 
 authRouter.post("/logout", authController.logout);
 
-authRouter.post("/reset", requireAuth, authValidator.resetPassword, authController.resetPassword);
+authRouter.post("/reset", requireAuth, authValidator.resetPassword, validate, authController.resetPassword);
