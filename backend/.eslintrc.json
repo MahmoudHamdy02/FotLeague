@@ -17,7 +17,7 @@
             {
             "ObjectExpression": "first",
             "CallExpression": {"arguments": "first"},
-            "MemberExpression": 2
+            "MemberExpression": 1
             // "ignoredNodes": [ "JSXAttribute" ]
         }],
         "function-paren-newline": ["error", "consistent"],

@@ -18,7 +18,7 @@ describe("Prediction System", () => {
 
     const newUser = {
         email: "test@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser"
     };
     let user_id: number;

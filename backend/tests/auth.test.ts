@@ -17,7 +17,7 @@ afterAll(async () => {
 describe("Auth System", () => {
     const newUser = {
         email: "test@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser"
     };
 
@@ -104,7 +104,7 @@ describe("Auth System", () => {
 describe("Reset password", () => {
     const newUser = {
         email: "testreset@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuserreset"
     };
 

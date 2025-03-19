@@ -20,14 +20,14 @@ describe("Score System", () => {
 
     const newUser = {
         email: "test@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser"
     };
     // Second user predicts all matches correctly
     // Used for average/max score test
     const newUser2 = {
         email: "test2@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser2"
     };
     let user_id: number;

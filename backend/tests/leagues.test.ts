@@ -20,13 +20,13 @@ describe("League System", () => {
 
     const newUser = {
         email: "test@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser"
     };
 
     const newUser2 = {
         email: "test2@gmail.com",
-        password: "test123",
+        password: "Testpass1!",
         name: "testuser2"
     };
 
